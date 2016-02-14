@@ -10,10 +10,10 @@ class Post(models.Model):
 		(PLAINTEXT, 'Plaintext')
 	)
 
-	ONLY_ME = 'ME',
-	FRIENDS = 'FR',
-	FRIENDS_OF_FRIENDS = 'FF',
-	PUBLIC = 'PB',
+	ONLY_ME = 'ME'
+	FRIENDS = 'FR'
+	FRIENDS_OF_FRIENDS = 'FF'
+	PUBLIC = 'PB'
 	# some more missing here
 	PRIVACY_SETTING_CHOICES = (
 		(ONLY_ME, 'Me'),
