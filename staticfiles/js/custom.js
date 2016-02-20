@@ -1,5 +1,6 @@
 window.onload = function() {
-  alert("HELLO");
+  // alert("HELLO");
+  
   /* Taken from http://jsfiddle.net/raving/2thfaxeu/ Author: raving 02-17-2016 */
   var originalLeave = $.fn.popover.Constructor.prototype.leave;
   $.fn.popover.Constructor.prototype.leave = function(obj){
