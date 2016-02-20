@@ -22,6 +22,8 @@ def public_stream(request):
 
 	return render(request, 'post/mainStream.html', {'posts': posts, 'form':form })
 
-# def my_stream(request):
-# 	posts = Post.objects.filter(author=User.get_username).order_by('date')
-# 	return render(request, 'post/mainStream.html', {'posts': posts})
+def my_stream(request):
+	posts = Post.objects.filter(author=request.user).order_by('date')
+	form = PostForm()
+
+	return render(request, 'post/mainStream.html', {'posts': posts, 'form':form })
