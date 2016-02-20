@@ -3,13 +3,11 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 import django.utils.timezone
-from django.conf import settings
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
@@ -20,7 +18,8 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=200)),
                 ('text', models.TextField()),
                 ('date', models.DateTimeField(default=django.utils.timezone.now)),
-                ('author', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('style', models.CharField(default=b'PT', max_length=2, choices=[(b'MD', b'Markdown'), (b'PT', b'Plaintext')])),
+                ('privacy', models.CharField(default=b'FR', max_length=2, choices=[(b'ME', b'Me'), (b'FR', b'Friends'), (b'FF', b'Friends of Friends'), (b'PB', b'Public')])),
             ],
         ),
     ]

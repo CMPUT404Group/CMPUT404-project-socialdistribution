@@ -25,4 +25,6 @@ Contributors:
     Erin Torbiak
     Abram Hindle
 
-Code was taken & used from : https://github.com/BlackrockDigital/startbootstrap-sb-admin
+Code was taken, used, & modified from : 
+Navbars & Sidebar - https://github.com/BlackrockDigital/startbootstrap-sb-admin
+http://tutorial.djangogirls.org/en/

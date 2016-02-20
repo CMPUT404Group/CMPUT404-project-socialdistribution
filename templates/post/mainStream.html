@@ -1,12 +1,64 @@
 {% extends 'base.html' %}
+{% load myfilters %}
 
 {% block content %}
+
+<div class="row post createPost">
+	<img class="profile-photo-icon img-circle img-responsive img-center pull-right create-post" src="http://placehold.it/50x50">
+
+  <form method="POST" action="/api/posts/">
+  	{% csrf_token %}
+    <div class="panel panel-primary media-body form-group">
+    	<div class="panel-body">
+    		{{ form.title|addAttributes:'{ "class":"form-control create-post", "placeholder":"Title" }' }}
+			<hr class="create-post">
+    		{{ form.content|addAttributes:'{ "class":"form-control create-post", "placeholder":"Enter something here", "rows":5}' }}
+		</div>
+  
+    	<hr class="post-hr">
+
+    	<div class="panel-body">
+			<!-- Privacy Settings -->
+			<div class="btn-group dropup">
+			  <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			    Privacy <span class="caret"></span>
+			  </button>
+			  <ul class="dropdown-menu" data-toggle="buttons">
+			    <li><a href="#">Public</a></li>
+			    <li><a href="#">Only Me</a></li>
+			    <li><a href="#">Friends</a></li>
+			    <li><a href="#">Friends of Friends</a></li>
+			  </ul>
+			</div>
+
+			<!-- Content Type -->
+			<div class="btn-group dropup">
+			  <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			    Type <span class="caret"></span>
+			  </button>
+			  <ul class="dropdown-menu">
+			    <li><a href="#">Plaintext</a></li>
+			    <li><a href="#">Markdown</a></li>
+			  </ul>
+			</div>
+
+			<button type='submit' class='btn btn-primary pull-right'>Post</button>
+    	</div>
+    </div>
+  </form>
+</div>
+
 {% for post in posts %}
 <div class="row post">
-	<img class ="profile-photo-icon img-circle img-responsive img-center pull-left" src='http://placehold.it/50x50' />
+	<img class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/50x50" data-popover="true" data-html=true data-toggle="popover" title="{{ post.author }}" data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"/>
+
     <div class="panel panel-primary media-body">
     	<div class='panel-heading'> {{ post.title }} <span class='date'> {{ post.date }} </span> </div>
-    	<div class='panel-body'> {{ post.text }} </div>
+    	<div class='panel-body'> {{ post.content }} </div>
+    	<hr class='post-hr'>
+    	<div class='panel-body'>
+    		<a href="#" class='comments'> # Comments </a>
+    	</div>
     </div>
 </div>
 {% endfor %}
