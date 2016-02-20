@@ -6,9 +6,9 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ('title', 'content', 'date', 'author', 'privilege', 'content_type')
-        exclude = ['author']
-
-    # def __init__(self, *args, **kwargs):
-    # 	self.author = kwargs.pop('author', '')
-    # 	super(PostForm, self).__init__(*args, **kwargs)
+        fields = ('title', 'content', 'publish_date', 'author', 'privilege', 'content_type')
+        exclude = ['publish_date', 'author']
+        widgets = {
+        	'privilege': forms.RadioSelect,
+        	'content_type': forms.RadioSelect,
+        }

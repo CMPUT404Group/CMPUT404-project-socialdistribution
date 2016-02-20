@@ -26,7 +26,7 @@ class Post(models.Model):
 	author = models.ForeignKey('auth.User')
 	title = models.CharField(max_length=200)
 	content = models.TextField()
-	date = models.DateTimeField(default=timezone.now)
+	publish_date = models.DateTimeField(default=timezone.now)
 	content_type = models.CharField(max_length=2, choices=CONTENT_TYPE_CHOICES, default=PLAINTEXT)
 	privilege = models.CharField(max_length=2, choices=PRIVACY_SETTING_CHOICES, default=FRIENDS)
 	
