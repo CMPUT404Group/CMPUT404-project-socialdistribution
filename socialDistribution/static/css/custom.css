@@ -24,27 +24,14 @@ a.comments {
 
 input.create-post {
     font-weight: 500;
-
-    /* Taken from http://stackoverflow.com/questions/12200544/override-twitter-bootstrap-textbox-glow-and-shadows
-     * Author : jeschafe
-     * 02-17-2016
-     */
-    outline: none;
-    border: none !important;
-    -webkit-box-shadow: none !important;
-    -moz-box-shadow: none !important;
-    box-shadow: none !important;
 }
 
-hr.create-post {
+hr {
     margin-top: 0.25em;
     margin-bottom: 0.25em;
 }
 
-textarea.create-post {
-	font-weight: 200;
-	resize: none;
-
+.inputTheme {
     /* Taken from http://stackoverflow.com/questions/12200544/override-twitter-bootstrap-textbox-glow-and-shadows
      * Author : jeschafe
      * 02-17-2016
@@ -54,9 +41,20 @@ textarea.create-post {
     -webkit-box-shadow: none !important;
     -moz-box-shadow: none !important;
     box-shadow: none !important;
+}
+textarea.create-post {
+	font-weight: 200;
+	resize: none;
 }
 
 img.create-post {
 	margin-left: 0.5em;
 	margin-right: 0;
+}
+
+/* LOGIN */
+div.login {
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
 }

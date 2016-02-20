@@ -1,0 +1,47 @@
+{% load staticfiles %}
+{% load myfilters %}
+
+<!-- skeleton of navbar & sidebar are taken from StartBootstrap : https://github.com/BlackrockDigital/startbootstrap-sb-admin -->
+
+<html>
+	<head>
+		<title> Social Distribution </title>
+		<meta charset='utf'>
+	    <!-- Bootstrap Core CSS -->
+	    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+	    <!-- Custom CSS from startbootstrap theme -->
+	    <link href="{% static 'css/sb-admin.css' %}" rel="stylesheet">
+
+	    <!-- Font Awesome -->
+	    <link href="{% static 'font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+
+		<link rel='stylesheet' href="{% static 'css/custom.css' %}">
+		<script type='text/javascript' src="{% static 'js/custom.js' %}"></script>
+	</head>
+
+	<body>
+
+		<div class='well well-lg login'>
+			<form method="POST" action="{% url 'django.contrib.auth.views.login' %}">
+				{% csrf_token %}
+				{{ form.username.label_tag }}
+    			{{ form.username|addAttributes:'{ "class":"form-control inputTheme" }' }}
+				<br/>
+				{{ form.password.label_tag }}
+    			{{ form.password|addAttributes:'{ "class":"form-control inputTheme" }' }}
+				<br/>
+				<button class='btn btn-primary btn-block' type='submit'> Login </button>
+			</form>
+			<hr>
+			<a href="#"><button class='btn btn-primary btn-block'> Sign Up </button></a>
+
+		</div>
+
+	    <!-- jQuery -->
+	    <script src="{% static 'js/jquery.js' %}"></script>
+
+	    <!-- Bootstrap Core JavaScript -->
+	    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+	</body>
+</html>
