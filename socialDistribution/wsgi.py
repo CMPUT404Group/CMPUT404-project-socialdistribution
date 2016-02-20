@@ -12,7 +12,13 @@ import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "socialDistribution.settings")
 
 from django.core.wsgi import get_wsgi_application
+
 from whitenoise.django import DjangoWhiteNoise
 
-application = get_wsgi_application()
+'''
+dj-static allows you to properly serve static assets 
+from production with a WSGI server: https://pypi.python.org/pypi/dj-static
+''' 
+from dj_static import Cling
+application = Cling(get_wsgi_application())
 application = DjangoWhiteNoise(application)

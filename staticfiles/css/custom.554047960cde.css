@@ -1,0 +1,60 @@
+.date {
+	float: right;
+}
+
+.post {
+	padding: 0.5em;
+}
+
+img.profile-photo-icon {
+	margin-top: 0.5em;
+	margin-right: 0.5em;
+}
+
+hr.post-hr {
+    margin-left: 1em;
+    margin-right: 1em;
+    margin-top: 0em;
+    margin-bottom: 0em;
+}
+
+a.comments {
+	color: grey;
+}
+
+input.create-post {
+    font-weight: 500;
+}
+
+hr {
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+}
+
+.inputTheme {
+    /* Taken from http://stackoverflow.com/questions/12200544/override-twitter-bootstrap-textbox-glow-and-shadows
+     * Author : jeschafe
+     * 02-17-2016
+     */
+    outline: none;
+    border: none !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    box-shadow: none !important;
+}
+textarea.create-post {
+	font-weight: 200;
+	resize: none;
+}
+
+img.create-post {
+	margin-left: 0.5em;
+	margin-right: 0;
+}
+
+/* LOGIN */
+div.login {
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
