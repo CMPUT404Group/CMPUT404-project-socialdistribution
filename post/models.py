@@ -14,7 +14,8 @@ class Author(models.Model):
     author = models.OneToOneField(User, on_delete=models.CASCADE)
     github_name = models.CharField(max_length=40)
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='W')
-
+    def __unicode__(self):
+        return self.author.username
 
 class Post(models.Model):
     TYPE_CHOICES = (
