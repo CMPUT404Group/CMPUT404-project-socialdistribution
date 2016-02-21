@@ -30,6 +30,9 @@ Code was taken & used from : https://github.com/BlackrockDigital/startbootstrap-
 http://www.when2meet.com/?4368216-nLULW
 
 #Note
+
 admin account:
+
 username: admin
+
 password: cmput404admin
