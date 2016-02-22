@@ -10,13 +10,17 @@ from rest_framework.views import APIView
 from django.http import Http404
 from django.contrib.auth.models import User
 from django.utils import timezone
+from rest_framework import generics
 
 # Create your views here.
 
 '''
 Lists all Posts  / Create a new Post
 '''
-class PostList(APIView):
+class PostList(generics.GenericAPIView):
+	serializer_class = PostSerializer
+	queryset = Post.objects.all()
+	
 	def get(self, request, format=None):
 		posts = Post.objects.all()
 		serializer = PostSerializer(posts, many=True)
@@ -40,7 +44,10 @@ class PostList(APIView):
 '''
 Gets a specific Post / Updates a Post / Deletes a Post 
 '''
-class PostDetail(APIView):
+class PostDetail(generics.GenericAPIView):
+	serializer_class = PostSerializer
+	queryset = Post.objects.all()
+
 	def get_object(self, pk):
 		try:
 			return Post.objects.get(pk=pk)
