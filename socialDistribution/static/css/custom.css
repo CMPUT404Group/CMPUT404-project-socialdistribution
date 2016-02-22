@@ -58,3 +58,15 @@ div.login {
     margin-right: auto;
     width: 50%;
 }
+
+
+/* Post Action Icons (edit, delete) */
+div.post-action-icons {
+    width: 25px;
+    padding-left: 5px;
+}
+
+button.action-icon {
+    margin-bottom: 5px;
+    width: 30px;
+}
