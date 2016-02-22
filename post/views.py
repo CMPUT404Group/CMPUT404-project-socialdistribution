@@ -13,7 +13,9 @@ def _helper(posts, request):
 		form = PostForm(request.POST)
 		if form.is_valid():
 			response = PostList.as_view()(request)	# makes post call to API
+			form = PostForm()						# Clear Form after posting
 			# -- TODO : display post success or failure on mainStream.html -- #
+			
 			# print "DEBUG : post - views.py"
 			# post = form.save(commit=False)
 			# post.author = request.user
