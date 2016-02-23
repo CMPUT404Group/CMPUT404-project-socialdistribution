@@ -77,12 +77,11 @@ WSGI_APPLICATION = 'socialDistribution.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
+os.environ['HEROKU_POSTGRESQL_ONYX_URL'] = 'postgres://tvnknuledvfalx:0-4GkPPfTwDuRt60lzD2O6Mvnl@ec2-107-20-136-89.compute-1.amazonaws.com:5432/d42mo6j9qpv6la'
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    'default': dj_database_url.config(default=os.environ['HEROKU_POSTGRESQL_ONYX_URL'])
 }
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
