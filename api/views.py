@@ -24,7 +24,7 @@ class PostList(generics.GenericAPIView):
 	def get(self, request, format=None):
 		posts = Post.objects.all()
 		serializer = PostSerializer(posts, many=True)
-		return Response(serializer.data)
+		return Response({ "posts": serializer.data })
 
 	def post(self, request, format=None):
 		serializer = PostSerializer(data=request.data)
