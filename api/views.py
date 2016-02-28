@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from api.models import Post
-from api.serializers import PostSerializer
+from api.models import Post, Comment
+from api.serializers import PostSerializer, CommentSerializer
 from api.serializers import UserSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -22,7 +22,8 @@ class PostList(generics.GenericAPIView):
 	queryset = Post.objects.all()
 	
 	def get(self, request, format=None):
-		posts = Post.objects.all()
+		# posts = Post.objects.all()
+		posts = Post.objects.filter(visibility='PUBLIC')
 		serializer = PostSerializer(posts, many=True)
 		return Response({ "posts": serializer.data })
 
@@ -31,7 +32,7 @@ class PostList(generics.GenericAPIView):
 		if serializer.is_valid():
 			print "DEBUG : API - views.py - PostList"
 			serializer.validated_data["author"] = request.user
-			serializer.validated_data["publish_date"] = timezone.now()
+			serializer.validated_data["published"] = timezone.now()
 			serializer.save()
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -77,6 +78,32 @@ class PostDetail(generics.GenericAPIView):
 
 
 
+
+'''
+Lists all Posts  / Create a new Post
+'''
+class CommentList(generics.GenericAPIView):
+	serializer_class = CommentSerializer
+	queryset = Comment.objects.all()
+	
+	def get(self, request, post_pk, format=None):
+		comments = Comment.objects.filter(post=post_pk)
+		serializer = CommentSerializer(comments, many=True)
+		return Response({ "comments": serializer.data })
+
+	def post(self, request, post_pk, format=None):
+		serializer = CommentSerializer(data=request.data)
+		if serializer.is_valid():
+			print "DEBUG : API - views.py - CommentList"
+			serializer.validated_data["author"] = request.user
+			serializer.validated_data["published"] = timezone.now()
+			serializer.validated_data["post"] = Post.objects.get(pk=post_pk)
+			serializer.save()
+			return Response(serializer.data, status=status.HTTP_201_CREATED)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+	def perform_create(self, serializer):
+		serializer.save(author=self.request.user)
 
 
 

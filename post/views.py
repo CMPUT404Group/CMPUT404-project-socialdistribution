@@ -29,8 +29,7 @@ def _helper(posts, request):
 
 def public_stream(request):
 	if (request.user.is_authenticated()):
-
-		posts = Post.objects.filter(privilege='PB').order_by('-publish_date')
+		posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
 		return _helper(posts, request)
 
 	else:
@@ -38,9 +37,16 @@ def public_stream(request):
 
 def my_stream(request):
 	if (request.user.is_authenticated()):
-
-		posts = Post.objects.filter(author=request.user).order_by('-publish_date')
+		posts = Post.objects.filter(author=request.user).order_by('-published')
 		return _helper(posts, request)
 
+	else:
+		return HttpResponseRedirect(reverse('accounts_login'))
+
+def post_detail(request, post_pk):
+	if (request.user.is_authenticated()):
+		post = Post.objects.get(pk=post_pk)
+		return render(request, 'post/postDetail.html', {'post': post})
+	
 	else:
 		return HttpResponseRedirect(reverse('accounts_login'))

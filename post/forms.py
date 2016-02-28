@@ -6,9 +6,9 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ('title', 'content', 'publish_date', 'author', 'privilege', 'content_type')
-        exclude = ['publish_date', 'author']
+        fields = ('title', 'content', 'published', 'author', 'visibility', 'contentType')
+        exclude = ['published', 'author']
         widgets = {
-        	'privilege': forms.RadioSelect,
-        	'content_type': forms.RadioSelect,
+        	'visibility': forms.RadioSelect,
+        	'contentType': forms.RadioSelect,
         }

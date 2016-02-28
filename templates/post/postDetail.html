@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load myfilters %}
+
+{% block content %}
+
+<div class="row post">
+	<img class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/50x50" data-popover="true" data-html=true data-toggle="popover" title="{{ post.author }}" data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"/>
+
+    <div class="panel panel-primary media-body">
+    	<div class='panel-heading'> {{ post.title }} <span class='date'> {{ post.published }} </span> </div>
+    	<div class='panel-body'> {{ post.content }} </div>
+    	<hr class='post-hr'>
+    	<div class='panel-body'>
+    		<a href="#" class='comments'> {{ post.comments.count }} Comments </a>
+			<a href='{% url "post_detail" post.id %}' class='pull-right'><i class="fa fa-plus"></i></a>
+    	</div>
+    </div>
+
+	<div class="media-body post-action-icons">
+		<button class="btn btn-default action-icon"><i class="fa fa-pencil-square-o"></i></button>
+		<button class="btn btn-default action-icon"><i class="fa fa-trash-o"></i></button>
+	</div>
+</div>
+
+<div class="comments" id="comments">
+	<h3> Comments: </h3>
+
+	<!-- POST A COMMENT -->
+	<div class="row comment createComment">
+		<form method="POST" action='{{ action }}'> {% csrf_token %}
+			<div class="panel panel-primary media-body form-group">
+				<div class="panel-body">
+				{{ form.comment}}
+				</div>
+
+				<hr class="post-hr">
+
+				<div class="panel-body comment-form-footer">
+					<!-- Content Type -->
+					<div class="btn-group dropup">
+						<button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						Type <span class="caret"></span>
+						</button>
+
+						<ul class="dropdown-menu" data-toggle="buttons">
+							{% for option in form.contentType %}
+							<li>{{ option }}</li>
+							{% endfor %}
+						</ul>
+					</div>
+
+					<button type='submit' class='btn btn-primary btn-sm pull-right'>Comment</button>
+				</div>
+			</div>
+		</form>
+	</div>
+
+	<!-- SHOW COMMENTS -->
+	<!-- TODO : Show comments in reverse order / most recent at the top -->
+	{% for comment in post.comments.all %}
+	<div class="row comment">
+		<img class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/35x35" data-popover="true" data-html=true data-toggle="popover" title="{{ post.author }}" data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"/>
+
+	    <div class="media-body">
+	    	<div> {{ comment.comment }} </div>
+	    	<div class="comment-footer">
+	    		<!-- {# {% if comment.author == user.get_username %} NOT WORKING - only show action-icons if user is the author #} -->
+	    		<button class="btn-default action-icon"><i class="fa fa-pencil-square-o"></i></button>
+				<button class="btn-default action-icon"><i class="fa fa-trash-o"></i></button>
+				<!-- {# {% endif %} #} -->
+				<span class='date'> {{ comment.published }} </span>
+			</div>
+		</div>
+
+	</div>
+	<hr class='comment-hr'>		
+	{% endfor %}
+</div>
+
+
+{% endblock %}

@@ -1,3 +1,7 @@
+body {
+    background-color: white;
+}
+
 .date {
 	float: right;
 }
@@ -16,6 +20,14 @@ hr.post-hr {
     margin-right: 1em;
     margin-top: 0em;
     margin-bottom: 0em;
+}
+
+a.title {
+    color: white;
+}
+
+a.title:hover {
+    color: white;
 }
 
 a.comments {
@@ -60,13 +72,48 @@ div.login {
 }
 
 
-/* Post Action Icons (edit, delete) */
+/* Post/Comment Action Icons (edit, delete) */
 div.post-action-icons {
     width: 25px;
-    padding-left: 5px;
 }
 
 button.action-icon {
-    margin-bottom: 5px;
-    width: 30px;
+    border: none;
+}
+
+
+/* Displaying Comments */
+div.comments {
+    margin-left: 3.5em;
+    margin-right: 30px;
+    margin-top: 1.5em;
+}
+
+hr.comment-hr {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+div.comment {
+    margin-left: 0em;
+    margin-right: 0em;
+}
+
+.comment .date {
+    color: grey;
+}
+
+.comment div {
+    padding-left: 0.25em;
+}
+
+.comment-footer {
+    color: grey;
+    padding-top: 0.5em;
+    padding-bottom: 0.3em;
+}
+
+.comment-form-footer {
+    padding-bottom: 0.6em;
+    padding-top: 0.6em;
 }

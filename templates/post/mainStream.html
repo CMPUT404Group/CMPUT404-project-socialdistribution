@@ -17,14 +17,14 @@
     	<hr class="post-hr">
 
     	<div class="panel-body">
-			<!-- Privacy Settings -->
+			<!-- Privacy/Visibility Settings -->
 			<div class="btn-group dropup">
 			  <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 			    Privacy <span class="caret"></span>
 			  </button>
 
 			  <ul class="dropdown-menu" data-toggle="buttons">
-				{% for option in form.privilege %}
+				{% for option in form.visibility %}
 			  	<li>{{ option }}</li>
 			  	{% endfor %}
 			  </ul>
@@ -37,7 +37,7 @@
 			  </button>
 
 			  <ul class="dropdown-menu" data-toggle="buttons">
-				{% for option in form.content_type %}
+				{% for option in form.contentType %}
 			  	<li>{{ option }}</li>
 			  	{% endfor %}
 			  </ul>
@@ -56,17 +56,18 @@
 	<img class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/50x50" data-popover="true" data-html=true data-toggle="popover" title="{{ post.author }}" data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"/>
 
     <div class="panel panel-primary media-body">
-    	<div class='panel-heading'> {{ post.title }} <span class='date'> {{ post.publish_date }} </span> </div>
+    	<div class='panel-heading'> <a class='title' href='{% url "post_detail" post.id %}'> {{ post.title }} </a> <span class='date'> {{ post.published }} </span> </div>
     	<div class='panel-body'> {{ post.content }} </div>
     	<hr class='post-hr'>
     	<div class='panel-body'>
-    		<a href="#" class='comments'> # Comments </a>
+    		<a href='{% url "post_detail" post.id %}#comments' class='comments'> {{ post.comments.count }} Comments </a>
+			<a href='{% url "post_detail" post.id %}' class='pull-right'><i class="fa fa-plus"></i></a>
     	</div>
     </div>
 
 	<div class="media-body post-action-icons">
-		<button class="btn btn-default btn-sm action-icon"><i class="fa fa-pencil-square-o"></i></button>
-		<button class="btn btn-default btn-sm action-icon"><i class="fa fa-trash-o"></i></button>
+		<button class="btn btn-default action-icon"><i class="fa fa-pencil-square-o"></i></button>
+		<button class="btn btn-default action-icon"><i class="fa fa-trash-o"></i></button>
 	</div>
 </div>
 {% endfor %}
