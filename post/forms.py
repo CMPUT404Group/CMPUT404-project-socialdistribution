@@ -1,14 +1,22 @@
 from django import forms
-from api.models import Post
+from api.models import Post, Comment
 from django.contrib.auth.models import User
 
 class PostForm(forms.ModelForm):
-
     class Meta:
         model = Post
         fields = ('title', 'content', 'published', 'author', 'visibility', 'contentType')
         exclude = ['published', 'author']
         widgets = {
-        	'visibility': forms.RadioSelect,
-        	'contentType': forms.RadioSelect,
+            'visibility': forms.RadioSelect,
+            'contentType': forms.RadioSelect,
+        }
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ('comment', 'contentType', 'published', 'author')
+        exclude = ['published', 'author']
+        widgets = {
+            'contentType': forms.RadioSelect,
         }
