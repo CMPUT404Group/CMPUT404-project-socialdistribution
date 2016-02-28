@@ -25,17 +25,16 @@ Contributors:
     Erin Torbiak
     Abram Hindle
 
-Code was taken, used, & modified from : 
-Navbars & Sidebar - https://github.com/BlackrockDigital/startbootstrap-sb-admin
-http://tutorial.djangogirls.org/en/
-Code was taken & used from : https://github.com/BlackrockDigital/startbootstrap-sb-admin
-  
+Code was taken, used, & modified from : Navbars & Sidebar - https://github.com/BlackrockDigital/startbootstrap-sb-admin
+http://tutorial.djangogirls.org/en/  
+Code was taken & used from : https://github.com/BlackrockDigital/startbootstrap-sb-admin  
+Code was taken & used from : http://stackoverflow.com/questions/5871730/need-a-minimal-django-file-upload-example
+
+group whentomeet:  
 http://www.when2meet.com/?4368216-nLULW
 
 #Note
 
-admin account:
-
-username: admin
-
+<b>admin account:</b>  
+username: admin  
 password: cmput404admin
