@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.forms import ModelForm
 
 # Create your models here.
 # temporarily put all the model in one place
@@ -51,6 +52,12 @@ class Post(models.Model):
     # python3: __str__()
     def __unicode__(self):
         return self.title
+
+
+# for files like images (hopefully will work for posting images)
+class Upload(models.Model):
+    pic = models.ImageField("Image", upload_to="images/")    
+    upload_date=models.DateTimeField(auto_now_add =True)
 
 class Comment(models.Model):
     comment_id = models.AutoField(primary_key=True, unique=True)

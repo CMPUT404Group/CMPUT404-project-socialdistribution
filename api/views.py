@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from api.models import Post, Comment
+from api.models import Post, Comment, Upload
 from api.serializers import PostSerializer, CommentSerializer
 from api.serializers import UserSerializer
 from rest_framework.decorators import api_view
