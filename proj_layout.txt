@@ -1,29 +1,29 @@
 .
-├── api
+├── api                 # backend code for everything
 │   ├── admin.py        # register our models in here
 │   ├── __init__.py
-│   ├── migrations      #don't touch this, right?
-│   ├── models.py       # each model is a database table of info NOT SURE WHICH MODELS FILE TO EDIT EVER
-│   ├── serializers.py  #DO WE CARE??? do we edit this ever?
+│   ├── migrations      # don't touch this, right?
+│   ├── models.py       # each model is a database table of info 
+│   ├── serializers.py  
 │   ├── tests.py        # should prob make some tests
-│   ├── urls.py         #NOT SURE when to put urls in here rather than socialdistribution/urls or post/urls.py?
-│   └── views.py        ##NOT SURE what goes in here vs. what goes in post/views.py?
+│   ├── urls.py         # put urls 
+│   └── views.py        
 ├── db.sqlite3
 ├── example-article.json
 ├── LICENSE
 ├── manage.py
-├── post
+├── post                # front end stuff for our post app
 │   ├── admin.py        # register the models as well as classes for who those with permissions?? (not sure exactly)
-│   ├── forms.py        #html forms that take <input> or have interface elements
+│   ├── forms.py        # html forms that take <input> or have interface elements
 │   ├── __init__.py
-│   ├── migrations      #don't touch this, right?
+│   ├── migrations      # don't touch this, right?
 │   ├── models.py
 │   ├── templatetags   
 │   │   ├── __init__.py
 │   │   └── myfilters.py
-│   ├── tests.py        #should prob make some tests
-│   ├── urls.py         #NOT SURE when to put urls in here rather than api/urls.py?
-│   └── views.py        ##NOT SURE what goes in here vs. what goes in api/views.py?
+│   ├── tests.py        # should prob make some tests
+│   ├── urls.py 
+│   └── views.py        
 ├── Procfile
 ├── project.org
 ├── README.md
