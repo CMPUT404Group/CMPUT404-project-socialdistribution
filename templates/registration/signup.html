@@ -29,21 +29,26 @@
 	<body>
 
 		<div class='well well-lg login'>
-			<form method="POST" action="{% url 'django.contrib.auth.views.login' %}">
-				{% csrf_token %}
-				{{ form.username.label_tag }}
-    			{{ form.username|addAttributes:'{ "class":"form-control inputTheme" }' }}
-				<br/>
-				{{ form.password.label_tag }}
-    			{{ form.password|addAttributes:'{ "class":"form-control inputTheme" }' }}
-				<br/>
-				<button class='btn btn-primary btn-block' type='submit'> Login </button>
-			</form>
+			<h3 class='registration'> <center> Registration </center> </h3>
 			<hr>
-			<a href="{% url 'accounts_signup' %}"><button class='btn btn-primary btn-block'> Sign Up </button></a>
+			<form method="POST" action="">
+				{% csrf_token %}
+				<label>Username:</label>
+    			<input class="form-control inputTheme" name="username" type='text'/>
+				<br/>
+				<label>Password:</label>
+    			<input class="form-control inputTheme" name="password" type='password'/>
+				<br/>
+				<label>Password Confirmation:</label>
+    			<input class="form-control inputTheme" name="password_confirmation" type='password'/>
+				<br/>
+				<label>Email:</label>
+    			<input class="form-control inputTheme" name="email" type='email'/>
+				<br/>
+				<button class='btn btn-primary btn-block' type='submit'> Sign Up </button>
+			</form>
 
 		</div>
-
 	    <!-- jQuery -->
 	    <script src="{% static 'js/jquery.js' %}"></script>
 

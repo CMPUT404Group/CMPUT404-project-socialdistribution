@@ -117,3 +117,8 @@ div.comment {
     padding-bottom: 0.6em;
     padding-top: 0.6em;
 }
+
+/* Registration / Sign Up Page */
+h3.registration {
+    margin-top: 0.5em;
+}
