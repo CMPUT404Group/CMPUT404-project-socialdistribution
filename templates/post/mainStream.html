@@ -65,10 +65,15 @@
     	</div>
     </div>
 
+    {% if post.author == user %}
 	<div class="media-body post-action-icons">
 		<button class="btn btn-default action-icon"><i class="fa fa-pencil-square-o"></i></button>
 		<button class="btn btn-default action-icon delete-post" id='delete-post-{{ post.id }}'><i class="fa fa-trash-o"></i></button>
 	</div>
+	{% else %}
+	<div class="media-body post-action-icons placeholder">
+	</div>
+	{% endif %}
 </div>
 {% endfor %}
 {% endblock %}

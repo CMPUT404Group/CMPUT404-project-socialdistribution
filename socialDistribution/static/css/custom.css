@@ -80,7 +80,9 @@ div.post-action-icons {
 button.action-icon {
     border: none;
 }
-
+div.placeholder {
+    padding: 19px;
+}
 
 /* Displaying Comments */
 div.comments {
