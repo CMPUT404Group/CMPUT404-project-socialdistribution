@@ -7,9 +7,10 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from api.views import PostList, CommentList
 from rest_framework.response import Response
+from django.contrib.auth.models import User
 
 # Create your views here.
-def _postHelper(posts, request):
+def _postHelper(posts, request, template_name):
     if request.method == "POST":
         form = PostForm(request.POST)
         if form.is_valid():
@@ -25,12 +26,12 @@ def _postHelper(posts, request):
     else:
         form = PostForm()
         response = None
-        return render(request, 'post/mainStream.html', {'posts': posts, 'form':form})
+        return render(request, template_name, {'posts': posts, 'form':form})
 
 def public_stream(request):
     if (request.user.is_authenticated()):
         posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
-        return _postHelper(posts, request)
+        return _postHelper(posts, request, 'post/mainStream.html')
 
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
@@ -38,7 +39,7 @@ def public_stream(request):
 def my_stream(request):
     if (request.user.is_authenticated()):
         posts = Post.objects.filter(author=request.user).order_by('-published')
-        return _postHelper(posts, request)
+        return _postHelper(posts, request, 'post/mainStream.html')
 
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
@@ -71,6 +72,39 @@ def post_detail(request, post_pk):
 
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
+
+
+
+def user_profile(request, username):
+    if (request.user.is_authenticated()):
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist as e:
+            # return render(request, "user_profile.html", {'posts': None, 'form': None, 'user_account': None})
+            return render(request, "404_page.html", {'message': "User does not exist."})
+
+        # --- TODO : FILTER POSTS BY VISIBILITY TO LOGGED IN USER --- #
+        posts = Post.objects.filter(author=user).order_by('-published')
+
+        # -- This is the same as _postHelper function but with additional key-value pairs -- #
+        if request.method == "POST":
+            form = PostForm(request.POST)
+            if form.is_valid():
+                response = PostList.as_view()(request)  # makes post call to API
+                form = PostForm() # Clear Form after posting
+
+                # -- TODO : display post success or failure on page -- #
+                return HttpResponseRedirect('/success/')
+        else:
+            form = PostForm()
+            response = None
+            return render(request, "user_profile.html", {'posts': posts, 'form':form, 'user_account':user})
+
+
+    else:
+        return HttpResponseRedirect(reverse('accounts_login'))
+
+
 
 #for image uploads
 def file(request):

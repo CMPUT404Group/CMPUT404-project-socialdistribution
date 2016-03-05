@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load myfilters %}
+
+{% block content %}
+
+<div class="row profile-header">
+	<img class="profile-photo-icon img-circle img-responsive img-center pull-left create-post" src="http://placehold.it/175x175">
+    <div class="media-body" style="padding-left: 3em;">
+    	<!-- Do some logic here : follow, unfollow, accept etc -->
+ 		<button class="btn btn-success pull-right" style="position: relative; top: 1.5em; right: 1.5em;">Follow</button>
+
+    	<h1> {{ user_account.username }} </h1>
+    	<p style="color: grey;"> {{ user_account.email }} </p>
+    </div>
+</div>
+
+{% if user_account == user %}
+<div class="row post createPost">
+  <form method="POST" action='{{ action }}'> {% csrf_token %}
+    <div class="panel panel-primary media-body form-group">
+    	<div class="panel-body">
+    		{{ form.title|addAttributes:'{ "class":"form-control inputTheme", "placeholder":"Title" }' }}
+			<hr class="create-post">
+    		{{ form.content|addAttributes:'{ "class":"form-control inputTheme create-post", "placeholder":"Enter something here", "rows":2}' }}
+		</div>
+  
+    	<hr class="post-hr">
+
+    	<div class="panel-body">
+			<!-- Privacy/Visibility Settings -->
+			<div class="btn-group dropup">
+			  <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			    Privacy <span class="caret"></span>
+			  </button>
+
+			  <ul class="dropdown-menu" data-toggle="buttons">
+				{% for option in form.visibility %}
+			  	<li>{{ option }}</li>
+			  	{% endfor %}
+			  </ul>
+			</div>
+
+			<!-- Content Type -->
+			<div class="btn-group dropup">
+			  <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			    Type <span class="caret"></span>
+			  </button>
+
+			  <ul class="dropdown-menu" data-toggle="buttons">
+				{% for option in form.contentType %}
+			  	<li>{{ option }}</li>
+			  	{% endfor %}
+			  </ul>
+			</div>
+
+			<button type="button" class="btn btn-default"><i class="fa fa-picture-o"></i></button>
+
+			<button type='submit' class='btn btn-primary pull-right'>Post</button>
+    	</div>
+    </div>
+  </form>
+</div>
+{% endif %}
+
+{% for post in posts %}
+<div class="row post">
+	<img class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/50x50" data-popover="true" data-html=true data-toggle="popover" title="{{ post.author }}" data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"/>
+
+    <div class="panel panel-primary media-body">
+    	<div class='panel-heading'> <a class='title' href='{% url "post_detail" post.id %}'> {{ post.title }} </a> <span class='date'> {{ post.published }} </span> </div>
+    	<div class='panel-body'> {{ post.content }} </div>
+    	<hr class='post-hr'>
+    	<div class='panel-body'>
+    		<a href='{% url "post_detail" post.id %}#comments' class='comments'> {{ post.comments.count }} Comments </a>
+			<a href='{% url "post_detail" post.id %}' class='pull-right'><i class="fa fa-plus"></i></a>
+    	</div>
+    </div>
+
+    {% if post.author == user %}
+	<div class="media-body post-action-icons">
+		<button class="btn btn-default action-icon"><i class="fa fa-pencil-square-o"></i></button>
+		<button class="btn btn-default action-icon delete-post" id='delete-post-{{ post.id }}'><i class="fa fa-trash-o"></i></button>
+	</div>
+	{% else %}
+	<div class="media-body post-action-icons placeholder">
+	</div>
+	{% endif %}
+</div>
+{% endfor %}
+{% endblock %}

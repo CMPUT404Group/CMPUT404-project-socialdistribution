@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+import uuid
 
 # Create your models here.
 MARKDOWN = 'text/x-markdown'
@@ -23,6 +24,8 @@ class Post(models.Model):
 		(ME_ONLY, 'Only Me'),
 		(SERVER_ONLY, "Only Server")
 	)
+
+	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 	title = models.CharField(max_length=200)
 	# source - where did you get this post from? - ex http://lastplaceigotthisfrom.com/post/yyyyy
 	# origin - where it is actually from - ex http://whereitcamefrom.com/post/zzzzz
@@ -38,6 +41,7 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
+	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 	post = models.ForeignKey('api.Post', related_name='comments')
 
 	author =  models.ForeignKey('auth.User')

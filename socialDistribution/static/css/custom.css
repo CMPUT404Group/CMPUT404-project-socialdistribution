@@ -126,6 +126,15 @@ h3.registration {
     margin-top: 0.5em;
 }
 
+/* User Profile */
+div.profile-header {
+    padding: 0.5em;
+    margin-bottom: 1em;
+}
+
+div.profile-header > p {
+    color: grey;
+}
 
 /* Toast Msgs */
 .toast {

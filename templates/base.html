@@ -70,7 +70,7 @@
 	                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> {{ user.get_username }} <b class="caret"></b></a>
 	                    <ul class="dropdown-menu">
 	                        <li>
-	                            <a href="#"><i class="fa fa-fw fa-user"></i> Profile</a>
+	                            <a href="{% url 'user_profile' user.get_username %}"><i class="fa fa-fw fa-user"></i> Profile</a>
 	                        </li>
 	                        <li>
 	                            <a href="#"><i class="fa fa-fw fa-envelope"></i> Inbox</a>
@@ -88,11 +88,14 @@
 	            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
 	            <div class="collapse navbar-collapse navbar-ex1-collapse">
 	                <ul class="nav navbar-nav side-nav">
+	                    <li>
+	                        <a href=""><i class="fa fa-fw fa-dashboard"></i> Timeline </a>
+	                    </li>
 	                    <li class="active">
-	                        <a href="/"><i class="fa fa-fw fa-dashboard"></i> Public Stream </a>
+	                        <a href="{% url 'public_stream' %}"><i class="fa fa-fw fa-dashboard"></i> Public Stream </a>
 	                    </li>
 	                    <li>
-	                        <a href="/myStream/"><i class="fa fa-fw fa-dashboard"></i> My Stream </a>
+	                        <a href="{% url 'my_stream' %}"><i class="fa fa-fw fa-dashboard"></i> My Stream </a>
 	                    </li>
 	                    <li>
 	                        <a href=""><i class="fa fa-fw fa-dashboard"></i> Friends Stream </a>
