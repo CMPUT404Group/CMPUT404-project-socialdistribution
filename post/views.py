@@ -21,11 +21,11 @@ def _postHelper(posts, request):
             # post.author = request.user
             # post.publish_date = timezone.now()
             # post.save()
+            return HttpResponseRedirect('/success/')
     else:
         form = PostForm()
         response = None
-
-    return render(request, 'post/mainStream.html', {'posts': posts, 'form':form})
+        return render(request, 'post/mainStream.html', {'posts': posts, 'form':form})
 
 def public_stream(request):
     if (request.user.is_authenticated()):

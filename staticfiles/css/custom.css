@@ -118,7 +118,14 @@ div.comment {
     padding-top: 0.6em;
 }
 
+
 /* Registration / Sign Up Page */
 h3.registration {
     margin-top: 0.5em;
+}
+
+
+/* Toast Msgs */
+.toast {
+   opacity: 1 !important;
 }
