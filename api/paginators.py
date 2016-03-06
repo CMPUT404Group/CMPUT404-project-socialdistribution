@@ -5,10 +5,10 @@ from rest_framework import status
 '''
 Handles the pagination of posts for the API
 '''
-class PostPaginator(pagination.PageNumberPagination):
-	page_size = 2
+class ListPaginator(pagination.PageNumberPagination):
+	page_size = 15
 	page_size_query_param = 'size'
-	max_page_size = 10
+	max_page_size = 50
 
 	def get_paginated_response(self, data):
 		if self.request.GET.get("size") != None:
@@ -16,11 +16,14 @@ class PostPaginator(pagination.PageNumberPagination):
 		else:
 			size = self.page_size
 
+		print "size " + str(size)
+		print self.request.path
+
 		return Response({
-			# 'query': ,
+			'query': data['query'],
 			'count': self.page.paginator.count,
 			'size': size,
 			'next': self.get_next_link(),
 			'previous': self.get_previous_link(),
-			'results': data,
+			data['query']: data['data'],
 		}, status=status.HTTP_201_CREATED)

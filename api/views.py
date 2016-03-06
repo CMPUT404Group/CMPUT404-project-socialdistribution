@@ -11,14 +11,14 @@ from django.http import Http404
 from django.contrib.auth.models import User
 from django.utils import timezone
 from rest_framework import generics
-from api.paginators import PostPaginator
+from api.paginators import ListPaginator
 
 # Create your views here.
 '''
 Lists all Posts  / Create a new Post
 '''
 class PostList(generics.GenericAPIView):
-	pagination_class = PostPaginator
+	pagination_class = ListPaginator
 	serializer_class = PostSerializer
 	queryset = Post.objects.all()
 
@@ -27,7 +27,7 @@ class PostList(generics.GenericAPIView):
 		page = self.paginate_queryset(posts)
 		if page is not None:
 			serializer = PostSerializer(page, many=True)
-			return self.get_paginated_response(serializer.data)
+			return self.get_paginated_response({"data":serializer.data, "query": "posts"})
 
 		# else 
 
@@ -85,16 +85,21 @@ class PostDetail(generics.GenericAPIView):
 
 
 '''
-Lists all Posts  / Create a new Post
+Lists all Comments for specific post  / Create a new comment
 '''
 class CommentList(generics.GenericAPIView):
+	pagination_class = ListPaginator
 	serializer_class = CommentSerializer
 	queryset = Comment.objects.all()
-	
+
 	def get(self, request, post_pk, format=None):
-		comments = Comment.objects.filter(post=post_pk)
-		serializer = CommentSerializer(comments, many=True)
-		return Response({ "comments": serializer.data })
+		comments = Comment.objects.filter(post=post_pk).order_by('-published')
+		page = self.paginate_queryset(comments)
+		if page is not None:
+			serializer = CommentSerializer(page, many=True)
+			return self.get_paginated_response({"data":serializer.data, "query": "comments"})
+
+		# else 
 
 	def post(self, request, post_pk, format=None):
 		serializer = CommentSerializer(data=request.data)
