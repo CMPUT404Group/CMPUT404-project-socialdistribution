@@ -101,7 +101,10 @@ window.onload = function() {
       },
       success: function(response) {
         console.log(response);
-        $(that).parent().parent().parent().remove();
+        var commentItem = $(that).parent().parent().parent();
+        var commentHR = commentItem.next();
+        commentHR.remove();
+        commentItem.remove();
         toastr.info("Comment Deleted!");
       },
       error: function(xhr, ajaxOptions, error) {
