@@ -1,55 +1,8 @@
 {% extends 'base.html' %}
-{% load myfilters %}
 
 {% block content %}
 
-<div class="row post createPost">
-	<img class="profile-photo-icon img-circle img-responsive img-center pull-right create-post" src="http://placehold.it/50x50">
-
-  <form method="POST" action='{{ action }}'> {% csrf_token %}
-    <div class="panel panel-primary media-body form-group">
-    	<div class="panel-body">
-    		{{ form.title|addAttributes:'{ "class":"form-control inputTheme", "placeholder":"Title" }' }}
-			<hr class="create-post">
-    		{{ form.content|addAttributes:'{ "class":"form-control inputTheme create-post", "placeholder":"Enter something here", "rows":5}' }}
-		</div>
-  
-    	<hr class="post-hr">
-
-    	<div class="panel-body">
-			<!-- Privacy/Visibility Settings -->
-			<div class="btn-group dropup">
-			  <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-			    Privacy <span class="caret"></span>
-			  </button>
-
-			  <ul class="dropdown-menu" data-toggle="buttons">
-				{% for option in form.visibility %}
-			  	<li>{{ option }}</li>
-			  	{% endfor %}
-			  </ul>
-			</div>
-
-			<!-- Content Type -->
-			<div class="btn-group dropup">
-			  <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-			    Type <span class="caret"></span>
-			  </button>
-
-			  <ul class="dropdown-menu" data-toggle="buttons">
-				{% for option in form.contentType %}
-			  	<li>{{ option }}</li>
-			  	{% endfor %}
-			  </ul>
-			</div>
-
-			<button type="button" class="btn btn-default"><i class="fa fa-picture-o"></i></button>
-
-			<button type='submit' class='btn btn-primary pull-right'>Post</button>
-    	</div>
-    </div>
-  </form>
-</div>
+{% include "post/createPost.html" with icon=True %}
 
 {% for post in posts %}
 <div class="row post">

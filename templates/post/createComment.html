@@ -1,0 +1,30 @@
+{% load widget_tweaks %}
+
+<div class="row comment createComment">
+	<form method="POST" action='{{ action }}'> {% csrf_token %}
+		<div class="panel panel-primary media-body form-group">
+			<div class="panel-body">
+				{% render_field commentForm.comment class+="form-control inputTheme create-post" placeholder="Enter comment here" rows="3" %}
+			</div>
+
+			<hr class="post-hr">
+
+			<div class="panel-body comment-form-footer">
+				<!-- Content Type -->
+				<div class="btn-group dropup">
+					<button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					Type <span class="caret"></span>
+					</button>
+
+					<ul class="dropdown-menu" data-toggle="buttons">
+						{% for option in commentForm.contentType %}
+						<li>{{ option }}</li>
+						{% endfor %}
+					</ul>
+				</div>
+
+				<button type='submit' class='btn btn-primary btn-sm pull-right'>Comment</button>
+			</div>
+		</div>
+	</form>
+</div>

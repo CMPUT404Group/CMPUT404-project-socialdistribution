@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load myfilters %}
 
 {% block content %}
 
@@ -14,52 +13,9 @@
     </div>
 </div>
 
+<!-- If this is the logged in user's profile page, show a create post component -->
 {% if user_account == user %}
-<div class="row post createPost">
-  <form method="POST" action='{{ action }}'> {% csrf_token %}
-    <div class="panel panel-primary media-body form-group">
-    	<div class="panel-body">
-    		{{ form.title|addAttributes:'{ "class":"form-control inputTheme", "placeholder":"Title" }' }}
-			<hr class="create-post">
-    		{{ form.content|addAttributes:'{ "class":"form-control inputTheme create-post", "placeholder":"Enter something here", "rows":2}' }}
-		</div>
-  
-    	<hr class="post-hr">
-
-    	<div class="panel-body">
-			<!-- Privacy/Visibility Settings -->
-			<div class="btn-group dropup">
-			  <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-			    Privacy <span class="caret"></span>
-			  </button>
-
-			  <ul class="dropdown-menu" data-toggle="buttons">
-				{% for option in form.visibility %}
-			  	<li>{{ option }}</li>
-			  	{% endfor %}
-			  </ul>
-			</div>
-
-			<!-- Content Type -->
-			<div class="btn-group dropup">
-			  <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-			    Type <span class="caret"></span>
-			  </button>
-
-			  <ul class="dropdown-menu" data-toggle="buttons">
-				{% for option in form.contentType %}
-			  	<li>{{ option }}</li>
-			  	{% endfor %}
-			  </ul>
-			</div>
-
-			<button type="button" class="btn btn-default"><i class="fa fa-picture-o"></i></button>
-
-			<button type='submit' class='btn btn-primary pull-right'>Post</button>
-    	</div>
-    </div>
-  </form>
-</div>
+{% include "post/createPost.html" with icon=False %}
 {% endif %}
 
 {% for post in posts %}

@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load myfilters %}
 
 {% block content %}
 
@@ -26,38 +25,11 @@
 	<h3> Comments: </h3>
 
 	<!-- POST A COMMENT -->
-	<div class="row comment createComment">
-		<form method="POST" action='{{ action }}'> {% csrf_token %}
-			<div class="panel panel-primary media-body form-group">
-				<div class="panel-body">
-					{{commentForm.comment|addAttributes:'{ "class":"form-control inputTheme create-post", "placeholder":"Enter comment here", "rows":3}'}}
-				</div>
+	{% include "post/createComment.html" %}
 
-				<hr class="post-hr">
-
-				<div class="panel-body comment-form-footer">
-					<!-- Content Type -->
-					<div class="btn-group dropup">
-						<button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						Type <span class="caret"></span>
-						</button>
-
-						<ul class="dropdown-menu" data-toggle="buttons">
-							{% for option in commentForm.contentType %}
-							<li>{{ option }}</li>
-							{% endfor %}
-						</ul>
-					</div>
-
-					<button type='submit' class='btn btn-primary btn-sm pull-right'>Comment</button>
-				</div>
-			</div>
-		</form>
-	</div>
 
 	<!-- SHOW COMMENTS -->
-	<!-- TODO : Show comments in reverse order / most recent at the top -->
-	{% for comment in post.comments.all %}
+	{% for comment in post.comments.all reversed %}
 	<div class="row comment">
 		<img class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/35x35" data-popover="true" data-html=true data-toggle="popover" title="{{ comment.author }}" data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"/>
 

@@ -10,66 +10,105 @@ from rest_framework.response import Response
 from django.contrib.auth.models import User
 
 # Create your views here.
-def _postHelper(posts, request, template_name):
+'''
+Handles submitting the Post form - used when creating a new Post
+'''
+def _submitPostForm(request):
     if request.method == "POST":
         form = PostForm(request.POST)
         if form.is_valid():
             response = PostList.as_view()(request)  # makes post call to API
-            form = PostForm() # Clear Form after posting
-            # -- TODO : display post success or failure on mainStream.html -- #
-            # print "DEBUG : post - views.py"
-            # post = form.save(commit=False)
-            # post.author = request.user
-            # post.publish_date = timezone.now()
-            # post.save()
-            return HttpResponseRedirect('/success/')
-    else:
-        form = PostForm()
-        response = None
-        return render(request, template_name, {'posts': posts, 'form':form})
+            return response
 
+
+'''
+Renders the Public Stream page
+'''
 def public_stream(request):
     if (request.user.is_authenticated()):
-        posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
-        return _postHelper(posts, request, 'post/mainStream.html')
+        if request.method == "POST":
+            response = _submitPostForm(request)
+            
+            # Empty Form Submitted
+            if response == None:
+                # alert user form was empty
+                pass
+            else:
+                 # -- TODO : display post success or failure on mainStream.html -- #
+                if response.status_code == 201:
+                    return HttpResponseRedirect('/success')
+                else: # 400 error
+                    # alert user of the error
+                    pass
 
+        posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
+        form = PostForm()
+        return render(request, 'post/mainStream.html', {'posts':posts, 'form': form})
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
+'''
+Renders the My Stream page
+'''
 def my_stream(request):
     if (request.user.is_authenticated()):
-        posts = Post.objects.filter(author=request.user).order_by('-published')
-        return _postHelper(posts, request, 'post/mainStream.html')
+        if request.method == "POST":
+            response = _submitPostForm(request)
 
+            # Empty Form Submitted
+            if response == None:
+                # alert user form was empty
+                pass
+            else:
+                 # -- TODO : display post success or failure on mainStream.html -- #
+                if response.status_code == 201:
+                    return HttpResponseRedirect('/success')
+                else: # 400 error
+                    # alert user of the error
+                    pass
+
+        posts = Post.objects.filter(author=request.user).order_by('-published')
+        form = PostForm()
+        return render(request, 'post/mainStream.html', {'posts':posts, 'form': form})
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
 
 
-
-def _commentHelper(post, request):
+'''
+Handles submitting the Comment form - used when creating a new Comment
+'''
+def _submitCommentForm(request, post_pk):
     if request.method == "POST":
-        commentForm = CommentForm(request.POST)
-        if commentForm.is_valid():
-            response = CommentList.as_view()(request, post.id) # makes post call to API
-            commentForm = CommentForm()    # Clear Form after posting
-            # -- TODO : display post success or failure on post/postDetail.html -- #
-            # print "DEBUG : post - views.py"
-            # post = form.save(commit=False)
-            # post.author = request.user
-            # post.publish_date = timezone.now()
-            # post.save()
-    else:
-        commentForm = CommentForm()
-        response = None
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            response = CommentList.as_view()(request, post_pk) # makes post call to API
+            return response
 
-    return render(request, 'post/postDetail.html', {'post': post, 'commentForm': commentForm})
-
+'''
+Renders the page for specific post (including the post's comments)
+'''
 def post_detail(request, post_pk):
     if (request.user.is_authenticated()):
-        post = Post.objects.get(pk=post_pk)
-        return _commentHelper(post, request)
 
+        if request.method == "POST":
+            response = _submitCommentForm(request, post_pk)
+            
+            # Empty Form Submitted
+            if response == None:
+                # alert user form was empty
+                pass
+            else:
+                 # -- TODO : display post success or failure on postDetail.html -- #
+                if ((response.status_code == 201) or (response.status_code == 200)):
+                    return HttpResponseRedirect(reverse('post_detail_success', kwargs={'post_pk':post_pk}))
+                else: # 400 error
+                    # alert user of the error
+                    pass
+
+        post = Post.objects.get(pk=post_pk)
+        form = CommentForm()
+        return render(request, 'post/postDetail.html', {'post': post, 'commentForm': form})
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
@@ -83,22 +122,26 @@ def user_profile(request, username):
             # return render(request, "user_profile.html", {'posts': None, 'form': None, 'user_account': None})
             return render(request, "404_page.html", {'message': "User does not exist."})
 
+        # Delegates create post form submission
+        if request.method == "POST":
+            response = _submitPostForm(request)
+
+            # Empty Form Submitted
+            if response == None:
+                # alert user form was empty
+                pass
+            else:
+                 # -- TODO : display post success or failure on mainStream.html -- #
+                if response.status_code == 201:
+                    return HttpResponseRedirect(reverse('user_profile_success', kwargs={'username': username}))
+                else: # 400 error
+                    # alert user of the error
+                    pass
+
         # --- TODO : FILTER POSTS BY VISIBILITY TO LOGGED IN USER --- #
         posts = Post.objects.filter(author=user).order_by('-published')
-
-        # -- This is the same as _postHelper function but with additional key-value pairs -- #
-        if request.method == "POST":
-            form = PostForm(request.POST)
-            if form.is_valid():
-                response = PostList.as_view()(request)  # makes post call to API
-                form = PostForm() # Clear Form after posting
-
-                # -- TODO : display post success or failure on page -- #
-                return HttpResponseRedirect('/success/')
-        else:
-            form = PostForm()
-            response = None
-            return render(request, "user_profile.html", {'posts': posts, 'form':form, 'user_account':user})
+        form = PostForm()    
+        return render(request, "user_profile.html", {'posts': posts, 'form':form, 'user_account':user})
 
 
     else:
