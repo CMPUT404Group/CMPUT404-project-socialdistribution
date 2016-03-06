@@ -88,5 +88,28 @@ window.onload = function() {
     });
   });
 
+  /* -- Deletes comments -- */
+  $("button.delete-comment").click(function(event) {
+    var that = this;
+    var comment_id = this.id.slice(15);
+    var post_id = $(this).data("post-id");
+    $.ajax({
+      url: 'http://' + window.location.host +'/api/posts/' + post_id + '/comments/' + comment_id,
+      type: "DELETE",
+      beforeSend: function(xhr, settings) {
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function(response) {
+        console.log(response);
+        $(that).parent().parent().parent().remove();
+        toastr.info("Comment Deleted!");
+      },
+      error: function(xhr, ajaxOptions, error) {
+        console.log(xhr.status);
+        console.log(xhr.responseText);
+        console.log(error);
+      }
+    });
+  });
   
 };

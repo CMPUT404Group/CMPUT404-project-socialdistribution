@@ -41,13 +41,19 @@
 		<img class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/35x35" data-popover="true" data-html=true data-toggle="popover" title="{{ comment.author }}" data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"/>
 
 	    <div class="media-body">
-	    	<div> {{ comment.comment }} </div>
+	    	<div class='panel-body'> 
+	    		{% if comment.contentType == "text/x-markdown" %}
+	    			{{ comment.comment|markdown }} 
+				{% else %}
+					{{ comment.comment }}
+	    		{% endif %}
+	    	</div>
 	    	<div class="comment-footer">
 
-<!--     			{# % if comment.author == user %}
+    			{% if comment.author == user %}
 	    		<button class="btn-default action-icon"><i class="fa fa-pencil-square-o"></i></button>
-				<button class="btn-default action-icon"><i class="fa fa-trash-o"></i></button>
-				{% endif % #} -->
+	    		<button class="btn-default action-icon  delete-comment" id='delete-comment-{{ comment.id }}' data-post-id='{{ post.id }}'><i class="fa fa-trash-o"></i></button>
+				{% endif %}
 
 				<span class='date'> {{ comment.published }} </span>
 			</div>

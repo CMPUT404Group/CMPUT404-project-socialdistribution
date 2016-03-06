@@ -12,6 +12,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from rest_framework import generics
 from api.paginators import ListPaginator
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 '''
@@ -65,10 +66,7 @@ class PostDetail(generics.GenericAPIView):
 	queryset = Post.objects.all()
 
 	def get_object(self, pk):
-		try:
-			return Post.objects.get(pk=pk)
-		except Post.DoesNotExist:
-			raise Http404
+		return get_object_or_404(Post, pk=pk)
 
 
 	def get(self, request, pk, format=None):
@@ -166,6 +164,67 @@ class CommentList(generics.GenericAPIView):
 
 	def perform_create(self, serializer):
 		serializer.save(author=self.request.user)
+
+
+'''
+Gets a specific Comment/ Updates a Comment / Deletes a Comment
+'''
+class CommentDetail(generics.GenericAPIView):
+	serializer_class = CommentSerializer
+	queryset = Comment.objects.all()
+
+	def get_object(self, pk):
+		return get_object_or_404(Comment, pk=pk)
+
+
+	def get(self, request, post_pk, comment_pk, format=None):
+		# ensure user is authenticated
+		if (request.user.is_authenticated()):
+
+			# --- TODO : Only authorize users to read/get this comment if visibility/privacy settings of the corresponding post allow it
+			comment = self.get_object(comment_pk)
+			serializer = CommentSerializer(comment)
+			return Response(serializer.data)
+
+		else:
+			return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+	def put(self, request, post_pk, comment_pk, format=None):
+		# ensure user is authenticated
+		if (request.user.is_authenticated()):
+			comment = self.get_object(comment_pk)
+
+			# only allow author of the comment to modify it
+			if request.user == comment.author:
+				serializer = CommentSerializer(post, data=request.data)
+				if serializer.is_valid():
+					serializer.save()
+					return Response(serializer.data)
+				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+			# if logged in user is not author of the comment
+			else:
+				return Response(status=status.HTTP_403_FORBIDDEN)
+
+		else:
+			return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+	def delete(self, request, post_pk, comment_pk, format=None):
+		# ensure user is authenticated
+		if (request.user.is_authenticated()):
+			comment = self.get_object(comment_pk)
+			# only allow author of the comment to modify it
+			if request.user == comment.author:
+				comment.delete()
+				return Response(status=status.HTTP_204_NO_CONTENT)
+
+			# if logged in user is not author of the comment
+			else:
+				return Response(status=status.HTTP_403_FORBIDDEN)
+
+		else:
+			return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 
