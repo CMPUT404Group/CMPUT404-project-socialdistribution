@@ -70,7 +70,7 @@ window.onload = function() {
     var that = this;
     var id = this.id.slice(12);
     $.ajax({
-      url: 'http://127.0.0.1:8000/api/posts/' + id + '/',
+      url: 'http://' + window.location.host +'/api/posts/' + id + '/',
       type: "DELETE",
       beforeSend: function(xhr, settings) {
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
