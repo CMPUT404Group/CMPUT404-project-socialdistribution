@@ -25,9 +25,11 @@ Contributors:
     Erin Torbiak
     Abram Hindle
 
-Code was taken, used, & modified from : Navbars & Sidebar - https://github.com/BlackrockDigital/startbootstrap-sb-admin
+Code was taken, used, & modified from : 
+Navbars & Sidebar - https://github.com/BlackrockDigital/startbootstrap-sb-admin
 http://tutorial.djangogirls.org/en/  
-Code was taken & used from : https://github.com/BlackrockDigital/startbootstrap-sb-admin  
+http://www.django-rest-framework.org/
+
 Code was taken & used from : http://stackoverflow.com/questions/5871730/need-a-minimal-django-file-upload-example
 
 group whentomeet:  
