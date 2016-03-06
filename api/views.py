@@ -11,21 +11,25 @@ from django.http import Http404
 from django.contrib.auth.models import User
 from django.utils import timezone
 from rest_framework import generics
+from api.paginators import PostPaginator
 
 # Create your views here.
-
 '''
 Lists all Posts  / Create a new Post
 '''
 class PostList(generics.GenericAPIView):
+	pagination_class = PostPaginator
 	serializer_class = PostSerializer
 	queryset = Post.objects.all()
-	
+
 	def get(self, request, format=None):
-		# posts = Post.objects.all()
-		posts = Post.objects.filter(visibility='PUBLIC')
-		serializer = PostSerializer(posts, many=True)
-		return Response({ "posts": serializer.data })
+		posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
+		page = self.paginate_queryset(posts)
+		if page is not None:
+			serializer = PostSerializer(page, many=True)
+			return self.get_paginated_response(serializer.data)
+
+		# else 
 
 	def post(self, request, format=None):
 		serializer = PostSerializer(data=request.data)
@@ -34,6 +38,7 @@ class PostList(generics.GenericAPIView):
 			serializer.validated_data["author"] = request.user
 			serializer.validated_data["published"] = timezone.now()
 			serializer.save()
+
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
