@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'post',
     'manager',
     'widget_tweaks',
+    'markdown_deux',
 )
 
 MIDDLEWARE_CLASSES = (

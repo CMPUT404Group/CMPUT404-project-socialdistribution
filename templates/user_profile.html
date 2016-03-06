@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load markdown_deux_tags %}
 
 {% block content %}
 
@@ -24,7 +25,13 @@
 
     <div class="panel panel-primary media-body">
     	<div class='panel-heading'> <a class='title' href='{% url "post_detail" post.id %}'> {{ post.title }} </a> <span class='date'> {{ post.published }} </span> </div>
-    	<div class='panel-body'> {{ post.content }} </div>
+        <div class='panel-body'> 
+            {% if post.contentType == "text/x-markdown" %}
+                {{ post.content|markdown }} 
+            {% else %}
+                {{ post.content }}
+            {% endif %}
+        </div>
     	<hr class='post-hr'>
     	<div class='panel-body'>
     		<a href='{% url "post_detail" post.id %}#comments' class='comments'> {{ post.comments.count }} Comments </a>
