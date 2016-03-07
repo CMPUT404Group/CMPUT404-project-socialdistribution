@@ -10,9 +10,9 @@
     	<div class='panel-heading'> {{ post.title }} <span class='date'> {{ post.published }} </span> </div>
     	<div class='panel-body'> 
     		{% if post.contentType == "text/x-markdown" %}
-    			{{ post.content|markdown }} 
+    			{{ post.content|markdown|urlize }} 
 			{% else %}
-				{{ post.content }}
+				{{ post.content|urlize }}
     		{% endif %}
     	</div>
     	<hr class='post-hr'>
@@ -43,9 +43,9 @@
 	    <div class="media-body">
 	    	<div class='panel-body'> 
 	    		{% if comment.contentType == "text/x-markdown" %}
-	    			{{ comment.comment|markdown }} 
+	    			{{ comment.comment|markdown|urlize }} 
 				{% else %}
-					{{ comment.comment }}
+					{{ comment.comment|urlize }}
 	    		{% endif %}
 	    	</div>
 	    	<div class="comment-footer">

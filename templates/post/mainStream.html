@@ -13,9 +13,9 @@
     	<div class='panel-heading'> <a class='title' href='{% url "post_detail" post.id %}'> {{ post.title }} </a> <span class='date'> {{ post.published }} </span> </div>
     	<div class='panel-body'> 
     		{% if post.contentType == "text/x-markdown" %}
-    			{{ post.content|markdown }} 
+    			{{ post.content|markdown|urlize }} 
 			{% else %}
-				{{ post.content }}
+				{{ post.content|urlize }}
     		{% endif %}
     	</div>
     	<hr class='post-hr'>
