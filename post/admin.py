@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import Author, Post, Upload, Comment, Node, Friending, Following
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 
 # Register your models here.
 class AuthorInline(admin.StackedInline):
@@ -13,6 +13,7 @@ class UserAdmin(BaseUserAdmin):
     inlines = (AuthorInline, )
 
 admin.site.unregister(User)
+admin.site.unregister(Group)
 #admin.site.register(User, UserAdmin)
 admin.site.register(Author)
 admin.site.register(Post)

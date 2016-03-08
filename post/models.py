@@ -6,6 +6,9 @@ from django.forms import ModelForm
 # Create your models here.
 # temporarily put all the model in one place
 # we can separate them into different apps later on
+
+# Why having additional Author class instead of Auth.user:
+# Auth.user is the model comes with Django, we have to add some fields to make it an author.
 class Author(models.Model):
     STATUS_CHOICES = (
         ('W', 'Waiting for approve'),
