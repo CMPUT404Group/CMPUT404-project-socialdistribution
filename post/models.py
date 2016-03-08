@@ -15,6 +15,7 @@ class Author(models.Model):
     author = models.OneToOneField(User, on_delete=models.CASCADE)
     github_name = models.CharField(max_length=40)
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='W')
+
     def __unicode__(self):
         return self.author.username
 
@@ -73,10 +74,6 @@ class Friending(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     friend = models.ForeignKey(Author, related_name='friend', on_delete=models.CASCADE)
 
-class Follwing(models.Model):
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    following = models.ForeignKey(Author, related_name='following', on_delete=models.CASCADE)
-
-class Commenting(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+class Following(models.Model):
+    author = models.ForeignKey(Author, related_name='follow_author', on_delete=models.CASCADE)
+    following = models.ForeignKey(Author, related_name='follow_following', on_delete=models.CASCADE)
