@@ -22,6 +22,8 @@ class Author(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     github_name = models.CharField(max_length=40)
+    # once signup, create an new author object,
+    # but the default status will be 'W', waiting admin to approve
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='W')
 
     def __unicode__(self):
@@ -49,7 +51,7 @@ class Post(models.Model):
     # description - a brief description of the post
     contentType = models.CharField(max_length=15, choices=CONTENT_TYPE_CHOICES, default=PLAINTEXT)
     content = models.TextField()
-    author = models.ForeignKey(Author)
+    author = models.ForeignKey('auth.user')
     # categories - categories this posts fits into - a list of strings - ex ["web","tutorial"]
     # count - total # of comments for this post
     published = models.DateTimeField(default=timezone.now)
@@ -60,7 +62,7 @@ class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     post = models.ForeignKey('api.Post', related_name='comments')
 
-    author = models.ForeignKey(Author)
+    author = models.ForeignKey('auth.user')
     comment = models.TextField()
     contentType = models.CharField(max_length=15, choices=CONTENT_TYPE_CHOICES, default=PLAINTEXT)
     published = models.DateTimeField(default=timezone.now)

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.template import RequestContext
 from django.utils import timezone
-from api.models import Post, Comment
+from api.models import Post, Author, Comment
 from .forms import UploadFileForm, PostForm, CommentForm
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
