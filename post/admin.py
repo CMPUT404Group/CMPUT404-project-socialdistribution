@@ -12,13 +12,12 @@ class AuthorInline(admin.StackedInline):
 class UserAdmin(BaseUserAdmin):
     inlines = (AuthorInline, )
 
-admin.site.unregister(User)
-admin.site.unregister(Group)
+
 #admin.site.register(User, UserAdmin)
-admin.site.register(Author)
-admin.site.register(Post)
-admin.site.register(Upload)
-admin.site.register(Comment)
-admin.site.register(Node)
-admin.site.register(Friending)
-admin.site.register(Following)
+# admin.site.register(Author)
+# admin.site.register(Post)
+# admin.site.register(Upload)
+# admin.site.register(Comment)
+# admin.site.register(Node)
+# admin.site.register(Friending)
+# admin.site.register(Following)
