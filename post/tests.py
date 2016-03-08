@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.utils import timezone
 from post.forms import PostForm, CommentForm
-from post.models import Author, Post
+from post.models import Author, Post, Comment
 import random
 
 # create the post ids as global variables
@@ -10,31 +10,12 @@ p_id1 = random.randint(0, 1000000)
 p_id2 = random.randint(0, 1000000)
 date = timezone.now()
 
+class CommentModelTestCase(TestCase):
+    def test_get_comment(self):
+        user = User.objects.create(username="kevin")
+        author = Author.objects.create(author=user, github_name="kevin", status="P")
+        #comment = Comment.objects.create(comment_id=random.randint(0, 1000000))
 
-class PostViewTestCase(TestCase):
-    # test if we can get the pages
-    def test_redirect_to_login(self):
-        # check that it redirects to the login page
-        resp = self.client.get("/")
-        self.assertTrue(resp.status_code, 302)
-        split = resp.get("location").split("/")
-        path = split[3] + "/" + split[4]
-        self.assertEqual(path, "accounts/login")
-
-        resp1 = self.client.get("/myStream/")
-        self.assertEqual(resp1.status_code, 302)
-        split = resp1.get("location").split("/")
-        path = split[3] + "/" + split[4]
-
-        resp2 = self.client.get("/user/vanbelle/")
-        self.assertEqual(resp2.status_code, 302)
-        split = resp2.get("location").split("/")
-        path = split[3] + "/" + split[4]
-
-    def test_login(self):
-        # login to the page
-        resp = self.client.post("/accounts/login/", {"username": "vanbelle", "password": "123"})
-        self.assertEqual(resp.status_code, 200)
 
 
 class PostModelTestCase(TestCase):
