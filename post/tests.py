@@ -16,8 +16,6 @@ class CommentModelTestCase(TestCase):
         author = Author.objects.create(author=user, github_name="kevin", status="P")
         #comment = Comment.objects.create(comment_id=random.randint(0, 1000000))
 
-
-
 class PostModelTestCase(TestCase):
     # Model tests - Set up authors and the created post
     def setUp(self):
