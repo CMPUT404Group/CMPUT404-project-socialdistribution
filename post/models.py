@@ -9,6 +9,8 @@ from django.forms import ModelForm
 
 # Why having additional Author class instead of Auth.user:
 # Auth.user is the model comes with Django, we have to add some fields to make it an author.
+
+'''
 class Author(models.Model):
     STATUS_CHOICES = (
         ('W', 'Waiting for approve'),
@@ -80,3 +82,4 @@ class Friending(models.Model):
 class Following(models.Model):
     author = models.ForeignKey(Author, related_name='follow_author', on_delete=models.CASCADE)
     following = models.ForeignKey(Author, related_name='follow_following', on_delete=models.CASCADE)
+'''
