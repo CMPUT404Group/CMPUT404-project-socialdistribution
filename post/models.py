@@ -3,18 +3,20 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.forms import ModelForm
 
-# Create your models here.
-# temporarily put all the model in one place
-# we can separate them into different apps later on
+# We are using models in api.model
+
+# Why having additional Author class instead of Auth.user:
+# Auth.user is the model comes with Django, we have to add some fields to make it an author.
 class Author(models.Model):
     STATUS_CHOICES = (
         ('W', 'Waiting for approve'),
         ('P', 'Passed')
     )
 
-    author = models.OneToOneField(User, on_delete=models.CASCADE)
+    author = models.OneToOneField(User, related_name='post_author', on_delete=models.CASCADE)
     github_name = models.CharField(max_length=40)
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='W')
+
     def __unicode__(self):
         return self.author.username
 
@@ -73,10 +75,7 @@ class Friending(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     friend = models.ForeignKey(Author, related_name='friend', on_delete=models.CASCADE)
 
-class Follwing(models.Model):
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    following = models.ForeignKey(Author, related_name='following', on_delete=models.CASCADE)
+class Following(models.Model):
+    author = models.ForeignKey(Author, related_name='follow_author', on_delete=models.CASCADE)
+    following = models.ForeignKey(Author, related_name='follow_following', on_delete=models.CASCADE)
 
-class Commenting(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)

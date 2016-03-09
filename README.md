@@ -38,5 +38,12 @@ http://www.when2meet.com/?4368216-nLULW
 #Note
 
 <b>admin account:</b>  
-username: admin  
-password: cmput404admin
+username: admin
+
+password: admin
+
+"python manage.py createsuperuser" to create admin account
+
+#Reference
+
+http://www.tangowithdjango.com/book17/
