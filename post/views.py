@@ -154,11 +154,8 @@ def file(request):
     if request.method=="POST":
         img = UploadFileForm(request.POST, request.FILES)       
         if img.is_valid():
-            #instance = UploadFileForm(file_field=request.FILES['file'])
-            #instance.save()  
             img.save()
             return HttpResponseRedirect(reverse('imageupload'))
-            #return HttpResponseRedirect('/success/url/')
     else:
         img=UploadFileForm()
     return render(request,'file.html',{'form':img})
