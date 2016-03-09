@@ -149,7 +149,7 @@ def user_profile(request, username):
 
 
 
-#for image uploads
+#for image uploads to save
 def file(request):
     if request.method=="POST":
         img = UploadFileForm(request.POST, request.FILES)       
