@@ -28,32 +28,34 @@
 
 	<body>
 
-    {% if registered %}
-    thank you for registering!
-    {% else  %}
-    register here!
+
 
 		<div class='well well-lg login'>
+
+            {% if registered %}
+            <h3 > <center> thank you for registering! </center> </h3>
+            <h3><center><a href="{% url 'public_stream'  %}">Login</a></center></h3>
+            {% else  %}
 			<h3 class='registration'> <center> Registration </center> </h3>
 			<hr>
-			<form id="user_from" method="POST" action="registration/signup"  enctype="multipart/form-data">
+			<form id="user_from" method="POST" action="../../accounts/signup/"  enctype="multipart/form-data">
 				{% csrf_token %}
 
                 {{ user_form.as_p }}
                 {{ author_form.as_p }}
 
-				<label>Username:</label>
-    			<input class="form-control inputTheme" name="username" type='text'/>
-				<br/>
-				<label>Password:</label>
-    			<input class="form-control inputTheme" name="password" type='password'/>
-				<br/>
-				<label>Password Confirmation:</label>
-    			<input class="form-control inputTheme" name="password_confirmation" type='password'/>
-				<br/>
-				<label>Email:</label>
-    			<input class="form-control inputTheme" name="email" type='email'/>
-				<br/>
+{#				<label>Username:</label>#}
+{#    			<input class="form-control inputTheme" name="username" type='text'/>#}
+{#				<br/>#}
+{#				<label>Password:</label>#}
+{#    			<input class="form-control inputTheme" name="password" type='password'/>#}
+{#				<br/>#}
+{#				<label>Password Confirmation:</label>#}
+{#    			<input class="form-control inputTheme" name="password_confirmation" type='password'/>#}
+{#				<br/>#}
+{#				<label>Email:</label>#}
+{#    			<input class="form-control inputTheme" name="email" type='email'/>#}
+{#				<br/>#}
 				<button class='btn btn-primary btn-block' type='submit'> Sign Up </button>
 			</form>
 
