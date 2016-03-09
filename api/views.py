@@ -140,18 +140,45 @@ class CommentList(generics.GenericAPIView):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
 
+    def isAllowed(self,request,pk):
+        post = self.get_object(pk)
+        privacy = post.visibility
+
+        #if the post was created by the user allow access
+        if request.user == post.author:
+            return True
+        #if it is a public post allow everypne access
+        if privacy == "PUBLIC":
+            return True
+        elif privacy == "FRIENDS" or privacy == "FRIENDS_OF_FRIENDS":
+            #TODO Friends needs to be implemented first
+            #friends = post.author.friends
+            #if request.user in friends:
+                #return True
+            #elif privacy == "FRIENDS_OF_FRIENDS":
+                #for i in range(len(friends)):
+                    #if request.user in friends[i].friends 
+                        #return True
+            #else:
+                #return False
+            pass
+        else:
+            return False
+
     def get(self, request, post_pk, format=None):
         # ensure user is authenticated
         if (request.user.is_authenticated()):
-
+            post = self.get_object(pk)
             # --- TODO : Only authorize users to read/get this post if visibility/privacy settings allow it
-            comments = Comment.objects.filter(post=post_pk).order_by('-published')
-            page = self.paginate_queryset(comments)
-            if page is not None:
-                serializer = CommentSerializer(page, many=True)
-                return self.get_paginated_response({"data": serializer.data, "query": "comments"})
-            # else
-
+            if(self.isAllowed(request, post_pk)):
+                comments = Comment.objects.filter(post=post_pk).order_by('-published')
+                page = self.paginate_queryset(comments)
+                if page is not None:
+                    serializer = CommentSerializer(page, many=True)
+                    return self.get_paginated_response({"data": serializer.data, "query": "comments"})
+                # else
+            else:
+                return Response(status=status.HTTP_403_FORBIDDEN)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
@@ -160,17 +187,19 @@ class CommentList(generics.GenericAPIView):
         if (request.user.is_authenticated()):
 
             # -- TODO : Only authorize user who can view the corresponding post to comment
-            serializer = CommentSerializer(data=request.data)
-            if serializer.is_valid():
-                print "DEBUG : API - views.py - CommentList"
-                serializer.validated_data["author"] = request.user
-                serializer.validated_data["published"] = timezone.now()
-                serializer.validated_data["post"] = Post.objects.get(pk=post_pk)
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            if(self.isAllowed(request,post_pk)):
+                serializer = CommentSerializer(data=request.data)
+                if serializer.is_valid():
+                    print "DEBUG : API - views.py - CommentList"
+                    serializer.validated_data["author"] = request.user
+                    serializer.validated_data["published"] = timezone.now()
+                    serializer.validated_data["post"] = Post.objects.get(pk=post_pk)
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+                return Response(status=status.HTTP_403_FORBIDDEN)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
@@ -187,6 +216,31 @@ class CommentDetail(generics.GenericAPIView):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
 
+    def isAllowed(self,request,pk):
+        post = self.get_object(pk)
+        privacy = post.visibility
+
+        #if the post was created by the user allow access
+        if request.user == post.author:
+            return True
+        #if it is a public post allow everypne access
+        if privacy == "PUBLIC":
+            return True
+        elif privacy == "FRIENDS" or privacy == "FRIENDS_OF_FRIENDS":
+            #TODO Friends needs to be implemented first
+            #friends = post.author.friends
+            #if request.user in friends:
+                #return True
+            #elif privacy == "FRIENDS_OF_FRIENDS":
+                #for i in range(len(friends)):
+                    #if request.user in friends[i].friends 
+                        #return True
+            #else:
+                #return False
+            return True
+        else:
+            return False
+
     def get_object(self, pk):
         return get_object_or_404(Comment, pk=pk)
 
@@ -195,10 +249,12 @@ class CommentDetail(generics.GenericAPIView):
         if (request.user.is_authenticated()):
 
             # --- TODO : Only authorize users to read/get this comment if visibility/privacy settings of the corresponding post allow it
-            comment = self.get_object(comment_pk)
-            serializer = CommentSerializer(comment)
-            return Response(serializer.data)
-
+            if(self.isAllowed(request,post_pk)):
+                comment = self.get_object(comment_pk)
+                serializer = CommentSerializer(comment)
+                return Response(serializer.data)
+            else:
+                return Response(status=status.HTTP_403_FORBIDDEN)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
