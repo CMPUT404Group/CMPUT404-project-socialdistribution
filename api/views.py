@@ -38,10 +38,20 @@ class PostList(generics.GenericAPIView):
         else:
             return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
 
-    def post(self, request, format=None):
+    def post(self, request, post_pk=None, format=None):
         # ensure user is authenticated
         if (request.user.is_authenticated()):
-            serializer = PostSerializer(data=request.data)
+            if post_pk != None:
+                post = get_object_or_404(Post, pk=post_pk)
+                # only allow author of the post to modify it
+                if request.user == post.author:
+                    serializer = PostSerializer(post, data=request.data)
+                # if logged in user is not author of the post
+                else:
+                    return Response(status=status.HTTP_403_FORBIDDEN) 
+            else:
+                serializer = PostSerializer(data=request.data)
+
             if serializer.is_valid():
                 print "DEBUG : API - views.py - PostList"
                 serializer.validated_data["author"] = request.user

@@ -29,23 +29,15 @@
 	<body>
 
 		<div class='well well-lg login'>
-            <h1><center>Login</center></h1>
-			<form id="login_form" method="POST" action="../../accounts/login/">
+            <h2><center>Login</center></h2>
+			<form id="login_form" method="POST" action="{% url 'accounts_login' %}">
 				{% csrf_token %}
-                Username: <label>
-                <input type="text" name="username" value="" size="50"/>
-            </label>
+               <label> Username: </label>
+                <input class="form-control inputTheme" type="text" name="username" value="" size="50"/>
                 <br />
-                Password: <label>
-                <input type="password" name="password" value="" size="50"/>
-            </label>
+                <label> Password: </label>
+                <input class='form-control inputTheme' type="password" name="password" value="" size="50"/>
                 <br />
-{#				{{ form.username.label_tag }}#}
-{#    			{{ form.username|addAttributes:'{ "class":"form-control inputTheme" }' }}#}
-{#				<br/>#}
-{#				{{ form.password.label_tag }}#}
-{#    			{{ form.password|addAttributes:'{ "class":"form-control inputTheme" }' }}#}
-{#				<br/>#}
 				<button class='btn btn-primary btn-block' type='submit'> Login </button>
 			</form>
 			<hr>

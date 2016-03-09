@@ -6,6 +6,9 @@
 <div class="row post">
 	<img class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/50x50" data-popover="true" data-html=true data-toggle="popover" title="{{ post.author }}" data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"/>
 
+	{% if form %}
+		{% include "post/createPost.html" with edit=True %}
+	{% else %}
     <div class="panel panel-primary media-body">
     	<div class='panel-heading'> {{ post.title }} <span class='date'> {{ post.published }} </span> </div>
     	<div class='panel-body'> 
@@ -14,6 +17,10 @@
 			{% else %}
 				{{ post.content|urlize }}
     		{% endif %}
+    		
+            {% if post.image_url %}
+                <img src="{{ post.image_url }}" />
+            {% endif %}
     	</div>
     	<hr class='post-hr'>
     	<div class='panel-body'>
@@ -26,6 +33,8 @@
 		<button class="btn btn-default action-icon"><i class="fa fa-pencil-square-o"></i></button>
 		<button class="btn btn-default action-icon"><i class="fa fa-trash-o"></i></button>
 	</div>
+    {% endif %}
+
 </div>
 
 <div class="comments" id="comments">

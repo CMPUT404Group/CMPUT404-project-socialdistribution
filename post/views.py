@@ -5,21 +5,24 @@ from api.models import Post, Author, Comment
 from .forms import UploadFileForm, PostForm, CommentForm
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
-from api.views import PostList, CommentList
+from api.views import PostList, CommentList, PostDetail
 from rest_framework.response import Response
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 '''
 Handles submitting the Post form - used when creating a new Post
 '''
-def _submitPostForm(request):
+def _submitPostForm(request, post_pk=None):
     if request.method == "POST":
         form = PostForm(request.POST)
         if form.is_valid():
-            response = PostList.as_view()(request)  # makes post call to API
+            if post_pk != None:
+                response = PostList.as_view()(request, post_pk)
+            else:
+                response = PostList.as_view()(request)  # makes post call to API
             return response
-
 
 '''
 Renders the Public Stream page
@@ -113,6 +116,28 @@ def post_detail(request, post_pk):
         return HttpResponseRedirect(reverse('accounts_login'))
 
 
+def post_edit(request, post_pk):
+    if (request.user.is_authenticated()):
+        if request.method == "POST":
+            response = _submitPostForm(request, post_pk)
+            
+            # Empty Form Submitted
+            if response == None:
+                # alert user form was empty
+                pass
+            else:
+                 # -- TODO : display post success or failure on postDetail.html -- #
+                if ((response.status_code == 201) or (response.status_code == 200)):
+                    return HttpResponseRedirect(reverse('post_detail_success', kwargs={'post_pk':post_pk}))
+                else: # 400 error
+                    # alert user of the error
+                    pass
+
+        post = Post.objects.get(pk=post_pk)
+        form = PostForm(instance=post)
+        return render(request, 'post/postDetail.html', {'post': post, 'form': form})
+    else:
+        return HttpResponseRedirect(reverse('accounts_login'))
 
 def user_profile(request, username):
     if (request.user.is_authenticated()):

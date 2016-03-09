@@ -6,6 +6,7 @@ urlpatterns = [
     url(r'^$', views.public_stream, name='public_stream'),
     url(r'^myStream/$', views.my_stream, name='my_stream'),
     url(r'^post/(?P<post_pk>[^/]+)/$', views.post_detail, name="post_detail"),
+    url(r'^post/(?P<post_pk>[^/]+)/edit/$', views.post_edit, name="post_edit"),
 
     # redirects here after posting - prevents auto re-submitting form upon page refresh
     url(r'^success/$', views.public_stream, name='public_stream_success'),  
