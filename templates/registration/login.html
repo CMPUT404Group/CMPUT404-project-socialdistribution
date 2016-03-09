@@ -29,14 +29,23 @@
 	<body>
 
 		<div class='well well-lg login'>
-			<form method="POST" action="{% url 'django.contrib.auth.views.login' %}">
+            <h1><center>Login</center></h1>
+			<form id="login_form" method="POST" action="../../accounts/login/">
 				{% csrf_token %}
-				{{ form.username.label_tag }}
-    			{{ form.username|addAttributes:'{ "class":"form-control inputTheme" }' }}
-				<br/>
-				{{ form.password.label_tag }}
-    			{{ form.password|addAttributes:'{ "class":"form-control inputTheme" }' }}
-				<br/>
+                Username: <label>
+                <input type="text" name="username" value="" size="50"/>
+            </label>
+                <br />
+                Password: <label>
+                <input type="password" name="password" value="" size="50"/>
+            </label>
+                <br />
+{#				{{ form.username.label_tag }}#}
+{#    			{{ form.username|addAttributes:'{ "class":"form-control inputTheme" }' }}#}
+{#				<br/>#}
+{#				{{ form.password.label_tag }}#}
+{#    			{{ form.password|addAttributes:'{ "class":"form-control inputTheme" }' }}#}
+{#				<br/>#}
 				<button class='btn btn-primary btn-block' type='submit'> Login </button>
 			</form>
 			<hr>

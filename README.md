@@ -25,10 +25,12 @@ Contributors:
     Erin Torbiak
     Abram Hindle
 
-Code was taken, used, & modified from : 
+Code was taken, used, & modified from :
+
 Navbars & Sidebar - https://github.com/BlackrockDigital/startbootstrap-sb-admin
 http://tutorial.djangogirls.org/en/  
 http://www.django-rest-framework.org/
+http://www.tangowithdjango.com/book17/
 
 Code was taken & used from : http://stackoverflow.com/questions/5871730/need-a-minimal-django-file-upload-example
 
@@ -44,6 +46,5 @@ password: admin
 
 "python manage.py createsuperuser" to create admin account
 
-#Reference
 
-http://www.tangowithdjango.com/book17/
+

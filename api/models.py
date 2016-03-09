@@ -20,14 +20,9 @@ class Author(models.Model):
         ('W', 'Waiting for approval'),
         ('P', 'Passed')
     )
-
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     github_name = models.CharField(max_length=40, blank=True)
     picture = models.ImageField(upload_to='profile_images', blank=True)
-
-    # once signup, create an new author object,
-    # but the default status will be 'W', waiting admin to approve
-    status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='W')
 
     def __unicode__(self):
         return self.user.username
