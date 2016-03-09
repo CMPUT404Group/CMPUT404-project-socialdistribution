@@ -114,5 +114,35 @@ window.onload = function() {
       }
     });
   });
+
+  /* -- Hide Upload Image Modal Initially -- */
+  $("#uploadImageModal").hide();
   
+  $("#uploadImageForm").submit(function(event) {
+    event.preventDefault();
+    var formData = new FormData($("#uploadImageForm")[0]);
+    $.ajax({
+      url: 'http://' + window.location.host + '/api/images/',
+      type: "POST",
+      data: formData,
+      contentType: false,
+      processData: false,
+      beforeSend: function(xhr, settings) {
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function(response) {
+        console.log(response);
+        $("button#closeUploadImageModal").click();
+        $("form#uploadImageForm").trigger("reset");
+        toastr.info("Image Uploaded!");
+      },
+      error: function(xhr, ajaxOptions, error) {
+        console.log(xhr.status);
+        console.log(xhr.responseText);
+        console.log(error);
+      }
+    });
+
+  });
+
 };

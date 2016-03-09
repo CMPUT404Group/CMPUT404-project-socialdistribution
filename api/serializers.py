@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models import Post, Comment
+from api.models import Post, Comment, Image
 from django.contrib.auth.models import User
 from django.utils import timezone
 
@@ -31,3 +31,12 @@ class UserSerializer(serializers.ModelSerializer):
 		model = User
 		fields = ('id', 'username')
 		# fields = ('id', 'username', 'posts')
+
+class ImageSerializer(serializers.ModelSerializer):
+	photo = serializers.ImageField(use_url=True)
+	upload_date = serializers.ReadOnlyField(default=timezone.now)
+	author = serializers.ReadOnlyField(source='author.username')
+
+	class Meta:
+		model = Image
+		fields = ('photo', 'upload_date', 'author')

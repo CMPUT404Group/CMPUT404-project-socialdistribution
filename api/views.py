@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from api.models import Post, Comment, Upload
-from api.serializers import PostSerializer, CommentSerializer
+from api.models import Post, Comment, Upload, Image
+from api.serializers import PostSerializer, CommentSerializer, ImageSerializer
 from api.serializers import UserSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -226,6 +226,48 @@ class CommentDetail(generics.GenericAPIView):
 		else:
 			return Response(status=status.HTTP_401_UNAUTHORIZED)
 
+
+
+'''
+Uploads a new image
+'''
+class Images(generics.GenericAPIView):
+	# pagination_class = ListPaginator
+	serializer_class = ImageSerializer
+	# queryset = Post.objects.all()
+
+	# def get(self, request, format=None):
+	# 	# ensure user is authenticated
+	# 	if (request.user.is_authenticated()):
+	# 		posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
+	# 		page = self.paginate_queryset(posts)
+	# 		if page is not None:
+	# 			serializer = PostSerializer(page, many=True)
+	# 			return self.get_paginated_response({"data":serializer.data, "query": "posts"})
+	# 		#else:
+
+	# 	else:
+	# 		return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
+
+	def post(self, request, format=None):
+		# ensure user is authenticated
+		if (request.user.is_authenticated()):
+			serializer = ImageSerializer(data=request.data)
+			if serializer.is_valid():
+				print "DEBUG : API - views.py - Images"
+				serializer.validated_data["author"] = request.user
+				serializer.validated_data["upload_date"] = timezone.now()
+				serializer.save()
+				return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+			else:
+				Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+		else:
+			return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
+
+	# def perform_create(self, serializer):
+	# 	serializer.save(author=self.request.user)
 
 
 '''

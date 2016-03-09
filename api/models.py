@@ -53,3 +53,10 @@ class Comment(models.Model):
 class Upload(models.Model):
     pic = models.ImageField("Image", upload_to="images/")    
     upload_date=models.DateTimeField(auto_now_add =True)
+
+
+class Image(models.Model):
+	photo = models.ImageField("Image", upload_to="images/")
+	upload_date = models.DateTimeField(auto_now_add=True)
+	author = models.ForeignKey('auth.User')
+
