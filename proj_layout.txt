@@ -68,7 +68,19 @@
 │   ├── file.html             # made this for uploading photos
 │   ├── post
 │   │   ├── mainStream.html
-│   │   └── postDetail.html
-│   └── registration
-        └── login.html
-
+│   │   ├── postDetail.html
+│   │   ├── createPost.html
+│   │   └── createComment.html
+│   ├── registration
+│   │   ├── signup.html
+|.. |.. └── login.html
+|.. └── user_profile.html
+├── manager
+│   ├── admin.py        
+│   ├── forms.py        # html forms that take <input> or have interface elements
+│   ├── __init__.py
+│   ├── migrations      # don't touch this, right?
+│   ├── models.py
+│   ├── tests.py        # should prob make some tests
+│   ├── urls.py 
+│   └── views.py 
