@@ -140,3 +140,8 @@ div.profile-header > p {
 .toast {
    opacity: 1 !important;
 }
+
+
+.imageAttachedIcon {
+    margin-left: 0.5em;
+}

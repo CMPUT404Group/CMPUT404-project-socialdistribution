@@ -132,8 +132,14 @@ window.onload = function() {
       },
       success: function(response) {
         console.log(response);
+        // close modal
         $("button#closeUploadImageModal").click();
+        // clear upload image form
         $("form#uploadImageForm").trigger("reset");
+        // append "Image Attached" element
+        $("#uploadImageTrigger").after('<span class="label label-primary imageAttachedIcon">Image Attached!</span>');
+        // disable add image button in create post form
+        $("#uploadImageTrigger").prop("disabled", true);
         toastr.info("Image Uploaded!");
       },
       error: function(xhr, ajaxOptions, error) {
