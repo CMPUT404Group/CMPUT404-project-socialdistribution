@@ -36,24 +36,24 @@
 		<div class='well well-lg login'>
 			<h3 class='registration'> <center> Registration </center> </h3>
 			<hr>
-			<form id="user_from" method="POST" action="registration/signup"  enctype="multipart/form-data">
+			<form id="user_from" method="POST" action="../../accounts/signup/"  enctype="multipart/form-data">
 				{% csrf_token %}
 
                 {{ user_form.as_p }}
                 {{ author_form.as_p }}
 
-				<label>Username:</label>
-    			<input class="form-control inputTheme" name="username" type='text'/>
-				<br/>
-				<label>Password:</label>
-    			<input class="form-control inputTheme" name="password" type='password'/>
-				<br/>
-				<label>Password Confirmation:</label>
-    			<input class="form-control inputTheme" name="password_confirmation" type='password'/>
-				<br/>
-				<label>Email:</label>
-    			<input class="form-control inputTheme" name="email" type='email'/>
-				<br/>
+{#				<label>Username:</label>#}
+{#    			<input class="form-control inputTheme" name="username" type='text'/>#}
+{#				<br/>#}
+{#				<label>Password:</label>#}
+{#    			<input class="form-control inputTheme" name="password" type='password'/>#}
+{#				<br/>#}
+{#				<label>Password Confirmation:</label>#}
+{#    			<input class="form-control inputTheme" name="password_confirmation" type='password'/>#}
+{#				<br/>#}
+{#				<label>Email:</label>#}
+{#    			<input class="form-control inputTheme" name="email" type='email'/>#}
+{#				<br/>#}
 				<button class='btn btn-primary btn-block' type='submit'> Sign Up </button>
 			</form>
 
