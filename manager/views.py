@@ -62,4 +62,4 @@ def register(request):
     # Render the template depending on the context.
     return render(request,
                   'registration/signup.html',
-                  {'user_form': user_form, 'profile_form': author_form, 'registered': registered})
+                  {'user_form': user_form, 'author_form': author_form, 'registered': registered})

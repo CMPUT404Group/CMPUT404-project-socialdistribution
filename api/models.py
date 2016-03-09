@@ -17,7 +17,7 @@ CONTENT_TYPE_CHOICES = (
 # create Author model with a one-to-one association with the the `User` model
 class Author(models.Model):
     STATUS_CHOICES = (
-        ('W', 'Waiting for approve'),
+        ('W', 'Waiting for approval'),
         ('P', 'Passed')
     )
 
