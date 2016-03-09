@@ -14,6 +14,7 @@ CONTENT_TYPE_CHOICES = (
 
 # Why having additional Authors class instead of auth.user:
 # auth.user is the model comes with Django, we need more attributes for Authors.
+# create Author model with a one-to-one association with the the `User` model
 class Author(models.Model):
     STATUS_CHOICES = (
         ('W', 'Waiting for approve'),
@@ -21,7 +22,9 @@ class Author(models.Model):
     )
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    github_name = models.CharField(max_length=40)
+    github_name = models.CharField(max_length=40, blank=True)
+    picture = models.ImageField(upload_to='profile_images', blank=True)
+
     # once signup, create an new author object,
     # but the default status will be 'W', waiting admin to approve
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='W')

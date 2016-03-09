@@ -43,3 +43,7 @@ username: admin
 password: admin
 
 "python manage.py createsuperuser" to create admin account
+
+#Reference
+
+http://www.tangowithdjango.com/book17/
