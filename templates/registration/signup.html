@@ -28,11 +28,20 @@
 
 	<body>
 
+    {% if registered %}
+    thank you for registering!
+    {% else  %}
+    register here!
+
 		<div class='well well-lg login'>
 			<h3 class='registration'> <center> Registration </center> </h3>
 			<hr>
-			<form method="POST" action="">
+			<form id="user_from" method="POST" action="registration/signup"  enctype="multipart/form-data">
 				{% csrf_token %}
+
+                {{ user_form.as_p }}
+                {{ author_form.as_p }}
+
 				<label>Username:</label>
     			<input class="form-control inputTheme" name="username" type='text'/>
 				<br/>
@@ -54,5 +63,6 @@
 
 	    <!-- Bootstrap Core JavaScript -->
 	    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    {%  endif %}
 	</body>
 </html>
