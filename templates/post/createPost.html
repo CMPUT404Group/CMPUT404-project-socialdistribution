@@ -42,32 +42,37 @@
 				  	{% endfor %}
 				  </ul>
 				</div>
-                <!-- Button trigger upload  modal -->
-                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal"><i class="fa fa-picture-o"></i>
-                </button>
 
-                <!-- Modal -->
-                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                           <div class="modal-body">
-                               <!--ref: https://www.cs.tut.fi/~jkorpela/forms/file.html -->
-                                <form action="http://www.cs.tut.fi/cgi-bin/run/~jkorpela/echo.cgi"
-                                      enctype="multipart/form-data" method="post">
-                                        Please specify an image <br>
-                                        <input type="file" name="datafile" size="40">
-                                    </p>
-                                    <div>
-                                        <input type="submit" value="Upload">
-                                    </div>
-                                </form>
-                            </div>                 
-                        </div>
-                    </div>
-                </div>
-                <!-- -End of Modal -->
+				<!-- Triggers uploadImageModal -->
+				<button id='uploadImageTrigger' type="button" class="btn btn-default" data-toggle="modal" data-target="#uploadImageModal">
+					<i class="fa fa-picture-o"></i>
+				</button>
+
+				{% render_field form.image_url type="hidden" %}
+
 				<button type='submit' class='btn btn-primary pull-right'>Post</button>
 			</div>
 		</div>
 	</form>
+</div>
+
+
+<div class="modal fade" id="uploadImageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Upload Image</h4>
+      </div>
+		<form id="uploadImageForm" method="POST" enctype="multipart/form-data"> {% csrf_token %}
+			<div class="modal-body">
+				<input id="id_photo" name="photo" type="file" accept="image/*"> 
+			</div>
+			<div class="modal-footer">
+			<button id="closeUploadImageModal" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			<input type="submit" class="btn btn-primary" value="Upload" />
+		</form>
+      </div>
+    </div>
+  </div>
 </div>

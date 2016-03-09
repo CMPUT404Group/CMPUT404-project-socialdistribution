@@ -27,6 +27,7 @@ class Author(models.Model):
     def __unicode__(self):
         return self.user.username
 
+
 class Post(models.Model):
     PUBLIC = 'PUBLIC'
     FRIENDS_OF_FRIENDS = 'FOAF'
@@ -49,12 +50,14 @@ class Post(models.Model):
     # description - a brief description of the post
     contentType = models.CharField(max_length=15, choices=CONTENT_TYPE_CHOICES, default=PLAINTEXT)
     content = models.TextField()
-    author = models.ForeignKey('auth.user')
+    author = models.ForeignKey('auth.User')
     # categories - categories this posts fits into - a list of strings - ex ["web","tutorial"]
     # count - total # of comments for this post
     published = models.DateTimeField(default=timezone.now)
     visibility = models.CharField(max_length=18, choices=VISIBILITY_SETTING_CHOICES, default=FRIENDS)
-# comments = models.ForeignKey('api.Comment', related_name='post')
+    # comments = models.ForeignKey('api.Comment', related_name='post')
+    image_url = models.CharField(max_length=200, blank=True, null=True)
+
 
 class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -70,3 +73,9 @@ class Comment(models.Model):
 class Upload(models.Model):
     pic = models.ImageField("Image", upload_to="images/")
     upload_date = models.DateTimeField(auto_now_add=True)
+
+
+class Image(models.Model):
+    photo = models.ImageField("Image", upload_to="images/")
+    upload_date = models.DateTimeField(auto_now_add=True)
+    author = models.ForeignKey('auth.User')
