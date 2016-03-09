@@ -13,7 +13,8 @@ from django.utils import timezone
 from rest_framework import generics
 from api.paginators import ListPaginator
 from django.shortcuts import get_object_or_404
-
+from django.conf import settings
+from django.http.request import QueryDict
 # Create your views here.
 '''
 Lists all Posts  / Create a new Post
@@ -48,7 +49,7 @@ class PostList(generics.GenericAPIView):
 				return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 			else:
-				Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 		else:
 			return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
@@ -253,6 +254,7 @@ class Images(generics.GenericAPIView):
 		# ensure user is authenticated
 		if (request.user.is_authenticated()):
 			serializer = ImageSerializer(data=request.data)
+
 			if serializer.is_valid():
 				print "DEBUG : API - views.py - Images"
 				serializer.validated_data["author"] = request.user
