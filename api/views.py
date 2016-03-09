@@ -15,10 +15,12 @@ from api.paginators import ListPaginator
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.http.request import QueryDict
+
 # Create your views here.
 '''
 Lists all Posts  / Create a new Post
 '''
+
 
 class PostList(generics.GenericAPIView):
     pagination_class = ListPaginator
@@ -33,7 +35,7 @@ class PostList(generics.GenericAPIView):
             if page is not None:
                 serializer = PostSerializer(page, many=True)
                 return self.get_paginated_response({"data": serializer.data, "query": "posts"})
-            # else:
+                # else:
 
         else:
             return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
@@ -48,7 +50,7 @@ class PostList(generics.GenericAPIView):
                     serializer = PostSerializer(post, data=request.data)
                 # if logged in user is not author of the post
                 else:
-                    return Response(status=status.HTTP_403_FORBIDDEN) 
+                    return Response(status=status.HTTP_403_FORBIDDEN)
             else:
                 serializer = PostSerializer(data=request.data)
 
@@ -171,11 +173,11 @@ class CommentList(generics.GenericAPIView):
             post = self.get_object(pk)
             # --- TODO : Only authorize users to read/get this post if visibility/privacy settings allow it
             if(self.isAllowed(request, post_pk)):
-                comments = Comment.objects.filter(post=post_pk).order_by('-published')
-                page = self.paginate_queryset(comments)
-                if page is not None:
-                    serializer = CommentSerializer(page, many=True)
-                    return self.get_paginated_response({"data": serializer.data, "query": "comments"})
+            comments = Comment.objects.filter(post=post_pk).order_by('-published')
+            page = self.paginate_queryset(comments)
+            if page is not None:
+                serializer = CommentSerializer(page, many=True)
+                return self.get_paginated_response({"data": serializer.data, "query": "comments"})
                 # else
             else:
                 return Response(status=status.HTTP_403_FORBIDDEN)
@@ -298,44 +300,47 @@ class CommentDetail(generics.GenericAPIView):
 '''
 Uploads a new image
 '''
+
+
 class Images(generics.GenericAPIView):
-	# pagination_class = ListPaginator
-	serializer_class = ImageSerializer
-	# queryset = Post.objects.all()
+    # pagination_class = ListPaginator
+    serializer_class = ImageSerializer
 
-	# def get(self, request, format=None):
-	# 	# ensure user is authenticated
-	# 	if (request.user.is_authenticated()):
-	# 		posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
-	# 		page = self.paginate_queryset(posts)
-	# 		if page is not None:
-	# 			serializer = PostSerializer(page, many=True)
-	# 			return self.get_paginated_response({"data":serializer.data, "query": "posts"})
-	# 		#else:
+    # queryset = Post.objects.all()
 
-	# 	else:
-	# 		return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
+    # def get(self, request, format=None):
+    # 	# ensure user is authenticated
+    # 	if (request.user.is_authenticated()):
+    # 		posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
+    # 		page = self.paginate_queryset(posts)
+    # 		if page is not None:
+    # 			serializer = PostSerializer(page, many=True)
+    # 			return self.get_paginated_response({"data":serializer.data, "query": "posts"})
+    # 		#else:
 
-	def post(self, request, format=None):
-		# ensure user is authenticated
-		if (request.user.is_authenticated()):
-			serializer = ImageSerializer(data=request.data)
+    # 	else:
+    # 		return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
 
-			if serializer.is_valid():
-				print "DEBUG : API - views.py - Images"
-				serializer.validated_data["author"] = request.user
-				serializer.validated_data["upload_date"] = timezone.now()
-				serializer.save()
-				return Response(serializer.data, status=status.HTTP_201_CREATED)
+    def post(self, request, format=None):
+        # ensure user is authenticated
+        if (request.user.is_authenticated()):
+            serializer = ImageSerializer(data=request.data)
 
-			else:
-				Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            if serializer.is_valid():
+                print "DEBUG : API - views.py - Images"
+                serializer.validated_data["author"] = request.user
+                serializer.validated_data["upload_date"] = timezone.now()
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-		else:
-			return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
+            else:
+                Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-	# def perform_create(self, serializer):
-	# 	serializer.save(author=self.request.user)
+        else:
+            return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
+
+        # def perform_create(self, serializer):
+        # 	serializer.save(author=self.request.user)
 
 
 '''
