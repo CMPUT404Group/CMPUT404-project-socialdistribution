@@ -14,7 +14,7 @@
     	<div class='panel-body'> 
             <p>
     		{% if post.contentType == "text/x-markdown" %}
-    			{{ post.content|markdown|urlize }} 
+    			{{ post.content|markdown }} 
 			{% else %}
 				{{ post.content|urlize }}
     		{% endif %}
