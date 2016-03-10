@@ -76,3 +76,11 @@ class Image(models.Model):
     photo = models.ImageField("Image", upload_to="images/")
     upload_date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey('auth.User')
+    
+class Friending(models.Model):
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    friend = models.ForeignKey(Author, related_name='friend', on_delete=models.CASCADE)
+
+class Following(models.Model):
+    author = models.ForeignKey(Author, related_name='follow_author', on_delete=models.CASCADE)
+    following = models.ForeignKey(Author, related_name='follow_following', on_delete=models.CASCADE)
