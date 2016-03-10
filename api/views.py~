@@ -313,9 +313,6 @@ class FriendingList(generics.GenericAPIView):
     serializer_class = CommentSerializer
     queryset = Friending.objects.all()
 
-    def addfriend(){
-
-
 
 
 
