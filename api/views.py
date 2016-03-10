@@ -173,11 +173,11 @@ class CommentList(generics.GenericAPIView):
             post = self.get_object(pk)
             # --- TODO : Only authorize users to read/get this post if visibility/privacy settings allow it
             if(self.isAllowed(request, post_pk)):
-            comments = Comment.objects.filter(post=post_pk).order_by('-published')
-            page = self.paginate_queryset(comments)
-            if page is not None:
-                serializer = CommentSerializer(page, many=True)
-                return self.get_paginated_response({"data": serializer.data, "query": "comments"})
+                comments = Comment.objects.filter(post=post_pk).order_by('-published')
+                page = self.paginate_queryset(comments)
+                if page is not None:
+                    serializer = CommentSerializer(page, many=True)
+                    return self.get_paginated_response({"data": serializer.data, "query": "comments"})
                 # else
             else:
                 return Response(status=status.HTTP_403_FORBIDDEN)
