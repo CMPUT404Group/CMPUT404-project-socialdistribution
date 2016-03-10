@@ -18,7 +18,7 @@ CONTENT_TYPE_CHOICES = (
 class Author(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     github_name = models.CharField(max_length=40, blank=True)
-    picture = models.ImageField(upload_to='profile_images', blank=True)
+    picture = models.ImageField(upload_to='profile_images/', blank=True)
 
 
     def __unicode__(self):

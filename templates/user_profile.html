@@ -4,7 +4,12 @@
 {% load widget_tweaks %}
 
 <div class="row profile-header">
-	<img class="profile-photo-icon img-circle img-responsive img-center pull-left create-post" src="http://placehold.it/175x175">
+	
+    {% if author.picture %}
+    <img src="{{ post.image_url }}" />
+    {% else %}
+    <img class="profile-photo-icon img-circle img-responsive img-center pull-left create-post" src="http://placehold.it/175x175">
+    {% endif %}
     <!-- Button trigger upload  modal -->
     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal"><i class="fa fa-picture-o"></i>
     </button>
