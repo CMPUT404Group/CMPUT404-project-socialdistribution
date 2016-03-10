@@ -6,7 +6,7 @@
 <div class="row profile-header">
 	
     {% if author.picture %}
-    <img src="{{ author.picture }}" />
+    <img src="/media/{{ author.picture }}" height="175" width="175" />
     {% else %}
     <img class="profile-photo-icon img-circle img-responsive img-center pull-left create-post" src="http://placehold.it/175x175">
     {% endif %}
@@ -78,7 +78,7 @@
                 <div class="modal-body">   
                     select image <br>
                     <input id="id_photo" name="photo" type="file" accept="profile_images/*">
-        </p>
+                </div>
         <div>
             <input type="submit" value="Upload">
         </div>

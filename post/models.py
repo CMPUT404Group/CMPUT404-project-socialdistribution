@@ -7,6 +7,12 @@ from django.forms import ModelForm
 
 # Why having additional Author class instead of Auth.user:
 # Auth.user is the model comes with Django, we have to add some fields to make it an author.
+
+# ===========================================
+# ATTENTION: models in this file are outdated,
+# Do not use them. Instead, use api.models.py.
+# ===========================================
+
 class Author(models.Model):
     STATUS_CHOICES = (
         ('W', 'Waiting for approve'),
