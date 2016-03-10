@@ -151,6 +151,6 @@ button.padding {
     margin-right: 0.25em;
 }
 
-.panel-body > img {
-    max-width: 75%;
+.panel-body > p > img {
+    max-width: 75% !important;
 }
