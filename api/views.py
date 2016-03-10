@@ -143,7 +143,7 @@ class CommentList(generics.GenericAPIView):
     queryset = Comment.objects.all()
 
     def isAllowed(self,request,pk):
-        post = self.get_object(pk)
+        post = Post.objects.get(id=pk)
         privacy = post.visibility
 
         #if the post was created by the user allow access
@@ -154,16 +154,27 @@ class CommentList(generics.GenericAPIView):
             return True
         elif privacy == "FRIENDS" or privacy == "FRIENDS_OF_FRIENDS":
             #TODO Friends needs to be implemented first
-            #friends = post.author.friends
-            #if request.user in friends:
+            #friend_pairs = Friending.objects.filter(author=post.author)
+            #friends = []
+            #users = []
+            #for i in range(len(friend_pairs)):
+                #friends.append(friend_pairs[i].friend)
+                #users.append(friend_pairs[i].friend.user)
+            #if request.user in users:
                 #return True
             #elif privacy == "FRIENDS_OF_FRIENDS":
                 #for i in range(len(friends)):
-                    #if request.user in friends[i].friends 
+                    #friend_pairs = Friending.objects.filter(author=friends[i])
+                    #friends = []
+                    #users = []
+                    #for i in range(len(friend_pairs)):
+                        #friends.append(friend_pairs[i].friend)
+                        #users.append(friend_pairs[i].friend.user)
+                    #if request.user in users:
                         #return True
             #else:
                 #return False
-            pass
+            return True
         else:
             return False
 
@@ -219,7 +230,7 @@ class CommentDetail(generics.GenericAPIView):
     queryset = Comment.objects.all()Post
 
     def isAllowed(self,request,pk):
-        post = self.get_object(pk)
+        post = Post.objects.get(id=pk)
         privacy = post.visibility
 
         #if the post was created by the user allow access
@@ -230,12 +241,23 @@ class CommentDetail(generics.GenericAPIView):
             return True
         elif privacy == "FRIENDS" or privacy == "FRIENDS_OF_FRIENDS":
             #TODO Friends needs to be implemented first
-            #friends = post.author.friends
-            #if request.user in friends:
+            #friend_pairs = Friending.objects.filter(author=post.author)
+            #friends = []
+            #users = []
+            #for i in range(len(friend_pairs)):
+                #friends.append(friend_pairs[i].friend)
+                #users.append(friend_pairs[i].friend.user)
+            #if request.user in users:
                 #return True
             #elif privacy == "FRIENDS_OF_FRIENDS":
                 #for i in range(len(friends)):
-                    #if request.user in friends[i].friends 
+                    #friend_pairs = Friending.objects.filter(author=friends[i])
+                    #friends = []
+                    #users = []
+                    #for i in range(len(friend_pairs)):
+                        #friends.append(friend_pairs[i].friend)
+                        #users.append(friend_pairs[i].friend.user)
+                    #if request.user in users:
                         #return True
             #else:
                 #return False
