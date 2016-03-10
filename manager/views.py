@@ -87,19 +87,19 @@ def user_login(request):
         # combination is valid - a User object is returned if it is.
         user = authenticate(username=username, password=password)
 
-        # Redirect admin to admin page
-        try:
-            author = Author.objects.get(user=user)
-        except Author.DoesNotExist as e:
-            if user:
-                return HttpResponseRedirect("/admin")
-            else:
-                return render(request, "registration/login.html", {'message': "Invalid username or password."})
+        # # # Redirect admin to admin page
+        # try:
+        #     author = Author.objects.get(user=user)
+        # except Author.DoesNotExist as e:
+        #     if user:
+        #         return HttpResponseRedirect('/admin')
+        #     else:
+        #         return render(request, "registration/login.html", {'message': "Invalid username or password."})
 
         # If we have a User object, the details are correct.
         # If None (Python's way of representing the absence of a value), no user
         # with matching credentials was found.
-        if author:
+        if user:
 
             # Is the account active? It could have been disabled.
             if user.is_active:

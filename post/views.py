@@ -181,7 +181,7 @@ def user_profile(request, username):
         try:
             author = Author.objects.get(user=user)
         except Author.DoesNotExist as e:
-            return render(request, "404_page.html", {'message': "Author does not exist."})
+            return render(request, "admin.html")
 
         form = PostForm()
         return render(request, "user_profile.html",
