@@ -182,7 +182,6 @@ class CommentList(generics.GenericAPIView):
     def get(self, request, post_pk, format=None):
         # ensure user is authenticated
         if (request.user.is_authenticated()):
-            post = self.get_object(pk)
             # --- TODO : Only authorize users to read/get this post if visibility/privacy settings allow it
             if(self.isAllowed(request, post_pk)):
                 comments = Comment.objects.filter(post=post_pk).order_by('-published')
@@ -270,12 +269,15 @@ class CommentDetail(generics.GenericAPIView):
         return get_object_or_404(Comment, pk=pk)
 
     def get(self, request, post_pk, comment_pk, format=None):
+        print comment_pk
         # ensure user is authenticated
         if (request.user.is_authenticated()):
 
             # --- TODO : Only authorize users to read/get this comment if visibility/privacy settings of the corresponding post allow it
             if(self.isAllowed(request,post_pk)):
+                print "IN HERE"
                 comment = self.get_object(comment_pk)
+                print "OU HERE"
                 serializer = CommentSerializer(comment)
                 return Response(serializer.data)
             else:

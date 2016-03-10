@@ -7,7 +7,7 @@
 
     <!-- Display profile image -->
     {% if author.picture %}
-    <img id="id-user-profile-image" src="/media/{{ author.picture }}" class="profile-photo-icon img-circle img-responsive img-center pull-left create-post" alt="Profile Image"/>
+    <img id="id-user-profile-image" src="/media/{{ author.picture }}" class="profile-photo img-circle img-responsive img-center pull-left create-post" alt="Profile Image"/>
     {% else %}
     <img id="id-user-profile-image" class="profile-photo-icon img-circle img-responsive img-center pull-left create-post" src="http://placehold.it/175x175">
     {% endif %}
@@ -19,7 +19,7 @@
         <!-- Display required user info on profile page -->
         <h1> {{ user_account.username }} </h1>
         <div>
-            <p style="color: grey;">id: {{ user_account.id }} </p>
+            <!-- <p style="color: grey;">id: {{ user_account.id }} </p> -->
             <p style="color: grey;">host: {{ author.host }} </p>
             <p style="color: grey;">username: {{ user_account.username }} </p>
             <p style="color: grey;">url: {{ author.host }}/user/{{ user_account.username }} </p>
@@ -69,7 +69,7 @@
         </div>
     </div>
 
-    {% if post.author == user %}
+    {% if post.author == author %}
     <div class="media-body post-action-icons">
         <a href="{% url 'post_edit' post.id %}"><button class="btn btn-default action-icon edit-post"><i class="fa fa-pencil-square-o"></i></button></a>
         <button class="btn btn-default action-icon"><i class="fa fa-trash-o"></i></button>
