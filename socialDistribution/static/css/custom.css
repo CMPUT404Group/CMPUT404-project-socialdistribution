@@ -145,3 +145,12 @@ div.profile-header > p {
 .imageAttachedIcon {
     margin-left: 0.5em;
 }
+
+button.padding {
+    margin-left: 0.25em;
+    margin-right: 0.25em;
+}
+
+.panel-body > p > img {
+    max-width: 75% !important;
+}

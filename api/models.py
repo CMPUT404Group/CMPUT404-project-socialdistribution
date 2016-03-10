@@ -24,6 +24,14 @@ class Author(models.Model):
     def __unicode__(self):
         return self.user.username
 
+# Source from http://stackoverflow.com/questions/4564760/best-way-to-make-djangos-user-system-have-friends March 9, 2016
+class Friend(models.Model):
+
+    # friends table	
+
+    user = models.ForeignKey(User)
+    friend = models.ForeignKey(User, related_name="friends")
+
 
 class Post(models.Model):
     PUBLIC = 'PUBLIC'
@@ -76,3 +84,11 @@ class Image(models.Model):
     photo = models.ImageField("Image", upload_to="images/")
     upload_date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey('auth.User')
+    
+class Friending(models.Model):
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    friend = models.ForeignKey(Author, related_name='friend', on_delete=models.CASCADE)
+
+class Following(models.Model):
+    author = models.ForeignKey(Author, related_name='follow_author', on_delete=models.CASCADE)
+    following = models.ForeignKey(Author, related_name='follow_following', on_delete=models.CASCADE)

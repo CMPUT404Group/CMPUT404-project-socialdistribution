@@ -42,6 +42,11 @@
             {% else %}
                 {{ post.content|urlize }}
             {% endif %}
+            
+            <br/>
+            {% if post.image_url %}
+                <img src="{{ post.image_url }}" />
+            {% endif %}
         </div>
     	<hr class='post-hr'>
     	<div class='panel-body'>
@@ -52,8 +57,8 @@
 
     {% if post.author == user %}
 	<div class="media-body post-action-icons">
-		<button class="btn btn-default action-icon"><i class="fa fa-pencil-square-o"></i></button>
-		<button class="btn btn-default action-icon delete-post" id='delete-post-{{ post.id }}'><i class="fa fa-trash-o"></i></button>
+        <a href="{% url 'post_edit' post.id %}"><button class="btn btn-default action-icon edit-post"><i class="fa fa-pencil-square-o"></i></button></a>
+        <button class="btn btn-default action-icon"><i class="fa fa-trash-o"></i></button>
 	</div>
 	{% else %}
 	<div class="media-body post-action-icons placeholder">

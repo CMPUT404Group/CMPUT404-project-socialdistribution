@@ -53,6 +53,7 @@
 
 				{% if edit %}
 					<button id='submit_edit_post' type='submit' class='btn btn-primary pull-right'>Save Changes</button>
+					<button id='delete-post-{{ post.id }}' class="btn btn-danger pull-right padding delete-post-single"> Delete Post </button>
 				{% else %}
 					<button type='submit' class='btn btn-primary pull-right'>Post</button>
 				{% endif %}
