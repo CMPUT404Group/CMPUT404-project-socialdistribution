@@ -2,10 +2,11 @@
 
 - [X] As an author I want to make posts.
   - Test Location: 
-    - CMPUT404-project-socialdistribution/api/tests.py (backend)
+    - CMPUT404-project-socialdistribution/api/tests.py test_get (backend)
     - [[https://youtu.be/4zgsHDWk6vE]] (frontend)
 - [X] As an author, posts I create can link to images.
   - Test Location:
+    - CMPUT404-project-socialdistribution/api/tests.py test_get (backend)
 - [X] As a server admin, images can be hosted on my server.
   - Test Location:
 - [ ] As an author, posts I create be private to me
@@ -51,7 +52,7 @@
   - Test Location:
 - [ ] As an author, I want to befriend local authors
   - Test Location:
-    -  CMPUT404-project-socialdistribution/api/tests.py (backend)
+    -  CMPUT404-project-socialdistribution/api/tests.py test_view_access (backend)
 - [ ] As an author, I want to befriend remote authors
   - Test Location:
 - [ ] As an author, I want to feel safe about sharing images and
@@ -82,6 +83,7 @@
     -  CMPUT404-project-socialdistribution/api/tests.py (backend)
 - [X] As an author, I want to comment on posts that I can access
   - Test Location:
+    -  CMPUT404-project-socialdistribution/api/tests.py test_view_access (backend)
 - [ ] As an author, my server will know about my friends
   - Test Location:
 - [ ] As an author, When I befriend someone it follows them, only when
@@ -91,7 +93,7 @@
   - Test Location:
 - [X] As an author I should be able to browse the public posts of everyone
   - Test Location:
-    -  CMPUT404-project-socialdistribution/api/tests.py (backend)
+    -  CMPUT404-project-socialdistribution/api/tests.py test_view_access (backend)
 - [ ] As an author I should be able to browse the posts of others depending on my status
   - Test Location:
 - [ ] As a server admin, I want to be able to add nodes to share with
