@@ -179,8 +179,11 @@ window.onload = function() {
   $("#uploadProfileImageForm").submit(function(event) {
     event.preventDefault();
     var formData = new FormData($("#uploadProfileImageForm")[0]);
+    formData.append("github_name", "");
+    formData.append("host", "");
+    var authorID = $("#uploadProfileImageForm").data("author-id");
     $.ajax({
-      url: 'http://' + window.location.host + '/api/images/',
+      url: 'http://' + window.location.host + '/api/authors/' + authorID + '/',
       type: "POST",
       data: formData,
       contentType: false,
@@ -189,13 +192,12 @@ window.onload = function() {
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
       },
       success: function(response) {
-        console.log(response);
         // close modal
         $("button#closeUploadProfileImageModal").click();
         // clear upload image form
         $("form#uploadProfileImageForm").trigger("reset");
         // change user profile image
-        $("img#id-user-profile-image").attr('src', response.photo);
+        $("img#id-user-profile-image").attr('src', response.picture);
         toastr.info("Profile Image Updated!");
       },
       error: function(xhr, ajaxOptions, error) {

@@ -13,6 +13,8 @@ body {
 img.profile-photo-icon {
 	margin-top: 0.5em;
 	margin-right: 0.5em;
+    max-width: 175px;
+    max-width: 175px;
 }
 
 hr.post-hr {

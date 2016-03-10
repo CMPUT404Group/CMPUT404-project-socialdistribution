@@ -88,6 +88,29 @@ window.onload = function() {
     });
   });
 
+  /* -- Deletes posts from editing page -- */
+  $("button.delete-post-single").click(function(event) {
+    var that = this;
+    var id = this.id.slice(12);
+    $.ajax({
+      url: 'http://' + window.location.host +'/api/posts/' + id + '/',
+      type: "DELETE",
+      beforeSend: function(xhr, settings) {
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function(response) {
+        console.log(response);
+        toastr.info("Post Deleted!");
+        window.location.replace("http://" + window.location.host);
+      },
+      error: function(xhr, ajaxOptions, error) {
+        console.log(xhr.status);
+        console.log(xhr.responseText);
+        console.log(error);
+      }
+    });
+  });
+
   /* -- Deletes comments -- */
   $("button.delete-comment").click(function(event) {
     var that = this;
@@ -117,8 +140,9 @@ window.onload = function() {
 
   /* -- Hide Upload Image Modal Initially -- */
   $("#uploadImageModal").hide();
+  $("#uploadProfileImageModal").hide();
   
-  $("#uploadImageForm").submit(function(event) {
+  $("#uploadImageForm").submit(function(event){
     event.preventDefault();
     var formData = new FormData($("#uploadImageForm")[0]);
     $.ajax({
@@ -150,7 +174,37 @@ window.onload = function() {
         console.log(error);
       }
     });
-
   });
 
+  $("#uploadProfileImageForm").submit(function(event) {
+    event.preventDefault();
+    var formData = new FormData($("#uploadProfileImageForm")[0]);
+    formData.append("github_name", "");
+    formData.append("host", "");
+    var authorID = $("#uploadProfileImageForm").data("author-id");
+    $.ajax({
+      url: 'http://' + window.location.host + '/api/author/' + authorID + '/',
+      type: "POST",
+      data: formData,
+      contentType: false,
+      processData: false,
+      beforeSend: function(xhr, settings) {
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function(response) {
+        // close modal
+        $("button#closeUploadProfileImageModal").click();
+        // clear upload image form
+        $("form#uploadProfileImageForm").trigger("reset");
+        // change user profile image
+        $("img#id-user-profile-image").attr('src', response.picture);
+        toastr.info("Profile Image Updated!");
+      },
+      error: function(xhr, ajaxOptions, error) {
+        console.log(xhr.status);
+        console.log(xhr.responseText);
+        console.log(error);
+      }
+    });
+  });
 };

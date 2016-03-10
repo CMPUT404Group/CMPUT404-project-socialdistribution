@@ -7,7 +7,7 @@
 
     <!-- Display profile image -->
     {% if author.picture %}
-    <img id="id-user-profile-image" src="/media/{{ author.picture }}" class="profile-photo-icon img-circle img-responsive img-center pull-left create-post" height="175" width="175" alt="Profile Image"/>
+    <img id="id-user-profile-image" src="/media/{{ author.picture }}" class="profile-photo-icon img-circle img-responsive img-center pull-left create-post" alt="Profile Image"/>
     {% else %}
     <img id="id-user-profile-image" class="profile-photo-icon img-circle img-responsive img-center pull-left create-post" src="http://placehold.it/175x175">
     {% endif %}

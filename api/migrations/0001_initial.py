@@ -17,9 +17,10 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Author',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('id', models.UUIDField(default=uuid.uuid4, serialize=False, editable=False, primary_key=True)),
                 ('github_name', models.CharField(max_length=40, blank=True)),
-                ('picture', models.ImageField(upload_to=b'profile_images', blank=True)),
+                ('picture', models.ImageField(upload_to=b'profile_images/', blank=True)),
+                ('host', models.CharField(default=b'http://127.0.0.1:8080/', max_length=40)),
                 ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
             ],
         ),
@@ -31,6 +32,30 @@ class Migration(migrations.Migration):
                 ('contentType', models.CharField(default=b'text/plain', max_length=15, choices=[(b'text/x-markdown', b'Markdown'), (b'text/plain', b'Plaintext')])),
                 ('published', models.DateTimeField(default=django.utils.timezone.now)),
                 ('author', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Following',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('author', models.ForeignKey(related_name='follow_author', to='api.Author')),
+                ('following', models.ForeignKey(related_name='follow_following', to='api.Author')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Friend',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('friend', models.ForeignKey(related_name='friends', to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Friending',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('author', models.ForeignKey(to='api.Author')),
+                ('friend', models.ForeignKey(related_name='friend', to='api.Author')),
             ],
         ),
         migrations.CreateModel(
