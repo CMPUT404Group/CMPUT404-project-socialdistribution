@@ -23,6 +23,15 @@ class ApiPostModelTestCase(TestCase):
         					author=user, published=date, visibility="PUBLIC")
         Comment.objects.create(id=c_id, post=post, author=user1, contentType="PLAINTEXT",
         					comment="this is my comment", published=date)
+        
+    def test_following(self):
+        user = User.objects.create(username="bob")
+        user1 = User.objects.create(username="sam")
+        author1 = Author.objects.create(user=user1, github_name="sammy", status="P")
+        author = Author.objects.create(user=user, github_name="bobby", status="P")
+        author1.following = author
+        print(author1.following)
+
 
     # check that the post is an instance of the post
     def test_is_post(self):
