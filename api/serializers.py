@@ -1,9 +1,5 @@
 from rest_framework import serializers
-<<<<<<< HEAD
-from api.models import Post, Comment, Image, Author, Friend
-=======
 from api.models import Post, Comment, Image, Author
->>>>>>> refs/remotes/origin/master
 from django.contrib.auth.models import User
 from django.utils import timezone
 
@@ -49,8 +45,6 @@ class ImageSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Image
 		fields = ('photo', 'upload_date', 'author')
-<<<<<<< HEAD
-=======
 
 class AuthorSerializer(serializers.ModelSerializer):
 	picture = serializers.ImageField(use_url=True)
@@ -58,4 +52,4 @@ class AuthorSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Author
 		fields = ('id', 'github_name', 'picture', 'host')
->>>>>>> refs/remotes/origin/master
+
