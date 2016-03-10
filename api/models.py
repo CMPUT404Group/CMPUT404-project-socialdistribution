@@ -20,6 +20,7 @@ class Author(models.Model):
     github_name = models.CharField(max_length=40, blank=True)
     picture = models.ImageField(upload_to='profile_images', blank=True)
 
+
     def __unicode__(self):
         return self.user.username
 
