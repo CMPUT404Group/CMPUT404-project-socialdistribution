@@ -77,8 +77,8 @@ def my_stream(request):
                 else:  # 400 error
                     # alert user of the error
                     pass
-
-        posts = Post.objects.filter(author=request.user).order_by('-published')
+        author = Author.objects.get(user=request.user)
+        posts = Post.objects.filter(author=author).order_by('-published')
         form = PostForm()
         return render(request, 'post/mainStream.html', {'posts': posts, 'form': form})
     else:
@@ -177,7 +177,8 @@ def user_profile(request, username):
                     pass
 
         # --- TODO : FILTER POSTS BY VISIBILITY TO LOGGED IN USER --- #
-        posts = Post.objects.filter(author=user).order_by('-published')
+        author = Author.objects.get(user=request.user)
+        posts = Post.objects.filter(author=author).order_by('-published')
         try:
             author = Author.objects.get(user=user)
         except Author.DoesNotExist as e:
