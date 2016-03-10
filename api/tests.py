@@ -10,6 +10,11 @@ post_id2 = uuid.uuid4()
 c_id = uuid.uuid4()
 c_id2 = uuid.uuid4()
 date = timezone.now()
+pid1 = uuid.uuid4()
+pid2 = uuid.uuid4()
+pid3 = uuid.uuid4()
+pid4 = uuid.uuid4()
+pid5 = uuid.uuid4()
 
 # testing creating and getting posts
 class ApiPostModelTestCase(TestCase):
@@ -18,12 +23,16 @@ class ApiPostModelTestCase(TestCase):
         user = User.objects.create(username="bob")
         user1 = User.objects.create(username="sam")
         author = Author.objects.create(user=user1, github_name="sammy")
+        author1 = Author.objects.create(user=user, github_name="bobby")
         post = Post.objects.create(id=post_id, title="Title", contentType="PLAINTEXT", 
         					content="this is my post data",
-        					author=user, published=date, visibility="PUBLIC")
-        Comment.objects.create(id=c_id, post=post, author=user1, contentType="PLAINTEXT",
+        					author=author, published=date, visibility="PUBLIC")
+
+        Comment.objects.create(id=c_id, post=post, author=author1, contentType="PLAINTEXT",
         					comment="this is my comment", published=date)
-        
+
+
+    #check that two authors can follow each other
     def test_following(self):
         user = User.objects.create(username="rob")
         user1 = User.objects.create(username="tammy")
@@ -34,6 +43,7 @@ class ApiPostModelTestCase(TestCase):
         self.assertEqual(following.author,author)
         self.assertEqual(following.following,author1)
 
+    #check that two authors can friend each other
     def test_friending(self):
         user = User.objects.create(username="cam")
         user1 = User.objects.create(username="mitchel")
@@ -54,7 +64,7 @@ class ApiPostModelTestCase(TestCase):
     def test_get(self):
         #test that we can get the post back
         post = Post.objects.get(id=post_id)
-        self.assertEqual(post.author.username, "bob")
+        self.assertEqual(post.author.user.username, "sam")
         self.assertEqual(post.contentType, "PLAINTEXT")
         self.assertEqual(post.published, date)
         self.assertEqual(post.visibility, "PUBLIC")
@@ -70,12 +80,44 @@ class ApiPostModelTestCase(TestCase):
         #test that we can get the comment back
         comment = Comment.objects.get(id=c_id)
         self.assertEqual(comment.post.id, post_id)
-        self.assertEqual(comment.author.username, "sam")
+        self.assertEqual(comment.author.user.username, "bob")
         self.assertEqual(comment.contentType, "PLAINTEXT")
         self.assertEqual(comment.comment, "this is my comment")
         self.assertEqual(comment.published, date)
 
 class ApiUrlsTestCase(TestCase):
+    def setUp(self):
+        user2 = User.objects.create(username="sam")
+        user1 = User.objects.create(username="bob")
+        user = User.objects.create(username='tester', password='12345', is_active=True, is_staff=False, is_superuser=True) 
+        user.set_password('hello') 
+        user.save()
+
+        sam = Author.objects.create(user=user2, github_name="sammy")
+        bob = Author.objects.create(user=user1, github_name="bobby")
+
+        tester = Author.objects.create(user=user)
+
+        post = Post.objects.create(id=post_id2, title="Title", contentType="PLAINTEXT", 
+                            content="this is my post data",
+                            author=tester, published=date, visibility="PUBLIC")
+
+        post1 = Post.objects.create(id=post_id, title="Title", contentType="PLAINTEXT", 
+                            content="this is my hidden post data",
+                            author=tester, published=date, visibility="PRIVATE")
+
+        post2 = Post.objects.create(id=pid3, title="Title", contentType="PLAINTEXT", 
+                            content="this is my friends private post data",
+                            author=bob, published=date, visibility="PRIVATE")
+
+        post3 = Post.objects.create(id=pid4, title="Title", contentType="PLAINTEXT", 
+                            content="this is my friends public post data",
+                            author=bob, published=date, visibility="PUBLIC")
+
+        Comment.objects.create(id=c_id, post=post, author=bob, contentType="PLAINTEXT",
+                            comment="this is my comment", published=date)
+
+
     def test_redirect(self):
         # check that it redirects to the login page
         # when the user is not signed in
@@ -98,16 +140,6 @@ class ApiUrlsTestCase(TestCase):
         self.assertEqual(path, "accounts/login")
 
         #check an existing post is not  viewable since the user is not logged in
-        user = User.objects.create(username="sam")
-        user1 = User.objects.create(username="bob")
-        post = Post.objects.create(id=post_id2, title="Title", contentType="PLAINTEXT", 
-                            content="this is my post data",
-                            author=user, published=date, visibility="PUBLIC")
-        post1 = Post.objects.create(id=post_id, title="Title", contentType="PLAINTEXT", 
-                            content="this is my hidden post data",
-                            author=user, published=date, visibility="PRIVATE")
-        Comment.objects.create(id=c_id, post=post, author=user1, contentType="PLAINTEXT",
-                            comment="this is my comment", published=date)
         resp = self.client.get("/post/"+str(post_id2)+"/")
         resp1 = self.client.get("/post/"+str(post_id2)+"/success/")
         self.assertEqual(resp.status_code, 302)
@@ -122,34 +154,8 @@ class ApiUrlsTestCase(TestCase):
         self.assertEqual(path1, "accounts/login")
 
     def test_access(self):
-    	#check an existing post is not  viewable since the user is not logged in
-        self.user = User.objects.create(username='testuser', password='12345', is_active=True, is_staff=True, is_superuser=True) 
-        user1 = User.objects.create(username="bob")
-
-
-        post = Post.objects.create(id=post_id2, title="Title", contentType="PLAINTEXT", 
-        					content="this is my post data",
-        					author=self.user, published=date, visibility="PUBLIC")
-
-        post1 = Post.objects.create(id=post_id, title="Title", contentType="PLAINTEXT", 
-        					content="this is my hidden post data",
-        					author=self.user, published=date, visibility="PRIVATE")
-
-        post2 = Post.objects.create(id=uuid.uuid4(), title="Title", contentType="PLAINTEXT", 
-                            content="this is my friends private post data",
-                            author=user1, published=date, visibility="PRIVATE")
-
-        post3 = Post.objects.create(id=uuid.uuid4(), title="Title", contentType="PLAINTEXT", 
-                            content="this is my friends public post data",
-                            author=user1, published=date, visibility="PUBLIC")
-
-        Comment.objects.create(id=c_id, post=post, author=user1, contentType="PLAINTEXT",
-        					comment="this is my comment", published=date)
-
-        # login to the page
-        self.user.set_password('hello') 
-        self.user.save() 
-        login = self.client.login(username='testuser', password='hello') 
+    	#login
+        login = self.client.login(username='tester', password='hello') 
         self.assertTrue(login)
         self.client.session.save()
 
@@ -157,8 +163,8 @@ class ApiUrlsTestCase(TestCase):
         resp1 = self.client.get("/post/"+str(post_id2)+"/")
         resp2 = self.client.get("/")
         resp3 = self.client.get("/myStream/")
-        resp4 = self.client.get("/user/testuser/")
-        resp5 = self.client.get("/post/"+str(post2.id)+"/")
+        resp4 = self.client.get("/user/tester/")
+        resp5 = self.client.get("/post/"+str(pid3)+"/")
         resp6 = self.client.get("/user/bob/")
         self.assertEqual(resp1.status_code, 200)
         self.assertEqual(resp2.status_code, 200)
@@ -171,13 +177,13 @@ class ApiUrlsTestCase(TestCase):
         #with their authors from the page url ./post/<post id>
         self.assertContains(resp1,"this is my post data")
         self.assertContains(resp1, "this is my comment")
-        self.assertContains(resp1, "testuser")
-        self.assertContains(resp1, "bob")
+        self.assertContains(resp1, "tester")
 
         #check thats the public post is also viewable from the main page
         self.assertContains(resp2,"this is my post data")
         self.assertContains(resp2,"this is my friends public post data")
-        self.assertContains(resp2, "testuser")
+        self.assertContains(resp2, "tester")
+
         #but that the private posts are not visible
         self.assertFalse("this is my hidden post data" in str(resp2)) 
         self.assertFalse("this is my friends private post data" in str(resp2))     
@@ -188,12 +194,13 @@ class ApiUrlsTestCase(TestCase):
         self.assertFalse("this is my friends private post data" in str(resp3))
         self.assertFalse("this is my friends public post data" in str(resp3))
 
-        ''' Just for while the user page is under construction
+     
         #check that my posts are on my profile page
         self.assertContains(resp4,"this is my post data")
         self.assertContains(resp4,"this is my hidden post data")
 
+        print(resp6)
         #check that my friends private post is hidden but the public one is public
+        self.assertFalse("this is my post data" in str(resp6))
         self.assertContains(resp6,"this is my friends public post data")
         self.assertFalse("this is my friends private post data" in str(resp6))
-        '''
