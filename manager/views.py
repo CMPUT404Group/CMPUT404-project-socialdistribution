@@ -87,10 +87,20 @@ def user_login(request):
         # combination is valid - a User object is returned if it is.
         user = authenticate(username=username, password=password)
 
+        # Redirect admin to admin page
+        try:
+            author = Author.objects.get(user=user)
+        except Author.DoesNotExist as e:
+            if user:
+                return HttpResponseRedirect("/admin")
+            else:
+                return render(request, "registration/login.html", {'message': "Invalid username or password."})
+
         # If we have a User object, the details are correct.
         # If None (Python's way of representing the absence of a value), no user
         # with matching credentials was found.
-        if user:
+        if author:
+
             # Is the account active? It could have been disabled.
             if user.is_active:
                 # If the account is valid and active, we can log the user in.
@@ -99,11 +109,11 @@ def user_login(request):
                 return HttpResponseRedirect('/')
             else:
                 # An inactive account was used - no logging in!
-                return HttpResponse("Your account is disabled.")
+                return render(request, "registration/login.html", {'message': "Your account has not been activated."})
         else:
             # Bad login details were provided. So we can't log the user in.
             print "Invalid login details: {0}, {1}".format(username, password)
-            return HttpResponse("Invalid login details supplied.")
+            return render(request, "registration/login.html", {'message': "Invalid username or password."})
 
     # The request is not a HTTP POST, so display the login form.
     # This scenario would most likely be a HTTP GET.

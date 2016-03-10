@@ -29,6 +29,13 @@
 	<body>
 
 		<div class='well well-lg login'>
+        <!-- display login error -->
+            {%  if message %}
+            <div class="alert alert-danger">
+                {{ message }}
+            </div>
+            {% endif %}
+
             <h2><center>Login</center></h2>
 			<form id="login_form" method="POST" action="{% url 'accounts_login' %}">
 				{% csrf_token %}
