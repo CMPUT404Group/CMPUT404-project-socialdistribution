@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from api.models import Post, Comment, Upload, Image, Following, Friending
+from api.models import Post, Comment, Upload, Image, Following, Friending, Author
 from api.serializers import PostSerializer, CommentSerializer, ImageSerializer
 from api.serializers import UserSerializer
 from rest_framework.decorators import api_view
@@ -46,7 +46,8 @@ class PostList(generics.GenericAPIView):
             if post_pk != None:
                 post = get_object_or_404(Post, pk=post_pk)
                 # only allow author of the post to modify it
-                if request.user == post.author:
+                author = Author.objects.get(user=request.user)
+                if author == post.author:
                     serializer = PostSerializer(post, data=request.data)
                 # if logged in user is not author of the post
                 else:
@@ -56,7 +57,7 @@ class PostList(generics.GenericAPIView):
 
             if serializer.is_valid():
                 print "DEBUG : API - views.py - PostList"
-                serializer.validated_data["author"] = request.user
+                serializer.validated_data["author"] = Author.objects.get(user=request.user)
                 serializer.validated_data["published"] = timezone.now()
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -101,7 +102,7 @@ class PostDetail(generics.GenericAPIView):
             post = self.get_object(pk)
 
             # only allow author of the post to modify it
-            if request.user == post.author:
+            if Author.objects.get(user=request.user) == post.author:
                 serializer = PostSerializer(post, data=request.data)
                 if serializer.is_valid():
                     serializer.save()
@@ -120,7 +121,7 @@ class PostDetail(generics.GenericAPIView):
         if (request.user.is_authenticated()):
             post = self.get_object(pk)
             # only allow author of the post to modify it
-            if request.user == post.author:
+            if Author.objects.get(user=request.user)== post.author:
                 post.delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -147,7 +148,7 @@ class CommentList(generics.GenericAPIView):
         privacy = post.visibility
 
         #if the post was created by the user allow access
-        if request.user == post.author:
+        if Author.objects.get(user=request.user) == post.author :
             return True
         #if it is a public post allow everypne access
         if privacy == "PUBLIC":
@@ -204,7 +205,7 @@ class CommentList(generics.GenericAPIView):
                 serializer = CommentSerializer(data=request.data)
                 if serializer.is_valid():
                     print "DEBUG : API - views.py - CommentList"
-                    serializer.validated_data["author"] = request.user
+                    serializer.validated_data["author"] = Author.objects.get(user=request.user)
                     serializer.validated_data["published"] = timezone.now()
                     serializer.validated_data["post"] = Post.objects.get(pk=post_pk)
                     serializer.save()
@@ -234,7 +235,7 @@ class CommentDetail(generics.GenericAPIView):
         privacy = post.visibility
 
         #if the post was created by the user allow access
-        if request.user == post.author:
+        if Author.objects.get(user=request.user)== post.author:
             return True
         #if it is a public post allow everypne access
         if privacy == "PUBLIC":
@@ -288,7 +289,7 @@ class CommentDetail(generics.GenericAPIView):
             comment = self.get_object(comment_pk)
 
             # only allow author of the comment to modify it
-            if request.user == comment.author:
+            if Author.objects.get(user=request.user) == comment.author:
                 serializer = CommentSerializer(post, data=request.data)
                 if serializer.is_valid():
                     serializer.save()
@@ -307,7 +308,7 @@ class CommentDetail(generics.GenericAPIView):
         if (request.user.is_authenticated()):
             comment = self.get_object(comment_pk)
             # only allow author of the comment to modify it
-            if request.user == comment.author:
+            if Author.objects.get(user=request.user) == comment.author:
                 comment.delete()
                 return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -367,7 +368,7 @@ class Images(generics.GenericAPIView):
 
             if serializer.is_valid():
                 print "DEBUG : API - views.py - Images"
-                serializer.validated_data["author"] = request.user
+                serializer.validated_data["author"] = Author.objects.get(user=request.user)
                 serializer.validated_data["upload_date"] = timezone.now()
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)

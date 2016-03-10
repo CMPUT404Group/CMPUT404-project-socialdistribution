@@ -54,7 +54,7 @@ class Post(models.Model):
     # description - a brief description of the post
     contentType = models.CharField(max_length=15, choices=CONTENT_TYPE_CHOICES, default=PLAINTEXT)
     content = models.TextField()
-    author = models.ForeignKey('auth.User')
+    author = models.ForeignKey('Author')
     # categories - categories this posts fits into - a list of strings - ex ["web","tutorial"]
     # count - total # of comments for this post
     published = models.DateTimeField(default=timezone.now)
@@ -67,7 +67,7 @@ class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     post = models.ForeignKey('api.Post', related_name='comments')
 
-    author = models.ForeignKey('auth.user')
+    author = models.ForeignKey('Author')
     comment = models.TextField()
     contentType = models.CharField(max_length=15, choices=CONTENT_TYPE_CHOICES, default=PLAINTEXT)
     published = models.DateTimeField(default=timezone.now)
@@ -82,7 +82,7 @@ class Upload(models.Model):
 class Image(models.Model):
     photo = models.ImageField("Image", upload_to="images/")
     upload_date = models.DateTimeField(auto_now_add=True)
-    author = models.ForeignKey('auth.User')
+    author = models.ForeignKey('Author')
     
 class Friending(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
