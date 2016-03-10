@@ -21,3 +21,7 @@ venv
 node_modules
 .sass-cache
 .idea
+
+# Cached files
+.py~
+
