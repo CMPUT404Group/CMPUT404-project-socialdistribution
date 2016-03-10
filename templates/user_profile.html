@@ -1,10 +1,14 @@
 {% extends 'base.html' %}
 {% load markdown_deux_tags %}
-
 {% block content %}
+{% load widget_tweaks %}
 
 <div class="row profile-header">
 	<img class="profile-photo-icon img-circle img-responsive img-center pull-left create-post" src="http://placehold.it/175x175">
+    <!-- Button trigger upload  modal -->
+    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal"><i class="fa fa-picture-o"></i>
+    </button>
+    
     <div class="media-body" style="padding-left: 3em;">
     	<!-- Do some logic here : follow, unfollow, accept etc -->
  		<button class="btn btn-success pull-right" style="position: relative; top: 1.5em; right: 1.5em;">Follow</button>
@@ -13,6 +17,8 @@
     	<p style="color: grey;"> {{ user_account.email }} </p>
     </div>
 </div>
+
+ 
 
 <!-- If this is the logged in user's profile page, show a create post component -->
 {% if user_account == user %}
@@ -49,5 +55,25 @@
 	</div>
 	{% endif %}
 </div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form id="postForm" method="POST" action='{{ action }}'> {% csrf_token %}
+                    select image <br>
+                    <input type="file" name="datafile" size="40">
+        </p>
+        <div>
+            <input type="submit" value="Upload">
+        </div>
+                </form>
+            </div>  
+        </div> 
+    </div>
+</div>    
+
 {% endfor %}
 {% endblock %}
