@@ -143,7 +143,7 @@ class CommentList(generics.GenericAPIView):
     queryset = Comment.objects.all()
 
     def isAllowed(self,request,pk):
-        post = self.get_object(pk)
+        post = Post.objects.get(id=pk)
         privacy = post.visibility
 
         #if the post was created by the user allow access
@@ -230,7 +230,7 @@ class CommentDetail(generics.GenericAPIView):
     queryset = Comment.objects.all()
 
     def isAllowed(self,request,pk):
-        post = self.get_object(pk)
+        post = Post.objects.get(id=pk)
         privacy = post.visibility
 
         #if the post was created by the user allow access
