@@ -178,7 +178,11 @@ def user_profile(request, username):
 
         # --- TODO : FILTER POSTS BY VISIBILITY TO LOGGED IN USER --- #
         posts = Post.objects.filter(author=user).order_by('-published')
-        author = Author.objects.get(user=user)
+        try:
+            author = Author.objects.get(user=user)
+        except Author.DoesNotExist as e:
+            return render(request, "404_page.html", {'message': "Author does not exist."})
+
         form = PostForm()
         return render(request, "user_profile.html",
                       {'posts': posts, 'form': form, 'user_account': user, 'author': author})

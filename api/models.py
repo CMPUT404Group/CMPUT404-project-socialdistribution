@@ -11,7 +11,6 @@ CONTENT_TYPE_CHOICES = (
     (PLAINTEXT, 'Plaintext')
 )
 
-
 # Why having additional Authors class instead of auth.user:
 # auth.user is the model comes with Django, we need more attributes for Authors.
 # create Author model with a one-to-one association with the the `User` model
@@ -19,7 +18,7 @@ class Author(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     github_name = models.CharField(max_length=40, blank=True)
     picture = models.ImageField(upload_to='profile_images/', blank=True)
-
+    host = models.CharField(max_length=40, default="http://127.0.0.1:8080/")
 
     def __unicode__(self):
         return self.user.username

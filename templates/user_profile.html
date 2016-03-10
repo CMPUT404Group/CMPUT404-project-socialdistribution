@@ -4,9 +4,10 @@
 {% load widget_tweaks %}
 
 <div class="row profile-header">
-	
+
+    <!-- Display profile image -->
     {% if author.picture %}
-    <img src="/media/{{ author.picture }}" height="175" width="175" />
+    <img src="/media/{{ author.picture }}" height="175" width="175" alt="Profile Image"/>
     {% else %}
     <img class="profile-photo-icon img-circle img-responsive img-center pull-left create-post" src="http://placehold.it/175x175">
     {% endif %}
@@ -20,9 +21,15 @@
     	<!-- Do some logic here : follow, unfollow, accept etc -->
  		<button class="btn btn-success pull-right" style="position: relative; top: 1.5em; right: 1.5em;">Follow</button>
 
+        <!-- Display required user info on profile page -->
     	<h1> {{ user_account.username }} </h1>
-    	<p style="color: grey;"> {{ user_account.email }} </p>
-        <p style="color: grey;"> {{ author.github_name }} </p>
+    	<div>
+            <p style="color: grey;">id: {{ user_account.id }} </p>
+            <p style="color: grey;">host: {{ author.host }} </p>
+            <p style="color: grey;">username: {{ user_account.username }} </p>
+            <p style="color: grey;">url: {{ author.host }}/user/{{ user_account.username }} </p>
+            <p style="color: grey;">github: http://github.com/{{ author.github_name }} </p>
+        </div>
     </div>
 </div>
 

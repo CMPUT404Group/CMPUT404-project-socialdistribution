@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from api.models import Author
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from manager.forms import AuthorForm, UserForm
