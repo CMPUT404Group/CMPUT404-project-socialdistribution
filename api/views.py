@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from api.models import Post, Comment, Upload, Image
+from api.models import Post, Comment, Upload, Image, Following, Friending
 from api.serializers import PostSerializer, CommentSerializer, ImageSerializer
 from api.serializers import UserSerializer
 from rest_framework.decorators import api_view
@@ -227,7 +227,7 @@ Gets a specific Comment/ Updates a Comment / Deletes a Comment
 
 class CommentDetail(generics.GenericAPIView):
     serializer_class = CommentSerializer
-    queryset = Comment.objects.all()Post
+    queryset = Comment.objects.all()
 
     def isAllowed(self,request,pk):
         post = Post.objects.get(id=pk)
@@ -334,11 +334,6 @@ class FriendingList(generics.GenericAPIView):
     pagination_class = ListPaginator
     serializer_class = CommentSerializer
     queryset = Friending.objects.all()
-
-    def addfriend(){
-
-
-
 
 
 '''
