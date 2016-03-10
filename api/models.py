@@ -27,7 +27,7 @@ class Author(models.Model):
 # Source from http://stackoverflow.com/questions/4564760/best-way-to-make-djangos-user-system-have-friends March 9, 2016
 class Friend(models.Model):
 
-    # friends table	
+    # friends table 
 
     user = models.ForeignKey(User)
     friend = models.ForeignKey(User, related_name="friends")

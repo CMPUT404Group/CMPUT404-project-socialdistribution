@@ -51,7 +51,8 @@ def public_stream(request):
 
         posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
         form = PostForm()
-        return render(request, 'post/mainStream.html', {'posts': posts, 'form': form})
+        author = Author.objects.get(user=request.user)
+        return render(request, 'post/mainStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author})
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
@@ -80,7 +81,7 @@ def my_stream(request):
         author = Author.objects.get(user=request.user)
         posts = Post.objects.filter(author=author).order_by('-published')
         form = PostForm()
-        return render(request, 'post/mainStream.html', {'posts': posts, 'form': form})
+        return render(request, 'post/mainStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author})
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
@@ -123,7 +124,8 @@ def post_detail(request, post_pk):
 
         post = Post.objects.get(pk=post_pk)
         form = CommentForm()
-        return render(request, 'post/postDetail.html', {'post': post, 'commentForm': form})
+        author = Author.objects.get(user=request.user)
+        return render(request, 'post/postDetail.html', {'post': post, 'commentForm': form, 'loggedInAuthor': author})
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 

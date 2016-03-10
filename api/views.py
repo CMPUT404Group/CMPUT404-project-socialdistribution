@@ -38,7 +38,7 @@ class PostList(generics.GenericAPIView):
                 # else:
 
         else:
-            return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     def post(self, request, post_pk=None, format=None):
         # ensure user is authenticated
@@ -63,10 +63,10 @@ class PostList(generics.GenericAPIView):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 
             else:
-                Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         else:
-            return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -182,7 +182,6 @@ class CommentList(generics.GenericAPIView):
     def get(self, request, post_pk, format=None):
         # ensure user is authenticated
         if (request.user.is_authenticated()):
-            post = self.get_object(pk)
             # --- TODO : Only authorize users to read/get this post if visibility/privacy settings allow it
             if(self.isAllowed(request, post_pk)):
                 comments = Comment.objects.filter(post=post_pk).order_by('-published')
@@ -270,12 +269,15 @@ class CommentDetail(generics.GenericAPIView):
         return get_object_or_404(Comment, pk=pk)
 
     def get(self, request, post_pk, comment_pk, format=None):
+        print comment_pk
         # ensure user is authenticated
         if (request.user.is_authenticated()):
 
             # --- TODO : Only authorize users to read/get this comment if visibility/privacy settings of the corresponding post allow it
             if(self.isAllowed(request,post_pk)):
+                print "IN HERE"
                 comment = self.get_object(comment_pk)
+                print "OU HERE"
                 serializer = CommentSerializer(comment)
                 return Response(serializer.data)
             else:
@@ -377,7 +379,7 @@ class Images(generics.GenericAPIView):
                 Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         else:
-            return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
+            return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
 
         # def perform_create(self, serializer):
         # 	serializer.save(author=self.request.user)
@@ -420,7 +422,7 @@ class AuthorList(generics.GenericAPIView):
             serializer = AuthorSerializer(authors, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 ''' Gets Author / Updates Author via POST '''
 class AuthorDetail(generics.GenericAPIView):
@@ -477,7 +479,7 @@ class AuthorDetail(generics.GenericAPIView):
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
                 else:
-                    Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    Response(status=status.HTTP_400_BAD_REQUEST)
 
         else:
-            return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
+            return Response(status=HTTP_401_UNAUTHORIZED)
