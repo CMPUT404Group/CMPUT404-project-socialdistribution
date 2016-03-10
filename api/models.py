@@ -15,6 +15,7 @@ CONTENT_TYPE_CHOICES = (
 # auth.user is the model comes with Django, we need more attributes for Authors.
 # create Author model with a one-to-one association with the the `User` model
 class Author(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     github_name = models.CharField(max_length=40, blank=True)
     picture = models.ImageField(upload_to='profile_images/', blank=True)
