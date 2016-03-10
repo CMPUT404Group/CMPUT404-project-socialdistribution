@@ -165,8 +165,9 @@ def user_profile(request, username):
 
         # --- TODO : FILTER POSTS BY VISIBILITY TO LOGGED IN USER --- #
         posts = Post.objects.filter(author=user).order_by('-published')
+        author = Author.objects.get(user=user)
         form = PostForm()    
-        return render(request, "user_profile.html", {'posts': posts, 'form':form, 'user_account':user})
+        return render(request, "user_profile.html", {'posts': posts, 'form':form, 'user_account':user, 'author':author})
 
 
     else:

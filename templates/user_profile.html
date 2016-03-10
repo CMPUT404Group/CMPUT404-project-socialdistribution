@@ -6,10 +6,12 @@
 <div class="row profile-header">
 	
     {% if author.picture %}
-    <img src="{{ post.image_url }}" />
+    <img src="{{ author.picture }}" />
     {% else %}
     <img class="profile-photo-icon img-circle img-responsive img-center pull-left create-post" src="http://placehold.it/175x175">
     {% endif %}
+
+
     <!-- Button trigger upload  modal -->
     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal"><i class="fa fa-picture-o"></i>
     </button>
@@ -20,6 +22,7 @@
 
     	<h1> {{ user_account.username }} </h1>
     	<p style="color: grey;"> {{ user_account.email }} </p>
+        <p style="color: grey;"> {{ author.github_name }} </p>
     </div>
 </div>
 
@@ -71,16 +74,16 @@
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-body">
-                <form id="postForm" method="POST" action='{{ action }}'> {% csrf_token %}
+            <form id="uploadImageForm" method="POST" enctype="multipart/form-data"> {% csrf_token %}
+                <div class="modal-body">   
                     select image <br>
-                    <input type="file" name="datafile" size="40">
+                    <input id="id_photo" name="photo" type="file" accept="profile_images/*">
         </p>
         <div>
             <input type="submit" value="Upload">
         </div>
-                </form>
-            </div>  
+            </form>
+                </div>  
         </div> 
     </div>
 </div>    
