@@ -11,19 +11,18 @@
   - Test Location:
 - [ ] As an author, posts I create be private to me
   - Test Location:
-    -  CMPUT404-project-socialdistribution/api/tests.py (backend)
+    -  CMPUT404-project-socialdistribution/api/tests.py  test_view_access (backend)
 - [ ] As an author, posts I create be private to another author
   - Test Location:
-    -  CMPUT404-project-socialdistribution/api/tests.py (backend)
+    -  CMPUT404-project-socialdistribution/api/tests.py test_view_access (backend)
 - [ ] As an author, posts I create be private to my friends
   - Test Location:
-    -  CMPUT404-project-socialdistribution/api/tests.py (backend)
+    -  CMPUT404-project-socialdistribution/api/tests.py test_view_access (backend)
 - [ ] As an author, posts I create be private to friends of friends
   - Test Location:
-    -  CMPUT404-project-socialdistribution/api/tests.py (backend)
+    -  CMPUT404-project-socialdistribution/api/tests.py test_view_access (backend)
 - [ ] As an author, posts I create be private to only friends on my host
   - Test Location:
-    -  CMPUT404-project-socialdistribution/api/tests.py (backend)
 - [X] As an author, posts I create can be public
   - Test Location:
     -  CMPUT404-project-socialdistribution/api/tests.py (backend)
