@@ -1,26 +1,36 @@
 ** User Stories
 
 - [X] As an author I want to make posts.
+  - Test Location: 
+    - CMPUT404-project-socialdistribution/api/tests.py (backend)
+    - [[https://youtu.be/4zgsHDWk6vE]] (frontend)
+- [X] As an author, posts I create can link to images.
   - Test Location:
-- [ ] As an author, posts I create can link to images.
-  - Test Location:
-- [ ] As a server admin, images can be hosted on my server.
+- [X] As a server admin, images can be hosted on my server.
   - Test Location:
 - [ ] As an author, posts I create be private to me
   - Test Location:
+    -  CMPUT404-project-socialdistribution/api/tests.py (backend)
 - [ ] As an author, posts I create be private to another author
   - Test Location:
+    -  CMPUT404-project-socialdistribution/api/tests.py (backend)
 - [ ] As an author, posts I create be private to my friends
   - Test Location:
+    -  CMPUT404-project-socialdistribution/api/tests.py (backend)
 - [ ] As an author, posts I create be private to friends of friends
   - Test Location:
+    -  CMPUT404-project-socialdistribution/api/tests.py (backend)
 - [ ] As an author, posts I create be private to only friends on my host
   - Test Location:
-- [ ] As an author, posts I create can be public
+    -  CMPUT404-project-socialdistribution/api/tests.py (backend)
+- [X] As an author, posts I create can be public
   - Test Location:
-- [ ] As an author, posts I make can be in simple plain text
+    -  CMPUT404-project-socialdistribution/api/tests.py (backend)
+    - [[https://youtu.be/4zgsHDWk6vE]] (frontend)
+- [X] As an author, posts I make can be in simple plain text
   - Test Location:
-- [ ] As an author, posts I make can be in markdown (commonMark is good)
+    - [[https://youtu.be/4zgsHDWk6vE]] (frontend)
+- [X] As an author, posts I make can be in markdown (commonMark is good)
   - Test Location:
 - [ ] As an author, I want a consistent identity per server
   - Test Location:
@@ -34,12 +44,14 @@
    - Test Location:
 - [ ] As an author, I want to pull in my github activity to my "stream"
   - Test Location:
-- [ ] As an author, I want to post posts to my "stream"
+- [X] As an author, I want to post posts to my "stream"
   - Test Location:
-- [ ] As an author, I want to delete my own posts.
+    -  CMPUT404-project-socialdistribution/api/tests.py (backend)
+- [X] As an author, I want to delete my own posts.
   - Test Location:
 - [ ] As an author, I want to befriend local authors
   - Test Location:
+    -  CMPUT404-project-socialdistribution/api/tests.py (backend)
 - [ ] As an author, I want to befriend remote authors
   - Test Location:
 - [ ] As an author, I want to feel safe about sharing images and
@@ -65,9 +77,10 @@
    - Test Location:
 - [ ] As a server admin, I want a restful interface for most operations
   - Test Location:
-- [ ] As an author, other authors cannot modify my data
+- [X] As an author, other authors cannot modify my data
   - Test Location:
-- [ ] As an author, I want to comment on posts that I can access
+    -  CMPUT404-project-socialdistribution/api/tests.py (backend)
+- [X] As an author, I want to comment on posts that I can access
   - Test Location:
 - [ ] As an author, my server will know about my friends
   - Test Location:
@@ -76,8 +89,9 @@
    - Test Location:
 - [ ] As an author, I want to know if I have friend requests.
   - Test Location:
-- [ ] As an author I should be able to browse the public posts of everyone
+- [X] As an author I should be able to browse the public posts of everyone
   - Test Location:
+    -  CMPUT404-project-socialdistribution/api/tests.py (backend)
 - [ ] As an author I should be able to browse the posts of others depending on my status
   - Test Location:
 - [ ] As a server admin, I want to be able to add nodes to share with
