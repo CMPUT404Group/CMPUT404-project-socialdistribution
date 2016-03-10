@@ -11,7 +11,7 @@ class UserAdmin(admin.ModelAdmin):
     inlines = [
         AuthorInline,
     ]
-    fields = {'username', 'password', 'is_active', 'email'}
+    fields = {'username', 'is_active', 'email'}
 
 admin.site.unregister(Group)
 admin.site.unregister(User)
