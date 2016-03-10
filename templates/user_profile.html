@@ -7,23 +7,18 @@
 
     <!-- Display profile image -->
     {% if author.picture %}
-    <img src="/media/{{ author.picture }}" height="175" width="175" alt="Profile Image"/>
+    <img id="id-user-profile-image" src="/media/{{ author.picture }}" class="profile-photo-icon img-circle img-responsive img-center pull-left create-post" alt="Profile Image"/>
     {% else %}
-    <img class="profile-photo-icon img-circle img-responsive img-center pull-left create-post" src="http://placehold.it/175x175">
+    <img id="id-user-profile-image" class="profile-photo-icon img-circle img-responsive img-center pull-left create-post" src="http://placehold.it/175x175">
     {% endif %}
-
-
-    <!-- Button trigger upload  modal -->
-    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal"><i class="fa fa-picture-o"></i>
-    </button>
     
     <div class="media-body" style="padding-left: 3em;">
-    	<!-- Do some logic here : follow, unfollow, accept etc -->
- 		<button class="btn btn-success pull-right" style="position: relative; top: 1.5em; right: 1.5em;">Follow</button>
+        <!-- Do some logic here : follow, unfollow, accept etc -->
+        <button class="btn btn-success pull-right" style="position: relative; top: 1.5em; right: 1.5em;">Follow</button>
 
         <!-- Display required user info on profile page -->
-    	<h1> {{ user_account.username }} </h1>
-    	<div>
+        <h1> {{ user_account.username }} </h1>
+        <div>
             <p style="color: grey;">id: {{ user_account.id }} </p>
             <p style="color: grey;">host: {{ author.host }} </p>
             <p style="color: grey;">username: {{ user_account.username }} </p>
@@ -31,6 +26,13 @@
             <p style="color: grey;">github: http://github.com/{{ author.github_name }} </p>
         </div>
     </div>
+
+    <!-- Triggers uploadImageModal -->
+    <span>
+        <button id='uploadProfileImageTrigger' type="button" class="btn btn-default" data-toggle="modal" data-target="#uploadProfileImageModal"><i class="fa fa-picture-o"></i></button>
+    </span>
+
+
 </div>
 
  
@@ -42,10 +44,10 @@
 
 {% for post in posts %}
 <div class="row post">
-	<img class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/50x50" data-popover="true" data-html=true data-toggle="popover" title="{{ post.author }}" data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"/>
+    <img class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/50x50" data-popover="true" data-html=true data-toggle="popover" title="{{ post.author }}" data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"/>
 
     <div class="panel panel-primary media-body">
-    	<div class='panel-heading'> <a class='title' href='{% url "post_detail" post.id %}'> {{ post.title }} </a> <span class='date'> {{ post.published }} </span> </div>
+        <div class='panel-heading'> <a class='title' href='{% url "post_detail" post.id %}'> {{ post.title }} </a> <span class='date'> {{ post.published }} </span> </div>
         <div class='panel-body'> 
             {% if post.contentType == "text/x-markdown" %}
                 {{ post.content|markdown|urlize }} 
@@ -58,42 +60,24 @@
                 <img src="{{ post.image_url }}" />
             {% endif %}
         </div>
-    	<hr class='post-hr'>
-    	<div class='panel-body'>
-    		<a href='{% url "post_detail" post.id %}#comments' class='comments'> {{ post.comments.count }} Comments </a>
-			<a href='{% url "post_detail" post.id %}' class='pull-right'><i class="fa fa-plus"></i></a>
-    	</div>
+        <hr class='post-hr'>
+        <div class='panel-body'>
+            <a href='{% url "post_detail" post.id %}#comments' class='comments'> {{ post.comments.count }} Comments </a>
+            <a href='{% url "post_detail" post.id %}' class='pull-right'><i class="fa fa-plus"></i></a>
+        </div>
     </div>
 
     {% if post.author == user %}
-	<div class="media-body post-action-icons">
+    <div class="media-body post-action-icons">
         <a href="{% url 'post_edit' post.id %}"><button class="btn btn-default action-icon edit-post"><i class="fa fa-pencil-square-o"></i></button></a>
         <button class="btn btn-default action-icon"><i class="fa fa-trash-o"></i></button>
-	</div>
-	{% else %}
-	<div class="media-body post-action-icons placeholder">
-	</div>
-	{% endif %}
-</div>
-
-
-<!-- Modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <form id="uploadImageForm" method="POST" enctype="multipart/form-data"> {% csrf_token %}
-                <div class="modal-body">   
-                    select image <br>
-                    <input id="id_photo" name="photo" type="file" accept="profile_images/*">
-                </div>
-        <div>
-            <input type="submit" value="Upload">
-        </div>
-            </form>
-                </div>  
-        </div> 
     </div>
-</div>    
-
+    {% else %}
+    <div class="media-body post-action-icons placeholder">
+    </div>
+    {% endif %}
+</div>
 {% endfor %}
+
+{% include "post/uploadProfileImageModal.html" %}
 {% endblock %}

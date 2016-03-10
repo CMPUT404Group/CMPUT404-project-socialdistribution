@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from api.models import Post, Comment, Upload, Image, Following, Friending, Author
-from api.serializers import PostSerializer, CommentSerializer, ImageSerializer
+from api.serializers import PostSerializer, CommentSerializer, ImageSerializer, AuthorSerializer
 from api.serializers import UserSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -386,8 +386,6 @@ class Images(generics.GenericAPIView):
 '''
 Lists all Users
 '''
-
-
 class UserList(APIView):
     def get(self, request, format=None):
         users = User.objects.all()
@@ -398,8 +396,6 @@ class UserList(APIView):
 '''
 Get a specific User
 '''
-
-
 class UserDetail(APIView):
     def get_object(self, pk):
         try:
@@ -411,3 +407,77 @@ class UserDetail(APIView):
         user = self.get_object(pk)
         serializer = UserSerializer(user)
         return Response(serializer.data)
+
+''' Author List '''
+class AuthorList(generics.GenericAPIView):
+    serializer_class = AuthorSerializer
+    queryset = Author.objects.all()
+
+    def get(self, request,format=None):
+        # ensure user is authenticated
+        if (request.user.is_authenticated()):
+            authors = Author.objects.all()
+            serializer = AuthorSerializer(authors, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
+
+''' Gets Author / Updates Author via POST '''
+class AuthorDetail(generics.GenericAPIView):
+    serializer_class = AuthorSerializer
+    queryset = Author.objects.all()
+
+    def get_object(self, pk):
+        return get_object_or_404(Author, pk=pk)
+
+    def get(self, request, author_pk, format=None):
+        # ensure user is authenticated
+        if (request.user.is_authenticated()):
+
+            # --- TODO : Only authorize users to read/get this post if visibility/privacy settings allow it
+            author = self.get_object(author_pk)
+            serializer = AuthorSerializer(author)
+            return Response(serializer.data)
+
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    def post(self, request, author_pk=None, format=None):
+        if (request.user.is_authenticated()):
+
+            # update profile picture only
+            if (request.data["github_name"] == "" and request.data['host'] == "" and request.data["picture"] != ""):
+                author = get_object_or_404(Author, pk=author_pk)
+                if request.user == author.user:
+                    author.picture = request.data["picture"]
+                    author.save()
+                    serializer = AuthorSerializer(author)
+                    print serializer
+                    print serializer.data
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                else:
+                   return Response(status=status.HTTP_403_FORBIDDEN)
+
+            # Haven't tested this part below yet
+            else:   
+                if author_pk != None:
+                    author = get_object_or_404(Author, pk=author_pk)
+                    # only allow author of the post to modify it
+                    if request.user == author.user:
+                        serializer = AuthorSerializer(author, data=request.data)
+                    # if logged in user is not author of the post
+                    else:
+                        return Response(status=status.HTTP_403_FORBIDDEN)
+                else:
+                    serializer = AuthorSerializer(data=request.data)
+
+                if serializer.is_valid():
+                    print "DEBUG : API - views.py - AuthorDetail"
+                    # serializer.save()
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+                else:
+                    Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
