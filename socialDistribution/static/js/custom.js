@@ -88,6 +88,29 @@ window.onload = function() {
     });
   });
 
+  /* -- Deletes posts from editing page -- */
+  $("button.delete-post-single").click(function(event) {
+    var that = this;
+    var id = this.id.slice(12);
+    $.ajax({
+      url: 'http://' + window.location.host +'/api/posts/' + id + '/',
+      type: "DELETE",
+      beforeSend: function(xhr, settings) {
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function(response) {
+        console.log(response);
+        toastr.info("Post Deleted!");
+        window.location.replace("http://" + window.location.host);
+      },
+      error: function(xhr, ajaxOptions, error) {
+        console.log(xhr.status);
+        console.log(xhr.responseText);
+        console.log(error);
+      }
+    });
+  });
+
   /* -- Deletes comments -- */
   $("button.delete-comment").click(function(event) {
     var that = this;
