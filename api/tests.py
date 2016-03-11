@@ -4,6 +4,7 @@ from django.utils import timezone
 from api.models import Author, Post, Comment, Following, Friending
 import uuid
 import requests
+from urllib import urlencode
 
 #global vars
 post_id = uuid.uuid4()
@@ -27,11 +28,11 @@ class ApiPostModelTestCase(TestCase):
         user1 = User.objects.create(username="sam")
         author = Author.objects.create(user=user1, github_name="sammy")
         author1 = Author.objects.create(user=user, github_name="bobby")
-        post = Post.objects.create(id=post_id, title="Title", contentType="PLAINTEXT", 
+        post = Post.objects.create(id=post_id, title="Title", contentType="text/plain", 
         					content="this is my post data", author=author, published=date, 
                             visibility="PUBLIC", image_url="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu-eC39iANJccZL5c6oKKFdRyRldGt5UT1gCTpXbRkOSb2IFAv")
 
-        Comment.objects.create(id=c_id, post=post, author=author1, contentType="PLAINTEXT",
+        Comment.objects.create(id=c_id, post=post, author=author1, contentType="text/plain",
         					comment="this is my comment", published=date)
 
 
@@ -68,7 +69,7 @@ class ApiPostModelTestCase(TestCase):
         #test that we can get the post back
         post = Post.objects.get(id=post_id)
         self.assertEqual(post.author.user.username, "sam")
-        self.assertEqual(post.contentType, "PLAINTEXT")
+        self.assertEqual(post.contentType, "text/plain")
         self.assertEqual(post.published, date)
         self.assertEqual(post.visibility, "PUBLIC")
         self.assertEqual(post.title, "Title")
@@ -88,7 +89,7 @@ class ApiPostModelTestCase(TestCase):
         comment = Comment.objects.get(id=c_id)
         self.assertEqual(comment.post.id, post_id)
         self.assertEqual(comment.author.user.username, "bob")
-        self.assertEqual(comment.contentType, "PLAINTEXT")
+        self.assertEqual(comment.contentType, "text/plain")
         self.assertEqual(comment.comment, "this is my comment")
         self.assertEqual(comment.published, date)
 
@@ -121,49 +122,115 @@ class ApiUrlsTestCase(TestCase):
         Following.objects.create(author=tester, following=sam)
     
 
-        post = Post.objects.create(id=post_id, title="Title", contentType="PLAINTEXT", 
+        post = Post.objects.create(id=post_id, title="Title", contentType="text/plain", 
                             content="this is my post data",
                             author=tester, published=date, visibility="PUBLIC")
 
-        post1 = Post.objects.create(id=pid1, title="Title", contentType="PLAINTEXT", 
+        post1 = Post.objects.create(id=pid1, title="Title", contentType="text/plain", 
                             content="this is my hidden post data",
                             author=tester, published=date, visibility="PRIVATE")
 
-        post2 = Post.objects.create(id=pid2, title="Title", contentType="PLAINTEXT", 
+        post2 = Post.objects.create(id=pid2, title="Title", contentType="text/plain", 
                             content="this is my friends private post data",
                             author=john, published=date, visibility="PRIVATE")
 
-        post3 = Post.objects.create(id=pid3, title="Title", contentType="PLAINTEXT", 
+        post3 = Post.objects.create(id=pid3, title="Title", contentType="text/plain", 
                             content="this is my friends public post data",
                             author=john, published=date, visibility="FRIENDS")
 
-        post4 = Post.objects.create(id=pid4, title="Title", contentType="PLAINTEXT", 
+        post4 = Post.objects.create(id=pid4, title="Title", contentType="text/plain", 
                             content="this is my FoaF friend post",
                             author=bob, published=date, visibility="FRIENDS")
 
-        post5 = Post.objects.create(id=pid5, title="Title", contentType="PLAINTEXT", 
+        post5 = Post.objects.create(id=pid5, title="Title", contentType="text/plain", 
                             content="this is my FoaF foaf post",
                             author=bob, published=date, visibility="FOAF")
 
-        post6 = Post.objects.create(id=pid6, title="Title", contentType="PLAINTEXT", 
+        post6 = Post.objects.create(id=pid6, title="Title", contentType="text/plain", 
                             content="this is my following private post data",
                             author=sam, published=date, visibility="PRIVATE")
 
-        post7 = Post.objects.create(id=pid7, title="Title", contentType="PLAINTEXT", 
+        post7 = Post.objects.create(id=pid7, title="Title", contentType="text/plain", 
                             content="this is my following public post data",
                             author=sam, published=date, visibility="PUBLIC")
 
-        Comment.objects.create(id=c_id, post=post, author=bob, contentType="PLAINTEXT",
+        Comment.objects.create(id=c_id, post=post, author=bob, contentType="text/plain",
                             comment="this is my comment", published=date)
 
-    #test that people can edit their own posts and comments
-    #test that people cant edit other peoples posts and comments
-    def test_edits(self):
+    #test that people cant edit/delete other peoples posts and comments
+    def test_posts_notAllowed(self):
         #login
         login = self.client.login(username='tester', password='hello') 
         self.assertTrue(login)
 
-        resp1= self.client.post("/")
+        #test that we can't edit someone else's post
+        post_data = {"title":"Changed Title","content":"changed post data","contentType":"text/plain","visibility":"PRIVATE"}
+        resp1= self.client.put("/api/posts/"+str(pid7)+"/", urlencode(post_data),content_type = 'application/x-www-form-urlencoded')
+        self.assertEqual(resp1.status_code,403)
+
+        #check if he can delete his post
+        resp2= self.client.delete("/api/posts/"+str(pid7)+"/")
+        self.assertEqual(resp2.status_code,403)
+
+        #Check that things were correctly updated
+        posts = Post.objects.filter(id=pid7)
+        self.assertEqual(len(posts),1)
+
+
+    #test that people can add/edit/delete their own posts and comments
+    def test_posts_allowed(self):
+        #login
+        login = self.client.login(username='tester', password='hello') 
+        self.assertTrue(login)
+
+        post_data_new = {"title":"New Title","content":"new body data","contentType":"text/plain","visibility":"PUBLIC"}
+        post_data_e = {"title":"Changed Title","content":"changed post data","contentType":"text/plain","visibility":"PRIVATE"}
+
+        #test that we were able to make a new post
+        resp1= self.client.post("/api/posts/", post_data_new)
+        self.assertEqual(resp1.status_code,201)
+
+        #test that the information is correct
+        new_post = Post.objects.get(title="New Title")
+        newpid = new_post.id
+        self.assertEqual(new_post.content,"new body data")
+        self.assertEqual(new_post.contentType,"text/plain")
+        self.assertEqual(new_post.visibility,"PUBLIC")
+
+        #test that we can edit the post
+        resp2= self.client.put("/api/posts/"+str(newpid)+"/", urlencode(post_data_e),content_type = 'application/x-www-form-urlencoded')
+        self.assertEqual(resp2.status_code,200)
+
+        #Check that things were correctly updated
+        changed_post = Post.objects.get(id=newpid)
+        self.assertEqual(changed_post.content,"changed post data")
+        self.assertEqual(changed_post.contentType,"text/plain")
+        self.assertEqual(changed_post.visibility,"PRIVATE")
+
+        #check if he can delete his post
+        resp3= self.client.delete("/api/posts/"+str(newpid)+"/")
+        self.assertEqual(resp3.status_code,204)
+
+        #Check that things were correctly updated
+        posts = Post.objects.filter(id=newpid)
+        self.assertEqual(len(posts),0)
+
+        #check that we can add a comment
+        new_comment = {"comment":"this is my new comment", "contentType":"text/plain"}
+        resp4= self.client.post("/api/posts/"+str(pid7)+"/comments/",new_comment)
+        self.assertEqual(resp4.status_code,201)
+        comment = Comment.objects.get(comment="this is my new comment")
+        self.assertEqual(comment.contentType,"text/plain")
+
+        #check that we can edit a comment
+        changed_comment = {"comment":"this is my changed comment", "contentType":"text/plain"}
+        resp5= self.client.put("/api/posts/"+str(pid7)+"/comments/"+str(comment.id)+"/",urlencode(changed_comment),content_type = 'application/x-www-form-urlencoded')
+        self.assertEqual(resp5.status_code,200)
+
+        comment = Comment.objects.get(id=comment.id)
+        self.assertEqual(comment.comment,"this is my changed comment")
+
+        #check that we can delete a comment
 
     def test_redirect(self):
         # check that it redirects to the login page

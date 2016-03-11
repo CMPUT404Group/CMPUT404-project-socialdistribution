@@ -87,6 +87,7 @@ class PostDetail(generics.GenericAPIView):
     def isAllowed(self,request,pk):
         post = Post.objects.get(id=pk)
         privacy = post.visibility
+        viewer = Author.objects.get(user=request.user)
 
         #if the post was created by the user allow access
         if viewer == post.author :
@@ -180,6 +181,7 @@ class CommentList(generics.GenericAPIView):
     def isAllowed(self,request,pk):
         post = Post.objects.get(id=pk)
         privacy = post.visibility
+        viewer = Author.objects.get(user=request.user)
 
         #if the post was created by the user allow access
         if viewer == post.author :
@@ -263,6 +265,7 @@ class CommentDetail(generics.GenericAPIView):
     def isAllowed(self,request,pk):
         post = Post.objects.get(id=pk)
         privacy = post.visibility
+        viewer = Author.objects.get(user=request.user)
 
         #if the post was created by the user allow access
         if viewer == post.author :
