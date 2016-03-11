@@ -37,13 +37,6 @@ Code was taken & used from : http://stackoverflow.com/questions/5871730/need-a-m
 group whentomeet:  
 http://www.when2meet.com/?4368216-nLULW
 
-A Note to Josh
-========================
-- This is how to run our webpage:
-...
-
-- Also just for you! Check out [our user story page](https://github.com/CMPUT404Group/CMPUT404-project-socialdistribution/wiki/User-Stories) to see our progress with the usr stories! This page also includes the location to the test we have created to verify our work.
-
 #Note
 
 <b>admin account:</b>  
