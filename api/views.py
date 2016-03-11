@@ -539,16 +539,31 @@ class FriendingCheck(generics.GenericAPIView):
     queryset = Friending.objects.all()
     serializer_class = FriendingSerializer
 
-    def get(self, request, author_id1, author_id2, format=None):
+    def get(self, request, author_id1, author_id2=None, format=None):
         if request.user.is_authenticated():
-            aList = Friending.objects.filter(author__id=author_id1, friend__id=author_id2)
-            bList = Friending.objects.filter(author__id=author_id2, friend__id=author_id1)
-            result = list(chain(aList, bList))
-            print result
-            if (result != []):
-                friends = True
+
+            # returns whether or not author_id1 & author_id2 are friends or not
+            if author_id2 != None:
+                aList = Friending.objects.filter(author__id=author_id1, friend__id=author_id2)
+                bList = Friending.objects.filter(author__id=author_id2, friend__id=author_id1)
+                result = list(chain(aList, bList))
+                print result
+                if (result != []):
+                    friends = True
+                else:
+                    friends = False
+                return Response({'query':'friends', 'authors': [author_id1, author_id2], 'friends':friends}, status=status.HTTP_200_OK)
+            
+
+            # returns all friends of author_1
             else:
-                friends = False
-            return Response({'query':'friends', 'authors': [author_id1, author_id2], 'friends':friends}, status=status.HTTP_200_OK)
+                friendsList = []
+                # return json object so we must extract the friend id
+                aList = Friending.objects.filter(author__id=author_id1).values('friend__id')
+                for i in aList:
+                    friendsList.append(i["friend__id"])
+                print friendsList
+                return Response({'query':'friends', 'authors': friendsList}, status=status.HTTP_200_OK)
+
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
