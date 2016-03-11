@@ -51,7 +51,17 @@ def public_stream(request):
 
         posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
         form = PostForm()
-        author = Author.objects.get(user=request.user)
+
+        # If an super user who is not admin tries to login
+        # Add him into Author class
+        try:
+            author = Author.objects.get(user=request.user)
+        except Author.DoesNotExist:
+            author = Author.objects.create(user=request.user)
+            author.save()
+
+        # author = Author.objects.get(user=request.user)
+
         return render(request, 'post/mainStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author})
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
