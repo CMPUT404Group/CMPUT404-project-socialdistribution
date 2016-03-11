@@ -154,7 +154,7 @@ class ApiUrlsTestCase(TestCase):
                             content="this is my following public post data",
                             author=sam, published=date, visibility="PUBLIC")
 
-        Comment.objects.create(id=c_id, post=post, author=bob, contentType="text/plain",
+        Comment.objects.create(id=c_id, post=post7, author=bob, contentType="text/plain",
                             comment="this is my comment", published=date)
 
     #test that people cant edit/delete other peoples posts and comments
@@ -175,6 +175,14 @@ class ApiUrlsTestCase(TestCase):
         #Check that things were correctly updated
         posts = Post.objects.filter(id=pid7)
         self.assertEqual(len(posts),1)
+
+        #check that we cant delete a comment
+        resp6= self.client.delete("/api/posts/"+str(pid7)+"/comments/"+str(c_id)+"/")
+        self.assertEqual(resp6.status_code,204)
+
+        #Check that things were correctly left alone
+        comments = Comment.objects.filter(id=c_id)
+        self.assertEqual(len(comments),1)
 
 
     #test that people can add/edit/delete their own posts and comments
@@ -229,8 +237,15 @@ class ApiUrlsTestCase(TestCase):
 
         comment = Comment.objects.get(id=comment.id)
         self.assertEqual(comment.comment,"this is my changed comment")
+        self.assertEqual(comment.contentType,"text/plain")
 
         #check that we can delete a comment
+        resp6= self.client.delete("/api/posts/"+str(pid7)+"/comments/"+str(comment.id)+"/")
+        self.assertEqual(resp6.status_code,204)
+
+        #Check that things were correctly updated
+        comments = Comment.objects.filter(id=newpid)
+        self.assertEqual(len(comments),0)
 
     def test_redirect(self):
         # check that it redirects to the login page
