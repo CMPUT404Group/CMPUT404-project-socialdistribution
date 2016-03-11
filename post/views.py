@@ -52,7 +52,7 @@ def public_stream(request):
         posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
         form = PostForm()
 
-         # If an super user who is not admin tries to login
+        # If an super user who is not admin tries to login
         # Add him into Author class
         try:
             author = Author.objects.get(user=request.user)
