@@ -322,9 +322,21 @@ class CommentDetail(generics.GenericAPIView):
 Displaying Following list
 '''
 class FollowingList(generics.GenericAPIView):
-    pagination_class = ListPaginator
-    serializer_class = CommentSerializer
+    serializer_class = UserSerializer
     queryset = Following.objects.all()
+
+    def get(self, request, format=None):
+        # ensure user is authenticated
+        if (request.user.is_authenticated()):
+            followings = Following.objects
+            page = self.paginate_queryset(followings)
+            if page is not None:
+                serializer = UserSerializer(page, many=True)
+                return self.get_paginated_response({"data": serializer.data, "query": "following"})
+                # else:
+
+        else:
+            return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
 
 
 '''
@@ -332,7 +344,7 @@ Displaying Friend list
 '''
 class FriendingList(generics.GenericAPIView):
     pagination_class = ListPaginator
-    serializer_class = CommentSerializer
+    serializer_class = FriendingSerializer
     queryset = Friending.objects.all()
 
 
