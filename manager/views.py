@@ -84,6 +84,8 @@ def user_login(request):
         # combination is valid - a User object is returned if it is.
         user = authenticate(username=username, password=password)
 
+
+
         # # # Redirect admin to admin page
         # try:
         #     author = Author.objects.get(user=user)
@@ -97,6 +99,13 @@ def user_login(request):
         # If None (Python's way of representing the absence of a value), no user
         # with matching credentials was found.
         if user:
+            # If an super user who is not admin tries to login
+            # Add him into Author class
+            try:
+                author = Author.objects.get(user=user)
+            except Author.DoesNotExist:
+                author = Author.objects.create(user=user)
+                author.save()
 
             # Is the account active? It could have been disabled.
             if user.is_active:
