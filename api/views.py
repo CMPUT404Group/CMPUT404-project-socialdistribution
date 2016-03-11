@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from api.models import Post, Comment, Upload, Image, Following, Friending, Author
-from api.serializers import PostSerializer, CommentSerializer, ImageSerializer, AuthorSerializer, FriendingSerializer
+from api.serializers import PostSerializer, CommentSerializer, ImageSerializer, AuthorSerializer, FriendingSerializer, FollowingSerializer
 from api.serializers import UserSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -358,35 +358,6 @@ class CommentDetail(generics.GenericAPIView):
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-'''
-Displaying Following list
-'''
-class FollowingList(generics.GenericAPIView):
-    serializer_class = UserSerializer
-    queryset = Following.objects.all()
-
-    def get(self, request, format=None):
-        # ensure user is authenticated
-        if (request.user.is_authenticated()):
-            followings = Following.objects
-            page = self.paginate_queryset(followings)
-            if page is not None:
-                serializer = UserSerializer(page, many=True)
-                return self.get_paginated_response({"data": serializer.data, "query": "following"})
-                # else:
-
-        else:
-            return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
-
-
-'''
-Displaying Friend list
-'''
-class FriendingList(generics.GenericAPIView):
-    pagination_class = ListPaginator
-    serializer_class = FriendingSerializer
-    queryset = Friending.objects.all()
-
 
 '''
 Uploads a new image
@@ -567,3 +538,25 @@ class FriendingCheck(generics.GenericAPIView):
 
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+'''
+Displaying Following list
+'''
+class FollowingCheck(generics.GenericAPIView):
+    serializer_class = FollowingSerializer
+    queryset = Following.objects.all()
+
+    def get(self, request, author_id1, author_id2=None, format=None):
+        # ensure user is authenticated
+        if (request.user.is_authenticated()):
+
+            if author_id2 is not None:
+		aList = Following.objects.filter(author__id=author_id1, following__id=author_id2)
+                serializer = UserSerializer(page, many=True)
+                return self.get_paginated_response({"data": serializer.data, "query": "following"})
+                # else:
+
+        else:
+            return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
+
