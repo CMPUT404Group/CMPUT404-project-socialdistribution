@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from api.models import Post, Comment, Image, Author
+from api.models import Post, Comment, Image, Author, Friending
 from django.contrib.auth.models import User
 from django.utils import timezone
 
@@ -11,6 +11,13 @@ class AuthorSerializer(serializers.ModelSerializer):
 		model = Author
 		fields = ('id', 'github_name', 'picture', 'host')
 
+class FriendingSerializer(serializers.ModelSerializer):
+	author = AuthorSerializer(read_only=True)
+	friend = AuthorSerializer(read_only=True)
+
+	class Meta:
+		model = Friending
+		fields = ('author', 'friend')
 
 class CommentSerializer(serializers.ModelSerializer):
 	author = AuthorSerializer(read_only=True)

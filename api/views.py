@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from api.models import Post, Comment, Upload, Image, Following, Friending, Author
-from api.serializers import PostSerializer, CommentSerializer, ImageSerializer, AuthorSerializer
+from api.serializers import PostSerializer, CommentSerializer, ImageSerializer, AuthorSerializer, FriendingSerializer
 from api.serializers import UserSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -14,7 +14,8 @@ from rest_framework import generics
 from api.paginators import ListPaginator
 from django.shortcuts import get_object_or_404
 from django.conf import settings
-from django.http.request import QueryDict
+from itertools import chain
+from django.conf import settings
 
 # Create your views here.
 '''
@@ -28,6 +29,8 @@ class PostList(generics.GenericAPIView):
     queryset = Post.objects.all()
 
     def get(self, request, format=None):
+        print request.get_host()
+        print request.META.get('REMOTE_ADDR')  
         # ensure user is authenticated
         if (request.user.is_authenticated()):
             posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
@@ -516,4 +519,24 @@ class AuthorDetail(generics.GenericAPIView):
                     Response(status=status.HTTP_400_BAD_REQUEST)
 
         else:
-            return Response(status=HTTP_401_UNAUTHORIZED)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+
+class FriendingCheck(generics.GenericAPIView):
+    queryset = Friending.objects.all()
+    serializer_class = FriendingSerializer
+
+    def get(self, request, author_id1, author_id2, format=None):
+        if request.user.is_authenticated():
+            aList = Friending.objects.filter(author__id=author_id1, friend__id=author_id2)
+            bList = Friending.objects.filter(author__id=author_id2, friend__id=author_id1)
+            result = list(chain(aList, bList))
+            print result
+            if (result != []):
+                friends = True
+            else:
+                friends = False
+            return Response({'query':'friends', 'authors': [author_id1, author_id2], 'friends':friends}, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
