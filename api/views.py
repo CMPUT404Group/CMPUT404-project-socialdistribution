@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from api.models import Post, Comment, Upload, Image, Following, Friending, Author
-from api.serializers import PostSerializer, CommentSerializer, ImageSerializer, AuthorSerializer
+from api.serializers import PostSerializer, CommentSerializer, ImageSerializer, AuthorSerializer, FriendingSerializer, FollowingSerializer
 from api.serializers import UserSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -14,7 +14,8 @@ from rest_framework import generics
 from api.paginators import ListPaginator
 from django.shortcuts import get_object_or_404
 from django.conf import settings
-from django.http.request import QueryDict
+from itertools import chain
+from django.conf import settings
 
 # Create your views here.
 '''
@@ -28,6 +29,8 @@ class PostList(generics.GenericAPIView):
     queryset = Post.objects.all()
 
     def get(self, request, format=None):
+        print request.get_host()
+        print request.META.get('REMOTE_ADDR')  
         # ensure user is authenticated
         if (request.user.is_authenticated()):
             posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
@@ -352,23 +355,6 @@ class CommentDetail(generics.GenericAPIView):
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-'''
-Displaying Following list
-'''
-class FollowingList(generics.GenericAPIView):
-    pagination_class = ListPaginator
-    serializer_class = CommentSerializer
-    queryset = Following.objects.all()
-
-
-'''
-Displaying Friend list
-'''
-class FriendingList(generics.GenericAPIView):
-    pagination_class = ListPaginator
-    serializer_class = CommentSerializer
-    queryset = Friending.objects.all()
-
 
 '''
 Uploads a new image
@@ -467,10 +453,23 @@ class AuthorDetail(generics.GenericAPIView):
         # ensure user is authenticated
         if (request.user.is_authenticated()):
 
-            # --- TODO : Only authorize users to read/get this post if visibility/privacy settings allow it
             author = self.get_object(author_pk)
             serializer = AuthorSerializer(author)
-            return Response(serializer.data)
+
+            # get the author's friend list
+            responseData = serializer.data
+            friendsList = []
+            # return json object so we must extract the friend
+            aList = Friending.objects.filter(author=author).select_related('friend')
+            friendsList = []
+            for i in aList:
+                friendsList.append(i.friend)
+            serializer = AuthorSerializer(friendsList, many=True)
+            responseData["friends"] = serializer.data
+
+            responseData["url"] = author.host + "author/" + author.user.username
+
+            return Response(responseData, status=status.HTTP_200_OK)
 
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -513,4 +512,61 @@ class AuthorDetail(generics.GenericAPIView):
                     Response(status=status.HTTP_400_BAD_REQUEST)
 
         else:
-            return Response(status=HTTP_401_UNAUTHORIZED)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+
+class FriendingCheck(generics.GenericAPIView):
+    queryset = Friending.objects.all()
+    serializer_class = FriendingSerializer
+
+    def get(self, request, author_id1, author_id2=None, format=None):
+        if request.user.is_authenticated():
+
+            # returns whether or not author_id1 & author_id2 are friends or not
+            if author_id2 != None:
+                aList = Friending.objects.filter(author__id=author_id1, friend__id=author_id2)
+                bList = Friending.objects.filter(author__id=author_id2, friend__id=author_id1)
+                result = list(chain(aList, bList))
+                print result
+                if (result != []):
+                    friends = True
+                else:
+                    friends = False
+                return Response({'query':'friends', 'authors': [author_id1, author_id2], 'friends':friends}, status=status.HTTP_200_OK)
+            
+
+            # returns all friends of author_1
+            else:
+                friendsList = []
+                # return json object so we must extract the friend id
+                aList = Friending.objects.filter(author__id=author_id1).values('friend__id')
+                for i in aList:
+                    friendsList.append(i["friend__id"])
+                print friendsList
+                return Response({'query':'friends', 'authors': friendsList}, status=status.HTTP_200_OK)
+
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+'''
+Displaying Following list
+'''
+class FollowingCheck(generics.GenericAPIView):
+    serializer_class = FollowingSerializer
+    queryset = Following.objects.all()
+
+    def get(self, request, author_id1, author_id2=None, format=None):
+        # ensure user is authenticated
+        if (request.user.is_authenticated()):
+
+            if author_id2 is not None:
+		aList = Following.objects.filter(author__id=author_id1, following__id=author_id2)
+                serializer = UserSerializer(page, many=True)
+                return self.get_paginated_response({"data": serializer.data, "query": "following"})
+                # else:
+
+        else:
+            return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
+
