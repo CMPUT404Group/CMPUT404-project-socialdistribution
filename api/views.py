@@ -16,14 +16,20 @@ from django.shortcuts import get_object_or_404
 from django.conf import settings
 from itertools import chain
 from django.conf import settings
+from rest_framework.reverse import reverse
 
 # Create your views here.
-'''
-Lists all Posts  / Create a new Post
-'''
+@api_view(('GET',))
+def api_root(request, format=None):
+    return Response({
+        'posts': reverse('post-list', request=request, format=format),
+    })
 
 
 class PostList(generics.GenericAPIView):
+    '''
+    Lists all Posts  / Create a new Post
+    '''
     pagination_class = ListPaginator
     serializer_class = PostSerializer
     queryset = Post.objects.all()
