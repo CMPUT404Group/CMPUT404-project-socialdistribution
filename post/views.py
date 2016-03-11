@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.template import RequestContext
 from django.utils import timezone
-from api.models import Post, Author, Comment
+from api.models import Post, Author, Comment, Friending
 from .forms import UploadFileForm, PostForm, CommentForm
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.core.urlresolvers import reverse
 from api.views import PostList, CommentList, PostDetail
 from rest_framework.response import Response
@@ -106,26 +106,28 @@ Renders the page for specific post (including the post's comments)
 
 def post_detail(request, post_pk):
     if (request.user.is_authenticated()):
+        if (isAllowed(request,post_pk)):
+            if request.method == "POST":
+                response = _submitCommentForm(request, post_pk)
 
-        if request.method == "POST":
-            response = _submitCommentForm(request, post_pk)
-
-            # Empty Form Submitted
-            if response == None:
-                # alert user form was empty
-                pass
-            else:
-                # -- TODO : display post success or failure on postDetail.html -- #
-                if ((response.status_code == 201) or (response.status_code == 200)):
-                    return HttpResponseRedirect(reverse('post_detail_success', kwargs={'post_pk': post_pk}))
-                else:  # 400 error
-                    # alert user of the error
+                # Empty Form Submitted
+                if response == None:
+                    # alert user form was empty
                     pass
+                else:
+                    # -- TODO : display post success or failure on postDetail.html -- #
+                    if ((response.status_code == 201) or (response.status_code == 200)):
+                        return HttpResponseRedirect(reverse('post_detail_success', kwargs={'post_pk': post_pk}))
+                    else:  # 400 error
+                        # alert user of the error
+                        pass
 
-        post = Post.objects.get(pk=post_pk)
-        form = CommentForm()
-        author = Author.objects.get(user=request.user)
-        return render(request, 'post/postDetail.html', {'post': post, 'commentForm': form, 'loggedInAuthor': author})
+            post = Post.objects.get(pk=post_pk)
+            form = CommentForm()
+            author = Author.objects.get(user=request.user)
+            return render(request, 'post/postDetail.html', {'post': post, 'commentForm': form, 'loggedInAuthor': author})
+        else:
+            return HttpResponseForbidden("You are not allowed to access this page")
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
@@ -205,3 +207,44 @@ def file(request):
     else:
         img = UploadFileForm()
     return render(request, 'file.html', {'form': img})
+
+
+'''
+checks if a user is allowed access to a file
+
+'''
+def isAllowed(request,pk):
+    post = Post.objects.get(id=pk)
+    privacy = post.visibility
+    viewer = Author.objects.get(user=request.user)
+
+    #if the post was created by the user allow access
+    if viewer == post.author :
+        return True
+    #if it is a public post allow everypne access
+    elif privacy == "PUBLIC":
+        return True
+    #check if the user is in the friend list
+    elif privacy == "FRIENDS" or privacy == "FOAF":
+        friend_pairs = Friending.objects.filter(author=post.author)
+        friends = []
+        print(friend_pairs)
+        for i in range(len(friend_pairs)):
+            friends.append(friend_pairs[i].friend)
+            print(friend_pairs[i].friend.user.username)
+        if viewer in friends:
+            return True
+        #check if the user is in the FoaF list
+        elif privacy == "FOAF":
+            for i in range(len(friends)):
+                fofriend_pairs = Friending.objects.filter(author=friends[i])
+                fofriends = []
+                for i in range(len(fofriend_pairs)):
+                    fofriends.append(fofriend_pairs[i].friend)
+                if viewer in fofriends:
+                    return True
+        #if not a friend return false
+        else:
+            return False
+    else:
+        return False

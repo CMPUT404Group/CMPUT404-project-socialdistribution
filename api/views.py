@@ -84,15 +84,51 @@ class PostDetail(generics.GenericAPIView):
     def get_object(self, pk):
         return get_object_or_404(Post, pk=pk)
 
+    def isAllowed(self,request,pk):
+        post = Post.objects.get(id=pk)
+        privacy = post.visibility
+
+        #if the post was created by the user allow access
+        if viewer == post.author :
+            return True
+        #if it is a public post allow everypne access
+        elif privacy == "PUBLIC":
+            return True
+        #check if the user is in the friend list
+        elif privacy == "FRIENDS" or privacy == "FOAF":
+            friend_pairs = Friending.objects.filter(author=post.author)
+            friends = []
+            print(friend_pairs)
+            for i in range(len(friend_pairs)):
+                friends.append(friend_pairs[i].friend)
+                print(friend_pairs[i].friend.user.username)
+            if viewer in friends:
+                return True
+            #check if the user is in the FoaF list
+            elif privacy == "FOAF":
+                for i in range(len(friends)):
+                    fofriend_pairs = Friending.objects.filter(author=friends[i])
+                    fofriends = []
+                    for i in range(len(fofriend_pairs)):
+                        fofriends.append(fofriend_pairs[i].friend)
+                    if viewer in fofriends:
+                        return True
+            #if not a friend return false
+            else:
+                return False
+        else:
+            return False
+
+
     def get(self, request, pk, format=None):
         # ensure user is authenticated
         if (request.user.is_authenticated()):
-
-            # --- TODO : Only authorize users to read/get this post if visibility/privacy settings allow it
-            post = self.get_object(pk)
-            serializer = PostSerializer(post)
-            return Response(serializer.data)
-
+            if (self.isAllowed(request,pk)):
+                post = self.get_object(pk)
+                serializer = PostSerializer(post)
+                return Response(serializer.data)
+            else:
+                return Response(status=status.HTTP_403_FORBIDDEN)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
@@ -148,34 +184,33 @@ class CommentList(generics.GenericAPIView):
         privacy = post.visibility
 
         #if the post was created by the user allow access
-        if Author.objects.get(user=request.user) == post.author :
+        if viewer == post.author :
             return True
         #if it is a public post allow everypne access
-        if privacy == "PUBLIC":
+        elif privacy == "PUBLIC":
             return True
-        elif privacy == "FRIENDS" or privacy == "FRIENDS_OF_FRIENDS":
-            #TODO Friends needs to be implemented first
-            #friend_pairs = Friending.objects.filter(author=post.author)
-            #friends = []
-            #users = []
-            #for i in range(len(friend_pairs)):
-                #friends.append(friend_pairs[i].friend)
-                #users.append(friend_pairs[i].friend.user)
-            #if request.user in users:
-                #return True
-            #elif privacy == "FRIENDS_OF_FRIENDS":
-                #for i in range(len(friends)):
-                    #friend_pairs = Friending.objects.filter(author=friends[i])
-                    #friends = []
-                    #users = []
-                    #for i in range(len(friend_pairs)):
-                        #friends.append(friend_pairs[i].friend)
-                        #users.append(friend_pairs[i].friend.user)
-                    #if request.user in users:
-                        #return True
-            #else:
-                #return False
-            return True
+        #check if the user is in the friend list
+        elif privacy == "FRIENDS" or privacy == "FOAF":
+            friend_pairs = Friending.objects.filter(author=post.author)
+            friends = []
+            print(friend_pairs)
+            for i in range(len(friend_pairs)):
+                friends.append(friend_pairs[i].friend)
+                print(friend_pairs[i].friend.user.username)
+            if viewer in friends:
+                return True
+            #check if the user is in the FoaF list
+            elif privacy == "FOAF":
+                for i in range(len(friends)):
+                    fofriend_pairs = Friending.objects.filter(author=friends[i])
+                    fofriends = []
+                    for i in range(len(fofriend_pairs)):
+                        fofriends.append(fofriend_pairs[i].friend)
+                    if viewer in fofriends:
+                        return True
+            #if not a friend return false
+            else:
+                return False
         else:
             return False
 
@@ -234,34 +269,33 @@ class CommentDetail(generics.GenericAPIView):
         privacy = post.visibility
 
         #if the post was created by the user allow access
-        if Author.objects.get(user=request.user)== post.author:
+        if viewer == post.author :
             return True
         #if it is a public post allow everypne access
-        if privacy == "PUBLIC":
+        elif privacy == "PUBLIC":
             return True
-        elif privacy == "FRIENDS" or privacy == "FRIENDS_OF_FRIENDS":
-            #TODO Friends needs to be implemented first
-            #friend_pairs = Friending.objects.filter(author=post.author)
-            #friends = []
-            #users = []
-            #for i in range(len(friend_pairs)):
-                #friends.append(friend_pairs[i].friend)
-                #users.append(friend_pairs[i].friend.user)
-            #if request.user in users:
-                #return True
-            #elif privacy == "FRIENDS_OF_FRIENDS":
-                #for i in range(len(friends)):
-                    #friend_pairs = Friending.objects.filter(author=friends[i])
-                    #friends = []
-                    #users = []
-                    #for i in range(len(friend_pairs)):
-                        #friends.append(friend_pairs[i].friend)
-                        #users.append(friend_pairs[i].friend.user)
-                    #if request.user in users:
-                        #return True
-            #else:
-                #return False
-            return True
+        #check if the user is in the friend list
+        elif privacy == "FRIENDS" or privacy == "FOAF":
+            friend_pairs = Friending.objects.filter(author=post.author)
+            friends = []
+            print(friend_pairs)
+            for i in range(len(friend_pairs)):
+                friends.append(friend_pairs[i].friend)
+                print(friend_pairs[i].friend.user.username)
+            if viewer in friends:
+                return True
+            #check if the user is in the FoaF list
+            elif privacy == "FOAF":
+                for i in range(len(friends)):
+                    fofriend_pairs = Friending.objects.filter(author=friends[i])
+                    fofriends = []
+                    for i in range(len(fofriend_pairs)):
+                        fofriends.append(fofriend_pairs[i].friend)
+                    if viewer in fofriends:
+                        return True
+            #if not a friend return false
+            else:
+                return False
         else:
             return False
 
