@@ -9,7 +9,7 @@
     {% if author.picture %}
     <img id="id-user-profile-image" src="/media/{{ author.picture }}" class="profile-photo img-circle img-responsive img-center pull-left create-post" alt="Profile Image"/>
     {% else %}
-    <img id="id-user-profile-image" class="profile-photo-icon img-circle img-responsive img-center pull-left create-post" src="http://placehold.it/175x175">
+    <img id="id-user-profile-image" class="profile-photo img-circle img-responsive img-center pull-left create-post" src="http://placehold.it/175x175">
     {% endif %}
     
     <div class="media-body" style="padding-left: 3em;">
@@ -77,7 +77,7 @@
     {% if post.author == author %}
     <div class="media-body post-action-icons">
         <a href="{% url 'post_edit' post.id %}"><button class="btn btn-default action-icon edit-post"><i class="fa fa-pencil-square-o"></i></button></a>
-        <button class="btn btn-default action-icon"><i class="fa fa-trash-o"></i></button>
+        <button id='delete-post-{{ post.id }}' class="btn btn-default action-icon delete-post-single"><i class="fa fa-trash-o"></i></button>
     </div>
     {% else %}
     <div class="media-body post-action-icons placeholder">
