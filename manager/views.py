@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from api.models import Author
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
-from manager.forms import AuthorForm, UserForm
+from manager.forms import AuthorForm
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponseRedirect
@@ -21,7 +21,7 @@ def register(request):
     # If it's a HTTP POST, we're interested in processing form data.
     if request.method == 'POST':
         # Attempt to grab information from the raw form information.
-        user_form = UserForm(data=request.POST)
+        user_form = UserCreationForm(data=request.POST)
         author_form = AuthorForm(data=request.POST)
 
         # If the two forms are valid...
@@ -29,9 +29,6 @@ def register(request):
             # Save the user's form data to the database.
             user = user_form.save()
 
-            # Now we hash the password with the set_password method.
-            # Once hashed, we can update the user object.
-            user.set_password(user.password)
             # User account is inactive by default
             # Users can only login into their account after admin's approval
             user.is_active = False
@@ -63,7 +60,7 @@ def register(request):
     # Not a HTTP POST, so we render our form using two ModelForm instances.
     # These forms will be blank, ready for user input.
     else:
-        user_form = UserForm()
+        user_form = UserCreationForm()
         author_form = AuthorForm()
 
     # Render the template depending on the context.
