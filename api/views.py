@@ -16,14 +16,20 @@ from django.shortcuts import get_object_or_404
 from django.conf import settings
 from itertools import chain
 from django.conf import settings
+from rest_framework.reverse import reverse
 
 # Create your views here.
-'''
-Lists all Posts  / Create a new Post
-'''
+@api_view(('GET',))
+def api_root(request, format=None):
+    return Response({
+        'posts': reverse('post-list', request=request, format=format),
+    })
 
 
 class PostList(generics.GenericAPIView):
+    '''
+    Lists all Posts  / Create a new Post
+    '''
     pagination_class = ListPaginator
     serializer_class = PostSerializer
     queryset = Post.objects.all()
@@ -557,16 +563,16 @@ class FollowingCheck(generics.GenericAPIView):
     serializer_class = FollowingSerializer
     queryset = Following.objects.all()
 
-    def get(self, request, author_id1, author_id2=None, format=None):
+    def get(self, request, author_id1, format=None):
         # ensure user is authenticated
         if (request.user.is_authenticated()):
-
-            if author_id2 is not None:
-		aList = Following.objects.filter(author__id=author_id1, following__id=author_id2)
-                serializer = UserSerializer(page, many=True)
-                return self.get_paginated_response({"data": serializer.data, "query": "following"})
-                # else:
-
-        else:
-            return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
-
+	    # return all following
+            if author_id1 is not None:
+		followingList = []
+		aList = Following.objects.filter(author__id=author_id1).values("following__id")
+		for i in aList:
+		    followingList.append(i["following__id"])
+		print followingList
+		return Response({'query':'following', 'authors':followingList}, status=status.HTTP_200_OK)
+	else:
+	    return Response(status=status.HTTP_401_UNAUTHORIZED)
