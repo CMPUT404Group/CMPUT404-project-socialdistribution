@@ -90,6 +90,7 @@ class PostDetail(generics.GenericAPIView):
     def isAllowed(self,request,pk):
         post = Post.objects.get(id=pk)
         privacy = post.visibility
+        viewer = Author.objects.get(user=request.user)
 
         #if the post was created by the user allow access
         if viewer == post.author :
@@ -101,10 +102,8 @@ class PostDetail(generics.GenericAPIView):
         elif privacy == "FRIENDS" or privacy == "FOAF":
             friend_pairs = Friending.objects.filter(author=post.author)
             friends = []
-            print(friend_pairs)
             for i in range(len(friend_pairs)):
                 friends.append(friend_pairs[i].friend)
-                print(friend_pairs[i].friend.user.username)
             if viewer in friends:
                 return True
             #check if the user is in the FoaF list
@@ -185,6 +184,7 @@ class CommentList(generics.GenericAPIView):
     def isAllowed(self,request,pk):
         post = Post.objects.get(id=pk)
         privacy = post.visibility
+        viewer = Author.objects.get(user=request.user)
 
         #if the post was created by the user allow access
         if viewer == post.author :
@@ -196,10 +196,8 @@ class CommentList(generics.GenericAPIView):
         elif privacy == "FRIENDS" or privacy == "FOAF":
             friend_pairs = Friending.objects.filter(author=post.author)
             friends = []
-            print(friend_pairs)
             for i in range(len(friend_pairs)):
                 friends.append(friend_pairs[i].friend)
-                print(friend_pairs[i].friend.user.username)
             if viewer in friends:
                 return True
             #check if the user is in the FoaF list
@@ -270,6 +268,7 @@ class CommentDetail(generics.GenericAPIView):
     def isAllowed(self,request,pk):
         post = Post.objects.get(id=pk)
         privacy = post.visibility
+        viewer = Author.objects.get(user=request.user)
 
         #if the post was created by the user allow access
         if viewer == post.author :
@@ -281,10 +280,8 @@ class CommentDetail(generics.GenericAPIView):
         elif privacy == "FRIENDS" or privacy == "FOAF":
             friend_pairs = Friending.objects.filter(author=post.author)
             friends = []
-            print(friend_pairs)
             for i in range(len(friend_pairs)):
                 friends.append(friend_pairs[i].friend)
-                print(friend_pairs[i].friend.user.username)
             if viewer in friends:
                 return True
             #check if the user is in the FoaF list
