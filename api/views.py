@@ -473,10 +473,23 @@ class AuthorDetail(generics.GenericAPIView):
         # ensure user is authenticated
         if (request.user.is_authenticated()):
 
-            # --- TODO : Only authorize users to read/get this post if visibility/privacy settings allow it
             author = self.get_object(author_pk)
             serializer = AuthorSerializer(author)
-            return Response(serializer.data)
+
+            # get the author's friend list
+            responseData = serializer.data
+            friendsList = []
+            # return json object so we must extract the friend
+            aList = Friending.objects.filter(author=author).select_related('friend')
+            friendsList = []
+            for i in aList:
+                friendsList.append(i.friend)
+            serializer = AuthorSerializer(friendsList, many=True)
+            responseData["friends"] = serializer.data
+
+            responseData["url"] = author.host + "author/" + author.user.username
+
+            return Response(responseData, status=status.HTTP_200_OK)
 
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
