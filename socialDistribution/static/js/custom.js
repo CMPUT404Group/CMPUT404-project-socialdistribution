@@ -183,7 +183,7 @@ window.onload = function() {
     formData.append("host", "");
     var authorID = $("#uploadProfileImageForm").data("author-id");
     $.ajax({
-      url: 'http://' + window.location.host + '/api/authors/' + authorID + '/',
+      url: 'http://' + window.location.host + '/api/author/' + authorID + '/',
       type: "POST",
       data: formData,
       contentType: false,
