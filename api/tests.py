@@ -153,10 +153,17 @@ class ApiUrlsTestCase(TestCase):
                             content="this is my following public post data",
                             author=sam, published=date, visibility="PUBLIC")
 
-
         Comment.objects.create(id=c_id, post=post, author=bob, contentType="PLAINTEXT",
                             comment="this is my comment", published=date)
 
+    #test that people can edit their own posts and comments
+    #test that people cant edit other peoples posts and comments
+    def test_edits(self):
+        #login
+        login = self.client.login(username='tester', password='hello') 
+        self.assertTrue(login)
+
+        resp1= self.client.post("/")
 
     def test_redirect(self):
         # check that it redirects to the login page
@@ -197,7 +204,6 @@ class ApiUrlsTestCase(TestCase):
     	#login
         login = self.client.login(username='tester', password='hello') 
         self.assertTrue(login)
-        self.client.session.save()
 
         #check an existing post is viewable now that they are logged in
         resp1 = self.client.get("/post/"+str(post_id)+"/") #my public post is viewable

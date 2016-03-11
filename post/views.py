@@ -228,10 +228,8 @@ def isAllowed(request,pk):
     elif privacy == "FRIENDS" or privacy == "FOAF":
         friend_pairs = Friending.objects.filter(author=post.author)
         friends = []
-        print(friend_pairs)
         for i in range(len(friend_pairs)):
             friends.append(friend_pairs[i].friend)
-            print(friend_pairs[i].friend.user.username)
         if viewer in friends:
             return True
         #check if the user is in the FoaF list
