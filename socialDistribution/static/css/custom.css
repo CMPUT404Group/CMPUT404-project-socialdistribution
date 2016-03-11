@@ -13,6 +13,15 @@ body {
 img.profile-photo-icon {
 	margin-top: 0.5em;
 	margin-right: 0.5em;
+    max-width: 50px;
+    max-height: 50px;
+}
+
+img.profile-photo {
+    margin-top: 0.5em;
+    margin-right: 0.5em;
+    max-width: 175px;
+    max-height: 175px;
 }
 
 hr.post-hr {
@@ -144,4 +153,13 @@ div.profile-header > p {
 
 .imageAttachedIcon {
     margin-left: 0.5em;
+}
+
+button.padding {
+    margin-left: 0.25em;
+    margin-right: 0.25em;
+}
+
+.panel-body > p > img {
+    max-width: 75% !important;
 }

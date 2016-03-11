@@ -11,15 +11,15 @@ CONTENT_TYPE_CHOICES = (
     (PLAINTEXT, 'Plaintext')
 )
 
-
 # Why having additional Authors class instead of auth.user:
 # auth.user is the model comes with Django, we need more attributes for Authors.
 # create Author model with a one-to-one association with the the `User` model
 class Author(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     github_name = models.CharField(max_length=40, blank=True)
-    picture = models.ImageField(upload_to='profile_images', blank=True)
-
+    picture = models.ImageField(upload_to='profile_images/', blank=True)
+    host = models.CharField(max_length=40, default="http://127.0.0.1:8080/")
 
     def __unicode__(self):
         return self.user.username
@@ -27,7 +27,7 @@ class Author(models.Model):
 # Source from http://stackoverflow.com/questions/4564760/best-way-to-make-djangos-user-system-have-friends March 9, 2016
 class Friend(models.Model):
 
-    # friends table	
+    # friends table 
 
     user = models.ForeignKey(User)
     friend = models.ForeignKey(User, related_name="friends")
@@ -55,7 +55,7 @@ class Post(models.Model):
     # description - a brief description of the post
     contentType = models.CharField(max_length=15, choices=CONTENT_TYPE_CHOICES, default=PLAINTEXT)
     content = models.TextField()
-    author = models.ForeignKey('auth.User')
+    author = models.ForeignKey('Author')
     # categories - categories this posts fits into - a list of strings - ex ["web","tutorial"]
     # count - total # of comments for this post
     published = models.DateTimeField(default=timezone.now)
@@ -68,7 +68,7 @@ class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     post = models.ForeignKey('api.Post', related_name='comments')
 
-    author = models.ForeignKey('auth.user')
+    author = models.ForeignKey('Author')
     comment = models.TextField()
     contentType = models.CharField(max_length=15, choices=CONTENT_TYPE_CHOICES, default=PLAINTEXT)
     published = models.DateTimeField(default=timezone.now)
@@ -83,7 +83,7 @@ class Upload(models.Model):
 class Image(models.Model):
     photo = models.ImageField("Image", upload_to="images/")
     upload_date = models.DateTimeField(auto_now_add=True)
-    author = models.ForeignKey('auth.User')
+    author = models.ForeignKey('Author')
     
 class Friending(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)

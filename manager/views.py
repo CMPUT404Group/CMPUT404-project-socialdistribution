@@ -1,8 +1,9 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from api.models import Author
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
-from manager.forms import AuthorForm, UserForm
+from manager.forms import AuthorForm
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponseRedirect
@@ -20,7 +21,7 @@ def register(request):
     # If it's a HTTP POST, we're interested in processing form data.
     if request.method == 'POST':
         # Attempt to grab information from the raw form information.
-        user_form = UserForm(data=request.POST)
+        user_form = UserCreationForm(data=request.POST)
         author_form = AuthorForm(data=request.POST)
 
         # If the two forms are valid...
@@ -28,9 +29,6 @@ def register(request):
             # Save the user's form data to the database.
             user = user_form.save()
 
-            # Now we hash the password with the set_password method.
-            # Once hashed, we can update the user object.
-            user.set_password(user.password)
             # User account is inactive by default
             # Users can only login into their account after admin's approval
             user.is_active = False
@@ -62,7 +60,7 @@ def register(request):
     # Not a HTTP POST, so we render our form using two ModelForm instances.
     # These forms will be blank, ready for user input.
     else:
-        user_form = UserForm()
+        user_form = UserCreationForm()
         author_form = AuthorForm()
 
     # Render the template depending on the context.
@@ -86,10 +84,20 @@ def user_login(request):
         # combination is valid - a User object is returned if it is.
         user = authenticate(username=username, password=password)
 
+        # # # Redirect admin to admin page
+        # try:
+        #     author = Author.objects.get(user=user)
+        # except Author.DoesNotExist as e:
+        #     if user:
+        #         return HttpResponseRedirect('/admin')
+        #     else:
+        #         return render(request, "registration/login.html", {'message': "Invalid username or password."})
+
         # If we have a User object, the details are correct.
         # If None (Python's way of representing the absence of a value), no user
         # with matching credentials was found.
         if user:
+
             # Is the account active? It could have been disabled.
             if user.is_active:
                 # If the account is valid and active, we can log the user in.
@@ -98,11 +106,11 @@ def user_login(request):
                 return HttpResponseRedirect('/')
             else:
                 # An inactive account was used - no logging in!
-                return HttpResponse("Your account is disabled.")
+                return render(request, "registration/login.html", {'message': "Your account has not been activated."})
         else:
             # Bad login details were provided. So we can't log the user in.
             print "Invalid login details: {0}, {1}".format(username, password)
-            return HttpResponse("Invalid login details supplied.")
+            return render(request, "registration/login.html", {'message': "Invalid username or password."})
 
     # The request is not a HTTP POST, so display the login form.
     # This scenario would most likely be a HTTP GET.

@@ -21,3 +21,10 @@ venv
 node_modules
 .sass-cache
 .idea
+
+# Cached files
+.py~
+.html~
+
+#our databse stuff dont push for now
+db.sqlite3

@@ -18,6 +18,7 @@
 				{{ post.content|urlize }}
     		{% endif %}
     		
+    		<br/>
             {% if post.image_url %}
                 <img src="{{ post.image_url }}" />
             {% endif %}
@@ -29,10 +30,13 @@
     	</div>
     </div>
 
+    {% if post.author == loggedInAuthor %}
 	<div class="media-body post-action-icons">
 		<a href="{% url 'post_edit' post.id %}"><button class="btn btn-default action-icon edit-post"><i class="fa fa-pencil-square-o"></i></button></a>
-		<button class="btn btn-default action-icon"><i class="fa fa-trash-o"></i></button>
+		<button id='delete-post-{{ post.id }}' class="btn btn-default action-icon delete-post-single"><i class="fa fa-trash-o"></i></button>
 	</div>
+    {% endif %}
+
     {% endif %}
 
 </div>
@@ -59,7 +63,7 @@
 	    	</div>
 	    	<div class="comment-footer">
 
-    			{% if comment.author == user %}
+    			{% if comment.author == loggedInAuthor %}
 	    		<button class="btn-default action-icon"><i class="fa fa-pencil-square-o"></i></button>
 	    		<button class="btn-default action-icon  delete-comment" id='delete-comment-{{ comment.id }}' data-post-id='{{ post.id }}'><i class="fa fa-trash-o"></i></button>
 				{% endif %}

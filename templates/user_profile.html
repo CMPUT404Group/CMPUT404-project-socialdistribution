@@ -1,18 +1,48 @@
 {% extends 'base.html' %}
 {% load markdown_deux_tags %}
-
 {% block content %}
+{% load widget_tweaks %}
 
 <div class="row profile-header">
-	<img class="profile-photo-icon img-circle img-responsive img-center pull-left create-post" src="http://placehold.it/175x175">
-    <div class="media-body" style="padding-left: 3em;">
-    	<!-- Do some logic here : follow, unfollow, accept etc -->
- 		<button class="btn btn-success pull-right" style="position: relative; top: 1.5em; right: 1.5em;">Follow</button>
 
-    	<h1> {{ user_account.username }} </h1>
-    	<p style="color: grey;"> {{ user_account.email }} </p>
+    <!-- Display profile image -->
+    {% if author.picture %}
+    <img id="id-user-profile-image" src="/media/{{ author.picture }}" class="profile-photo img-circle img-responsive img-center pull-left create-post" alt="Profile Image"/>
+    {% else %}
+    <img id="id-user-profile-image" class="profile-photo img-circle img-responsive img-center pull-left create-post" src="http://placehold.it/175x175">
+    {% endif %}
+    
+    <div class="media-body" style="padding-left: 3em;">
+        <!-- Do some logic here : follow, unfollow, accept etc -->
+        <button class="btn btn-success pull-right" style="position: relative; top: 1.5em; right: 1.5em;">Follow</button>
+
+        <!-- Display required user info on profile page -->
+        <h1> {{ user_account.username }} </h1>
+        <div>
+            <!-- <p style="color: grey;">id: {{ user_account.id }} </p> -->
+            <p style="color: grey;">host: {{ author.host }} </p>
+            <p style="color: grey;">username: {{ user_account.username }} </p>
+            <p style="color: grey;">url: {{ author.host }}user/{{ user_account.username }} </p>
+            <p id="email" style="color: grey;">email: {{user_account.email}} 
+                <!-- Triggers editEmailModal -->
+                <button id='editEmailTrigger' type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#editEmailModal"><i class="fa fa-edit"></i></button> 
+          
+            </p>
+            <p style="color: grey;">github: http://github.com/{{ author.github_name }} </p>
+        </div>
     </div>
+
+    {% if user_account == user %}
+    <!-- Triggers uploadImageModal -->
+    <span>
+        <button id='uploadProfileImageTrigger' type="button" class="btn btn-default" data-toggle="modal" data-target="#uploadProfileImageModal"><i class="fa fa-picture-o"></i></button>
+    </span>
+    {% endif %}
+
+
 </div>
+
+ 
 
 <!-- If this is the logged in user's profile page, show a create post component -->
 {% if user_account == user %}
@@ -21,33 +51,41 @@
 
 {% for post in posts %}
 <div class="row post">
-	<img class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/50x50" data-popover="true" data-html=true data-toggle="popover" title="{{ post.author }}" data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"/>
+    <img class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/50x50" data-popover="true" data-html=true data-toggle="popover" title="{{ post.author }}" data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"/>
 
     <div class="panel panel-primary media-body">
-    	<div class='panel-heading'> <a class='title' href='{% url "post_detail" post.id %}'> {{ post.title }} </a> <span class='date'> {{ post.published }} </span> </div>
+        <div class='panel-heading'> <a class='title' href='{% url "post_detail" post.id %}'> {{ post.title }} </a> <span class='date'> {{ post.published }} </span> </div>
         <div class='panel-body'> 
             {% if post.contentType == "text/x-markdown" %}
                 {{ post.content|markdown|urlize }} 
             {% else %}
                 {{ post.content|urlize }}
             {% endif %}
+            
+            <br/>
+            {% if post.image_url %}
+                <img src="{{ post.image_url }}" />
+            {% endif %}
         </div>
-    	<hr class='post-hr'>
-    	<div class='panel-body'>
-    		<a href='{% url "post_detail" post.id %}#comments' class='comments'> {{ post.comments.count }} Comments </a>
-			<a href='{% url "post_detail" post.id %}' class='pull-right'><i class="fa fa-plus"></i></a>
-    	</div>
+        <hr class='post-hr'>
+        <div class='panel-body'>
+            <a href='{% url "post_detail" post.id %}#comments' class='comments'> {{ post.comments.count }} Comments </a>
+            <a href='{% url "post_detail" post.id %}' class='pull-right'><i class="fa fa-plus"></i></a>
+        </div>
     </div>
 
-    {% if post.author == user %}
-	<div class="media-body post-action-icons">
-		<button class="btn btn-default action-icon"><i class="fa fa-pencil-square-o"></i></button>
-		<button class="btn btn-default action-icon delete-post" id='delete-post-{{ post.id }}'><i class="fa fa-trash-o"></i></button>
-	</div>
-	{% else %}
-	<div class="media-body post-action-icons placeholder">
-	</div>
-	{% endif %}
+    {% if post.author == author %}
+    <div class="media-body post-action-icons">
+        <a href="{% url 'post_edit' post.id %}"><button class="btn btn-default action-icon edit-post"><i class="fa fa-pencil-square-o"></i></button></a>
+        <button id='delete-post-{{ post.id }}' class="btn btn-default action-icon delete-post-single"><i class="fa fa-trash-o"></i></button>
+    </div>
+    {% else %}
+    <div class="media-body post-action-icons placeholder">
+    </div>
+    {% endif %}
 </div>
 {% endfor %}
+
+{% include "post/editProfileFieldModal.html" %}
+{% include "post/uploadProfileImageModal.html" %}
 {% endblock %}
