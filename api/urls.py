@@ -14,5 +14,7 @@ urlpatterns = [
 
 	url(r'^friends/(?P<author_id1>[^/]+)/$',views.FriendingCheck.as_view()),
 	url(r'^friends/(?P<author_id1>[^/]+)/(?P<author_id2>[^/]+)/$',views.FriendingCheck.as_view()),
+	
+	url(r'^following/(?P<author_id1>[^/]+)/$',views.FollowingCheck.as_view()),
 
 ]
