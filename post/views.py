@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.template import RequestContext
 from django.utils import timezone
-from api.models import Post, Author, Comment, Friending
+from api.models import Post, Author, Comment, Friending, Following
 from .forms import UploadFileForm, PostForm, CommentForm
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.core.urlresolvers import reverse
@@ -9,6 +9,7 @@ from api.views import PostList, CommentList, PostDetail
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
+from itertools import chain
 
 # Create your views here.
 '''
@@ -88,8 +89,33 @@ def my_stream(request):
                 else:  # 400 error
                     # alert user of the error
                     pass
+
         author = Author.objects.get(user=request.user)
-        posts = Post.objects.filter(author=author).order_by('-published')
+        posts1 = Post.objects.filter(author=author).order_by('-published')
+
+        pks = []
+
+        #add the posts by the people we are following into our myStream
+        following_pairs = Following.objects.filter(author=author)
+        for i in range(len(following_pairs)):
+            following_posts = Post.objects.filter(author=following_pairs[i].following)
+            for j in range(len(following_posts)):
+                if isAllowed(request.user, following_posts[j].id):
+                    pks.append(following_posts[j].id)
+
+        #add the posts by the people we are friends with into our myStream
+        friend_pairs = Friending.objects.filter(author=author)
+        for i in range(len(friend_pairs)):
+            friend_posts = Post.objects.filter(author=friend_pairs[i].friend)
+            for j in range(len(friend_posts)):
+                if isAllowed(request.user, friend_posts[j].id):
+                    pks.append(friend_posts[j])
+
+        #sort the posts so that the most recent is at the top
+        posts2 = Post.objects.filter(id__in=pks)
+        posts = posts1 | posts2
+        posts.order_by('-published')
+
         form = PostForm()
         return render(request, 'post/mainStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author})
     else:
@@ -116,7 +142,7 @@ Renders the page for specific post (including the post's comments)
 
 def post_detail(request, post_pk):
     if (request.user.is_authenticated()):
-        if (isAllowed(request,post_pk)):
+        if (isAllowed(request.user,post_pk)):
             if request.method == "POST":
                 response = _submitCommentForm(request, post_pk)
 
@@ -223,10 +249,10 @@ def file(request):
 checks if a user is allowed access to a file
 
 '''
-def isAllowed(request,pk):
+def isAllowed(user,pk):
     post = Post.objects.get(id=pk)
     privacy = post.visibility
-    viewer = Author.objects.get(user=request.user)
+    viewer = Author.objects.get(user=user)
 
     #if the post was created by the user allow access
     if viewer == post.author :

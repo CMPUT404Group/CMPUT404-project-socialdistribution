@@ -78,7 +78,6 @@ class ApiPostModelTestCase(TestCase):
         response = requests.get(post.image_url)
         self.assertEqual(response.status_code,200)
 
-
         #test that we can get an author back
         user = User.objects.get(username="sam")
         author = Author.objects.get(user=user)
@@ -92,6 +91,10 @@ class ApiPostModelTestCase(TestCase):
         self.assertEqual(comment.contentType, "text/plain")
         self.assertEqual(comment.comment, "this is my comment")
         self.assertEqual(comment.published, date)
+
+        #host multiple authors
+        authors = Author.objects.all()
+        self.assertTrue(len(authors) > 1)
 
 class ApiUrlsTestCase(TestCase):
     def setUp(self):
@@ -177,8 +180,8 @@ class ApiUrlsTestCase(TestCase):
         self.assertEqual(len(posts),1)
 
         #check that we cant delete a comment
-        resp6= self.client.delete("/api/posts/"+str(pid7)+"/comments/"+str(c_id)+"/")
-        self.assertEqual(resp6.status_code,204)
+        resp6= self.client.delete("/api/posts/"+str(pid7)+"/comments/"+str(c_id))
+        self.assertEqual(resp6.status_code,403)
 
         #Check that things were correctly left alone
         comments = Comment.objects.filter(id=c_id)
@@ -232,7 +235,7 @@ class ApiUrlsTestCase(TestCase):
 
         #check that we can edit a comment
         changed_comment = {"comment":"this is my changed comment", "contentType":"text/plain"}
-        resp5= self.client.put("/api/posts/"+str(pid7)+"/comments/"+str(comment.id)+"/",urlencode(changed_comment),content_type = 'application/x-www-form-urlencoded')
+        resp5= self.client.put("/api/posts/"+str(pid7)+"/comments/"+str(comment.id),urlencode(changed_comment),content_type = 'application/x-www-form-urlencoded')
         self.assertEqual(resp5.status_code,200)
 
         comment = Comment.objects.get(id=comment.id)
@@ -240,7 +243,7 @@ class ApiUrlsTestCase(TestCase):
         self.assertEqual(comment.contentType,"text/plain")
 
         #check that we can delete a comment
-        resp6= self.client.delete("/api/posts/"+str(pid7)+"/comments/"+str(comment.id)+"/")
+        resp6= self.client.delete("/api/posts/"+str(pid7)+"/comments/"+str(comment.id))
         self.assertEqual(resp6.status_code,204)
 
         #Check that things were correctly updated
@@ -262,7 +265,7 @@ class ApiUrlsTestCase(TestCase):
         path = split[3] + "/" + split[4]
         self.assertEqual(path, "accounts/login")
 
-        resp2 = self.client.get("/user/vanbelle/")
+        resp2 = self.client.get("/author/vanbelle/")
         self.assertEqual(resp2.status_code, 302)
         split = resp2.get("location").split("/")
         path = split[3] + "/" + split[4]
@@ -291,7 +294,7 @@ class ApiUrlsTestCase(TestCase):
         resp1 = self.client.get("/post/"+str(post_id)+"/") #my public post is viewable
         resp2 = self.client.get("/") #home stream
         resp3 = self.client.get("/myStream/") #mystream
-        resp4 = self.client.get("/user/tester/") #my profile
+        resp4 = self.client.get("/author/tester/") #my profile
         resp5 = self.client.get("/post/"+str(pid1)+"/")
         resp6 = self.client.get("/post/"+str(pid2)+"/")
         resp7 = self.client.get("/post/"+str(pid3)+"/")
@@ -299,7 +302,7 @@ class ApiUrlsTestCase(TestCase):
         resp9 = self.client.get("/post/"+str(pid5)+"/")
         resp10 = self.client.get("/post/"+str(pid6)+"/")
         resp11 = self.client.get("/post/"+str(pid7)+"/")
-        resp12 = self.client.get("/user/bob/")
+        resp12 = self.client.get("/author/bob/")
 
         u = User.objects.get(username="tester")
         user = Author.objects.get(user=u)
@@ -329,7 +332,6 @@ class ApiUrlsTestCase(TestCase):
         #check that the content of the post and comment are viewable along 
         #with their authors from the page url ./post/<post id>
         self.assertContains(resp1,"this is my post data")
-        self.assertContains(resp1, "this is my comment")
         self.assertContains(resp1, "tester")
 
         #check thats the public post is also viewable from the main page, 
@@ -342,9 +344,13 @@ class ApiUrlsTestCase(TestCase):
         self.assertFalse("this is my FoaF foaf post" in str(resp2))
 
         #check that both my posts are viewable from the myStream page   
-        #TODO what should be on the mystream?
+        #check also that the posts from my friends and FOFs and the people i am 
+        #following are visiblie 
         self.assertContains(resp3,"this is my post data")
         self.assertContains(resp3,"this is my hidden post data")
+        self.assertContains(resp3,"this is my friends public post data")
+        self.assertContains(resp3,"this is my FoaF foaf post")
+        self.assertContains(resp3,"this is my following public post data")
         self.assertFalse("this is my friends private post data" in str(resp3))
         self.assertFalse("this is my friends public post data" in str(resp3))
      
@@ -364,5 +370,7 @@ class ApiUrlsTestCase(TestCase):
         self.assertContains(resp7,"this is my friends public post data")
         self.assertContains(resp9,"this is my FoaF foaf post")
         self.assertContains(resp11,"this is my following public post data")
+        #check the comment is there too
+        self.assertContains(resp11, "this is my comment")
         #self.assertContains(resp12,"this is my FoaF foaf post")
         self.assertFalse("this is my FoaF friend post" in str(resp12))
