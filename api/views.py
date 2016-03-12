@@ -84,7 +84,6 @@ def getAllFriends(author_id):
     aList = Friending.objects.filter(author__id=author_id).values('friend__id')
     for i in aList:
         friendsList.append(i["friend__id"])
-    print friendsList
     return friendsList
 
 
@@ -113,8 +112,9 @@ class PostList(generics.GenericAPIView):
     queryset = Post.objects.all()
 
     def get(self, request, format=None):
-        print request.get_host()
-        print request.META.get('REMOTE_ADDR')  
+        # print request.get_host()
+        # print request.META.get('REMOTE_ADDR')
+
         # ensure user is authenticated
         if (request.user.is_authenticated()):
             posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
@@ -175,7 +175,6 @@ class PostDetail(generics.GenericAPIView):
         # ensure user is authenticated
         if (request.user.is_authenticated()):
             author_id = Author.objects.get(user=request.user).id
-            print author_id
             if (isAllowed(pk, author_id)):
                 post = self.get_object(pk)
                 serializer = PostSerializer(post)
@@ -354,15 +353,12 @@ class CommentDetail(generics.GenericAPIView):
         return get_object_or_404(Comment, pk=pk)
 
     def get(self, request, post_pk, comment_pk, format=None):
-        print comment_pk
         # ensure user is authenticated
         if (request.user.is_authenticated()):
 
             # --- TODO : Only authorize users to read/get this comment if visibility/privacy settings of the corresponding post allow it
             if(self.isAllowed(request,post_pk)):
-                print "IN HERE"
                 comment = self.get_object(comment_pk)
-                print "OU HERE"
                 serializer = CommentSerializer(comment)
                 return Response(serializer.data)
             else:
@@ -370,6 +366,7 @@ class CommentDetail(generics.GenericAPIView):
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
+    # need to fix
     def put(self, request, post_pk, comment_pk, format=None):
         # ensure user is authenticated
         if (request.user.is_authenticated()):
@@ -515,11 +512,11 @@ class AuthorTimeline(generics.GenericAPIView):
 
                 # get friends posts
                 friends = getAllFriends(viewer.id)
-                friendsPosts = Post.objects.filter(author__id__in=friends, visibility=Post.FRIENDS)
+                friendsPosts = Post.objects.filter(author__id__in=friends, visibility__in=[Post.FRIENDS, Post.FRIENDS_OF_FRIENDS])
 
                 # get foaf posts
                 foaf = getAllFOAF(viewer.id)
-                foafPosts = Post.objects.filter(author__id__in=foaf, visibility=Post.FRIENDS_OF_FRIENDS)
+                foafPosts = Post.objects.filter(author__id__in=foaf, visibility__in=Post.FRIENDS_OF_FRIENDS)
 
                 # combine all posts into one list w/o duplicates
                 result = list(set(authorsPosts) | set(publicPosts) | set(friendsPosts) | set(foafPosts))
@@ -547,15 +544,15 @@ class AuthorTimeline(generics.GenericAPIView):
 
                 else:
                     # get all viewee's friends & foafs
-                    friends = getAllFriends(viewer.id)
-                    foaf = getAllFOAF(viewer.id)
+                    friends = getAllFriends(viewee.id)
+                    foaf = getAllFOAF(viewee.id)
 
                     friendsPosts = []
                     foafPosts = []
 
                     # if viewer is friends or foafs with viewee, get their posts
                     if (viewer.id in friends):
-                        friendsPosts = Post.objects.filter(author=viewee, visibility=Post.FRIENDS)
+                        friendsPosts = Post.objects.filter(author=viewee, visibility__in=[Post.FRIENDS, Post.FRIENDS_OF_FRIENDS])
                     if (viewer.id in foaf):
                         foafPosts = Post.objects.filter(author=viewee, visibility=Post.FRIENDS_OF_FRIENDS)
 
@@ -631,8 +628,6 @@ class AuthorDetail(generics.GenericAPIView):
                     author.picture = request.data["picture"]
                     author.save()
                     serializer = AuthorSerializer(author)
-                    print serializer
-                    print serializer.data
                     return Response(serializer.data, status=status.HTTP_200_OK)
                 else:
                    return Response(status=status.HTTP_403_FORBIDDEN)
@@ -674,7 +669,6 @@ class FriendingCheck(generics.GenericAPIView):
                 aList = Friending.objects.filter(author__id=author_id1, friend__id=author_id2)
                 bList = Friending.objects.filter(author__id=author_id2, friend__id=author_id1)
                 result = list(chain(aList, bList))
-                print result
                 if (result != []):
                     friends = True
                 else:
