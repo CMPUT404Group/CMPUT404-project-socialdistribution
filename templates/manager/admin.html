@@ -20,4 +20,16 @@ document.getElementById("manager").setAttribute("class", "active");
   {{ message }}
 </div>
 
+{% for author in authors %}
+
+    <!-- Display profile image -->
+    {% if author.picture %}
+    <img id="id-user-profile-image" src="/media/{{ author.picture }}" class="profile-photo img-circle img-responsive img-center pull-left create-post" alt="Profile Image"/>
+    {% else %}
+    <img id="id-user-profile-image" class="profile-photo img-circle img-responsive img-center pull-left create-post" src="http://placehold.it/175x175">
+    {% endif %}
+
+
+{% endfor %}
+
 {% endblock %}
