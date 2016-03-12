@@ -229,7 +229,7 @@ window.onload = function() {
         // clear editgithub form
         $("form#editGithubForm").trigger("reset");
         // change wuthor github
-        $("p#id-github").html("github: " + response.github_name);
+        $("p#id-github").html("github: http://github.com/" + response.github_name);
         toastr.info("Github Updated!");
       },
       error: function(xhr, ajaxOptions, error) {
