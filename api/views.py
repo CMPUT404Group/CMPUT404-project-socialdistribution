@@ -30,12 +30,18 @@ def api_root(request, format=None):
 
 
 '''
-Post_pk - the post whose privacy / visibility settings is being checked
-Author_id - author who is wants to view the post
-Returns True if access is allowed, False otherwise
+Paramters:
+    * Post_pk - the post whose privacy / visibility settings is being checked
+    * Author_id - author who is wants to view the post
+Return:
+    * True if access is allowed, False otherwise
 '''
 def isAllowed(post_pk, author_id):
-    post = Post.objects.get(id=post_pk)
+    try:
+        post = Post.objects.get(id=post_pk)
+    except:
+        raise Post.DoesNotExist
+
     privacy = post.visibility
     viewer = Author.objects.get(id=author_id)
 
@@ -105,15 +111,25 @@ def getAllFOAF(author_id):
 
 class PostList(generics.GenericAPIView):
     '''
-    Lists all Posts  / Create a new Post
+    Lists all Posts  |  Create a new Post / Update an existing post
+
+    GET : http://service/api/posts/ 
+        * Returns a list of all public posts on the server - most recent to least recent order
+
+    POST : http://service/api/posts/
+        * Creates a new post
+
+    POST : http://service/api/posts/<post_pk>
+        * Updates the post specified by the post_pk
+
     '''
     pagination_class = ListPaginator
     serializer_class = PostSerializer
     queryset = Post.objects.all()
 
     def get(self, request, format=None):
-        # print request.get_host()
-        # print request.META.get('REMOTE_ADDR')
+        print request.get_host()
+        print request.META.get('REMOTE_ADDR')
 
         # ensure user is authenticated
         if (request.user.is_authenticated()):
@@ -130,12 +146,14 @@ class PostList(generics.GenericAPIView):
     def post(self, request, post_pk=None, format=None):
         # ensure user is authenticated
         if (request.user.is_authenticated()):
+            responseStatus = status.HTTP_201_CREATED
             if post_pk != None:
                 post = get_object_or_404(Post, pk=post_pk)
                 # only allow author of the post to modify it
                 author = Author.objects.get(user=request.user)
                 if author == post.author:
                     serializer = PostSerializer(post, data=request.data)
+                    responseStatus=status.HTTP_200_OK
                 # if logged in user is not author of the post
                 else:
                     return Response(status=status.HTTP_403_FORBIDDEN)
@@ -147,7 +165,7 @@ class PostList(generics.GenericAPIView):
                 serializer.validated_data["author"] = Author.objects.get(user=request.user)
                 serializer.validated_data["published"] = timezone.now()
                 serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(serializer.data, status=responseStatus)
 
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -155,16 +173,24 @@ class PostList(generics.GenericAPIView):
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
-
-'''
-Gets a specific Post / Updates a Post / Deletes a Post 
-'''
 
 
 class PostDetail(generics.GenericAPIView):
+
+    '''
+    Gets a specific Post / Updates a Post / Deletes a Post 
+
+    GET : http://service/api/posts/<post_pk> 
+        * Returns the post with id post_pk
+
+    PUT : http://service/api/posts/<post_pk>
+        * Updates the post specified at post_pk
+
+    DELETE : http://service/api/posts/<post_pk>
+        * Deletes the post specified by the post_pk
+
+    '''
+
     serializer_class = PostSerializer
     queryset = Post.objects.all()
 
@@ -175,19 +201,26 @@ class PostDetail(generics.GenericAPIView):
         # ensure user is authenticated
         if (request.user.is_authenticated()):
             author_id = Author.objects.get(user=request.user).id
-            if (isAllowed(pk, author_id)):
-                post = self.get_object(pk)
-                serializer = PostSerializer(post)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response(status=status.HTTP_403_FORBIDDEN)
+            try:
+                if (isAllowed(pk, author_id)):
+                    post = self.get_object(pk)
+                    serializer = PostSerializer(post)
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                else:
+                    return Response(status=status.HTTP_403_FORBIDDEN)
+            except Post.DoesNotExist as e:
+                return Response(status=status.HTTP_404_NOT_FOUND)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     def put(self, request, pk, format=None):
         # ensure user is authenticated
         if (request.user.is_authenticated()):
-            post = self.get_object(pk)
+
+            try:
+                post = self.get_object(pk)
+            except Post.DoesNotExist as e:
+                return Response(status=status.HTTP_404_NOT_FOUND)
 
             # only allow author of the post to modify it
             if Author.objects.get(user=request.user) == post.author:
@@ -207,7 +240,11 @@ class PostDetail(generics.GenericAPIView):
     def delete(self, request, pk, format=None):
         # ensure user is authenticated
         if (request.user.is_authenticated()):
-            post = self.get_object(pk)
+            try:
+                post = self.get_object(pk)
+            except Post.DoesNotExist as e:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
             # only allow author of the post to modify it
             if Author.objects.get(user=request.user)== post.author:
                 post.delete()
@@ -221,12 +258,18 @@ class PostDetail(generics.GenericAPIView):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
-'''
-Lists all Comments for specific post  / Create a new comment
-'''
-
 
 class CommentList(generics.GenericAPIView):
+    '''
+    Lists all Comments for specific post  / Create a new comment
+
+    GET : http://service/api/posts/<post_pk>/comments/
+        * Returns a list of all comments on the post specified by post_pk - most recent to least recent order
+
+    POST : http://service/api/posts/<post_pk>/comments/
+        * Creates a new comment attached to the post specified by post_pk
+
+    '''
     pagination_class = ListPaginator
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
@@ -302,16 +345,21 @@ class CommentList(generics.GenericAPIView):
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
-
-'''
-Gets a specific Comment/ Updates a Comment / Deletes a Comment
-'''
-
 
 class CommentDetail(generics.GenericAPIView):
+    '''
+    Gets a specific Comment/ Updates a Comment / Deletes a Comment
+
+    GET : http://service/api/posts/<post_pk>/comments/<comment_pk>
+        * Returns the comment with id comment_pk correlating to the post specified by post_pk
+
+    PUT : http://service/api/posts/<post_pk>/comments/<comment_pk>
+        * Updates the comment specified at comment_pk
+
+    DELETE : http://service/api/posts/<post_pk>/comments/<comment_pk>
+        * Deletes the comment specified by the comment_pk
+
+    '''
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
 
@@ -360,7 +408,7 @@ class CommentDetail(generics.GenericAPIView):
             if(self.isAllowed(request,post_pk)):
                 comment = self.get_object(comment_pk)
                 serializer = CommentSerializer(comment)
-                return Response(serializer.data)
+                return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_403_FORBIDDEN)
         else:
@@ -374,10 +422,11 @@ class CommentDetail(generics.GenericAPIView):
 
             # only allow author of the comment to modify it
             if Author.objects.get(user=request.user) == comment.author:
+                post = Post.objects.get(id=post_pk)
                 serializer = CommentSerializer(post, data=request.data)
                 if serializer.is_valid():
                     serializer.save()
-                    return Response(serializer.data)
+                    return Response(serializer.data, status=status.HTTP_200_OK)
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             # if logged in user is not author of the comment
@@ -404,29 +453,34 @@ class CommentDetail(generics.GenericAPIView):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
-'''
-Uploads a new image
-'''
-
-
 class Images(generics.GenericAPIView):
-    # pagination_class = ListPaginator
+    '''
+    Lists all Images / Posts a new image
+
+    GET : http://service/api/images/
+        * Returns a list of all images on the server (not including profile pictures) - most recent to least recent order
+
+    POST : http://service/api/images/
+        * Creates a new image
+
+    '''
+    pagination_class = ListPaginator
     serializer_class = ImageSerializer
 
-    # queryset = Post.objects.all()
+    queryset = Image.objects.all()
 
-    # def get(self, request, format=None):
-    # 	# ensure user is authenticated
-    # 	if (request.user.is_authenticated()):
-    # 		posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
-    # 		page = self.paginate_queryset(posts)
-    # 		if page is not None:
-    # 			serializer = PostSerializer(page, many=True)
-    # 			return self.get_paginated_response({"data":serializer.data, "query": "posts"})
-    # 		#else:
+    def get(self, request, format=None):
+    	# ensure user is authenticated
+    	if (request.user.is_authenticated()):
+    		images = Image.objects.order_by('-upload_date')
+    		page = self.paginate_queryset(images)
+    		if page is not None:
+    			serializer = ImageSerializer(page, many=True)
+    			return self.get_paginated_response({"data":serializer.data, "query": "images"})
+    		#else:
 
-    # 	else:
-    # 		return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
+    	else:
+    		return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
 
     def post(self, request, format=None):
         # ensure user is authenticated
@@ -446,37 +500,16 @@ class Images(generics.GenericAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
 
-        # def perform_create(self, serializer):
-        # 	serializer.save(author=self.request.user)
 
 
-'''
-Lists all Users
-'''
-class UserList(APIView):
-    def get(self, request, format=None):
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data)
-
-
-'''
-Get a specific User
-'''
-class UserDetail(APIView):
-    def get_object(self, pk):
-        try:
-            return User.objects.get(pk=pk)
-        except User.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk, format=None):
-        user = self.get_object(pk)
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
-
-''' Author List '''
 class AuthorList(generics.GenericAPIView):
+    '''
+    Lists all Authors / Posts a new Author
+
+    GET : http://service/api/author/
+        * Returns a list of authors on the server
+
+    '''
     serializer_class = AuthorSerializer
     queryset = Author.objects.all()
 
@@ -490,6 +523,16 @@ class AuthorList(generics.GenericAPIView):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 class AuthorTimeline(generics.GenericAPIView):
+    '''
+    Lists all Images / Posts a new image
+
+    GET : http://service/api/images/
+        * Returns a list of all images on the server (not including profile pictures) - most recent to least recent order
+
+    POST : http://service/api/images/
+        * Creates a new image
+
+    '''
     pagination_class = ListPaginator
     serializer_class = PostSerializer
     queryset = Post.objects.all()
@@ -585,8 +628,17 @@ class AuthorTimeline(generics.GenericAPIView):
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-''' Gets Author / Updates Author via POST '''
 class AuthorDetail(generics.GenericAPIView):
+    '''
+    Gets Author / Updates Author via POST
+
+    GET : http://service/api/author/<author_id>
+        * Returns the author specified by author_id. This includes the author's id, github name, profile picture url, and host.
+
+    POST : http://service/api/author/<author_id>
+        * Updates the author specified by author_id
+
+    '''
     serializer_class = AuthorSerializer
     queryset = Author.objects.all()
 
@@ -658,6 +710,16 @@ class AuthorDetail(generics.GenericAPIView):
 
 
 class FriendingCheck(generics.GenericAPIView):
+    '''
+    Returns a list of an author's friends / Checks whether or not 2 authors are friends
+
+    GET : http://service/api/friends/<author_id>
+        * Returns the author specified by author_id's list of friends (by friend id)
+
+    GET : http://service/api/friends/<author_id1>/<author_id2>
+        * Returns the 2 author's ids & a boolean specifying if the 2 authors are friends or not.
+
+    '''
     queryset = Friending.objects.all()
     serializer_class = FriendingSerializer
 

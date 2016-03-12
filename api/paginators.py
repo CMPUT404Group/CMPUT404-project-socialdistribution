@@ -16,9 +16,6 @@ class ListPaginator(pagination.PageNumberPagination):
 		else:
 			size = self.page_size
 
-		print "size " + str(size)
-		print self.request.path
-
 		return Response({
 			'query': data['query'],
 			'count': self.page.paginator.count,
@@ -26,4 +23,4 @@ class ListPaginator(pagination.PageNumberPagination):
 			'next': self.get_next_link(),
 			'previous': self.get_previous_link(),
 			data['query']: data['data'],
-		}, status=status.HTTP_201_CREATED)
+		}, status=status.HTTP_200_OK)
