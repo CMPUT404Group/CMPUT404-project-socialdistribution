@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     url(r'^accounts/signup/$', 'manager.views.register', name='accounts_signup'),
     url(r'^api/', include('api.urls')),
     url(r'', include('post.urls')),
+    url(r'', include('manager.urls')),
     url(r'^upload/$', 'post.views.file', name='imageupload'),
     # url(r'^register/$', 'manager.views.register', name='register'),  # ADD NEW PATTERN!
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

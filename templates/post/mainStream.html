@@ -3,6 +3,11 @@
 
 {% block content %}
 
+<script>
+document.getElementById("public_stream").setAttribute("class", "active");
+</script>
+
+
 {% include "post/createPost.html" with icon=True %}
 
 {% for post in posts %}

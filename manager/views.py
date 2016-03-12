@@ -68,6 +68,7 @@ def register(request):
                   'registration/signup.html',
                   {'user_form': user_form, 'author_form': author_form, 'registered': registered})
 
+
 def user_login(request):
 
     # If the request is a HTTP POST, try to pull out the relevant information.
@@ -136,3 +137,12 @@ def user_logout(request):
 
     # Take the user back to the homepage.
     return HttpResponseRedirect('/')
+
+
+def manager(request):
+    if request.user.is_staff:
+        authors = Author.objects.all()
+        return render(request, 'manager/admin.html', {'authors': authors, 'message': "This is manager page."})
+
+# def list_friends(request):
+
