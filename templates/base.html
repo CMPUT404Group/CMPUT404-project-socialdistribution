@@ -88,20 +88,16 @@
 	            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
 	            <div class="collapse navbar-collapse navbar-ex1-collapse">
 	                <ul class="nav navbar-nav side-nav">
-	                    <li>
-	                        <a href=""><i class="fa fa-fw fa-dashboard"></i> Timeline </a>
+                        {%  if user.is_staff %}
+                        <li id="manager">
+	                        <a href="{% url 'manager' %}"><i class="fa fa-fw fa-dashboard"></i> Manager </a>
 	                    </li>
-	                    <li class="active">
+                        {% endif %}
+	                    <li id="public_stream">
 	                        <a href="{% url 'public_stream' %}"><i class="fa fa-fw fa-dashboard"></i> Public Stream </a>
 	                    </li>
-	                    <li>
+	                    <li id="my_stream">
 	                        <a href="{% url 'my_stream' %}"><i class="fa fa-fw fa-dashboard"></i> My Stream </a>
-	                    </li>
-	                    <li>
-	                        <a href=""><i class="fa fa-fw fa-dashboard"></i> Friends Stream </a>
-	                    </li>
-	                    <li>
-	                        <a href=""><i class="fa fa-fw fa-dashboard"></i> Follows Stream </a>
 	                    </li>
 	                </ul>
 	            </div>

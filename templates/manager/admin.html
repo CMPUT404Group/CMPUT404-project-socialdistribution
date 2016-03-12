@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<script>
+document.getElementById("manager").setAttribute("class", "active");
+</script>
+
+<h1> manager's page </h1>
+
+<div class="alert alert-danger">
+    Under Construction
+</div>
+
+<div>
+    <a href="/admin">Edit Author</a>
+</div>
+
+<div >
+  {{ message }}
+</div>
+
+{% for author in authors %}
+
+    <!-- Display post's author's profile image -->
+    <img id="id-user-profile-image"
+         class="profile-photo img-circle img-responsive img-center pull-left create-post"
+         data-popover="true" data-html=true data-toggle="popover" title="{{ author }}"
+         data-content=""
+         alt="Profile Image"
+
+          {% if author.picture %}
+         src="/media/{{ author.picture }}"/>
+          {% else %}
+              src="http://placehold.it/175x175"/>
+    {% endif %}
+
+
+{% endfor %}
+
+{% endblock %}
