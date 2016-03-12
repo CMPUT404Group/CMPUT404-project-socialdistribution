@@ -27,7 +27,6 @@ def api_root(request, format=None):
         'images': reverse('images', request=request, format=format),
         'befriend': reverse('befriend', request=request, format=format),
         'friendrequest': reverse('friendrequest', request=request, format=format),
-        'friends': reverse('friends', request=request, format=format),
     })
 
 
