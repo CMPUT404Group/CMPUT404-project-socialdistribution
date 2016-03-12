@@ -1,16 +1,16 @@
-<div class="modal fade" id="editEmailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal fade" id="editGithubModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="myModalLabel">Edit Your Email </h4>
             </div>
-		    <form id="editEmailForm" method="POST" enctype="multipart/form-data" data-author-id='{{ author.id}}' > {% csrf_token %}
+		    <form id="editGithubForm" method="POST" enctype="multipart/form-data" data-author-id='{{ author.id}}' > {% csrf_token %}
 			    <div class="modal-body">
-				    email: <input id="id_email" name="email" type="text" > 
+				    github: <input id="id_github" name="github" type="text" > 
 			    </div>
 			    <div class="modal-footer">
-			        <button id="closeeditEmailModal" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			        <button id="closeeditGithubModal" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
 			        <input type="submit" class="btn btn-primary" value="submit changes" />
 		    </form>
                 </div>

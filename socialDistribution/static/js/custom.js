@@ -208,3 +208,35 @@ window.onload = function() {
     });
   });
 };
+
+  $("#editGithubForm").submit(function(event) {
+    event.preventDefault();
+    var formData = new FormData($("#editGithubForm")[0]);
+    formData.append("host", "");
+    var authorID = $("#editGithubForm").data("author-id");
+    $.ajax({
+      url: 'http://' + window.location.host + '/api/author/' + authorID + '/',
+      type: "POST",
+      data: formData,
+      contentType: false,
+      processData: false,
+      beforeSend: function(xhr, settings) {
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function(response) {
+        // close modal
+        $("button#closeeditGithubForm").click();
+        // clear editgithub form
+        $("form#editGithubForm").trigger("reset");
+        // change wuthor github
+        $("p#id-github").html("github: " + response.github_name);
+        toastr.info("Github Updated!");
+      },
+      error: function(xhr, ajaxOptions, error) {
+        console.log(xhr.status);
+        console.log(xhr.responseText);
+        console.log(error);
+      }
+    });
+  });
+};

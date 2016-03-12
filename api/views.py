@@ -23,6 +23,9 @@ from rest_framework.reverse import reverse
 def api_root(request, format=None):
     return Response({
         'posts': reverse('post-list', request=request, format=format),
+        'author': reverse('author-list', request=request, format=format),
+      #  'images': reverse('images', request=request, format=format),
+        'friends': str(request.build_absolute_uri) + '<author_id>/friends',
     })
 
 
@@ -502,7 +505,7 @@ class AuthorDetail(generics.GenericAPIView):
                     author = get_object_or_404(Author, pk=author_pk)
                     # only allow author of the post to modify it
                     if request.user == author.user:
-                        serializer = AuthorSerializer(author, data=request.data)
+                        #serializer = AuthorSerializer(author, data=request.data)
                     # if logged in user is not author of the post
                     else:
                         return Response(status=status.HTTP_403_FORBIDDEN)

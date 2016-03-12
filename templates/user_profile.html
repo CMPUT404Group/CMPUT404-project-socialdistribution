@@ -23,12 +23,11 @@
             <p style="color: grey;">host: {{ author.host }} </p>
             <p style="color: grey;">username: {{ user_account.username }} </p>
             <p style="color: grey;">url: {{ author.host }}user/{{ user_account.username }} </p>
-            <p id="email" style="color: grey;">email: {{user_account.email}} 
-                <!-- Triggers editEmailModal -->
-                <button id='editEmailTrigger' type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#editEmailModal"><i class="fa fa-edit"></i></button> 
-          
+            <p id="id-email" style="color: grey;">email: {{user_account.email}} </p>
+            <p id="id-github" style="color: grey;">github: http://github.com/{{ author.github_name }}
+            <!-- Triggers editGithubModal -->
+            <button id='editGithubTrigger' type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#editGithubModal"><i class="fa fa-edit"></i></button> 
             </p>
-            <p style="color: grey;">github: http://github.com/{{ author.github_name }} </p>
         </div>
     </div>
 
