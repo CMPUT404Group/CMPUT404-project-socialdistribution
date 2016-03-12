@@ -16,8 +16,9 @@
     
     <div class="media-body" style="padding-left: 3em;">
         <!-- Do some logic here : follow, unfollow, accept etc -->
+        {% if profile_owner != author %}
         <button id='follow-btn-{{profile_owner.id}}'  class="follow-btn btn btn-success pull-right" style="position: relative; top: 1.5em; right: 1.5em;">Follow</button>
-
+        {% endif %}
         <!-- Display required user info on profile page -->
         <h1> {{ user_account.username }} </h1>
         <div>
