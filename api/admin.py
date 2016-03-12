@@ -18,7 +18,7 @@ class UserAdmin(admin.ModelAdmin):
 admin.site.unregister(Group)
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-admin.site.register(Author)
+# admin.site.register(Author)
 # admin.site.register(Post)
 # admin.site.register(Comment)
 # admin.site.register(Upload)
