@@ -117,7 +117,7 @@ def my_stream(request):
         posts.order_by('-published')
 
         form = PostForm()
-        return render(request, 'post/mainStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author})
+        return render(request, 'post/myStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author})
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
@@ -222,7 +222,7 @@ def user_profile(request, username):
         try:
             author = Author.objects.get(user=user)
         except Author.DoesNotExist as e:
-            return render(request, "admin.html")
+            return render(request, "manager/admin.html")
 
         form = PostForm()
         return render(request, "user_profile.html",

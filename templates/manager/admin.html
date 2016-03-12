@@ -2,6 +2,10 @@
 
 {% block content %}
 
+<script>
+document.getElementById("manager").setAttribute("class", "active");
+</script>
+
 <h1> manager's page </h1>
 
 <div class="alert alert-danger">
@@ -12,8 +16,8 @@
     <a href="/admin">Edit Author</a>
 </div>
 
-<div>
-
+<div >
+  {{ message }}
 </div>
 
 {% endblock %}
