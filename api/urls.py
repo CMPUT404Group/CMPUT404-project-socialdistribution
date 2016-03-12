@@ -9,9 +9,9 @@ urlpatterns = [
 	url(r'^posts/(?P<post_pk>[^/]+)/comments/(?P<comment_pk>[^/]+)$', views.CommentDetail.as_view()),
 	url(r'^users/$', views.UserList.as_view()),
 	url(r'^users/(?P<pk>[a-zA-Z0-9]+)/$', views.UserDetail.as_view()),
-	url(r'^images/$', views.Images.as_view()),
+	url(r'^images/$', views.Images.as_view(), name='images'),
 
-	url(r'^author/$', views.AuthorList.as_view()),
+	url(r'^author/$', views.AuthorList.as_view(), name='author-list'),
 	url(r'^author/posts$', views.AuthorTimeline.as_view()),
 	url(r'^author/(?P<author_pk>[^/]+)/$', views.AuthorDetail.as_view()),
 	url(r'^author/(?P<author_pk>[^/]+)/posts$', views.AuthorTimeline.as_view()),
