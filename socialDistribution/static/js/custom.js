@@ -244,7 +244,7 @@ window.onload = function() {
     console.log(author_id);
     var follower_id = document.getElementById('logged-in-author').getAttribute("data");
     console.log(follower_id);
-    var JSONobject = { "query": "friendrequest", "author":  { "id": author_id }, "friend": { "id": follower_id } };
+    var JSONobject = { "query": "friendrequest", "author":  { "id": follower_id }, "friend": { "id": author_id } };
     console.log(JSONobject);
     var jsonData = JSON.stringify( JSONobject);
     console.log(jsonData);
