@@ -20,7 +20,7 @@ urlpatterns = [
 	url(r'^friends/(?P<author_id1>[^/]+)/(?P<author_id2>[^/]+)/$',views.FriendingCheck.as_view()),
 	
 	url(r'^requestlist/(?P<author_id1>[^/]+)/$',views.RequestList.as_view()),
-	url(r'^friendrequest/$',views.FriendRequest.as_view()),
-	url(r'^befriend/$',views.BeFriend.as_view()),
+	url(r'^friendrequest/$',views.FriendRequest.as_view(), name='friendrequest'),
+	url(r'^befriend/$',views.BeFriend.as_view(), name='befriend'),
 
 ]
