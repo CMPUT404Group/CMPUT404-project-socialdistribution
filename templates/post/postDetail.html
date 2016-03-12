@@ -13,7 +13,7 @@
     	<div class='panel-heading'> {{ post.title }} <span class='date'> {{ post.published }} </span> </div>
     	<div class='panel-body'> 
     		{% if post.contentType == "text/x-markdown" %}
-    			{{ post.content|markdown|urlize }} 
+    			{{ post.content|markdown }} 
 			{% else %}
 				{{ post.content|urlize }}
     		{% endif %}
