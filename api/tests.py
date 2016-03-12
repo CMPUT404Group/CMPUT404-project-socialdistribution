@@ -349,10 +349,8 @@ class ApiUrlsTestCase(TestCase):
         self.assertContains(resp3,"this is my post data")
         self.assertContains(resp3,"this is my hidden post data")
         self.assertContains(resp3,"this is my friends public post data")
-        self.assertContains(resp3,"this is my FoaF foaf post")
         self.assertContains(resp3,"this is my following public post data")
         self.assertFalse("this is my friends private post data" in str(resp3))
-        self.assertFalse("this is my friends public post data" in str(resp3))
      
         #check that my posts are on my profile page and that other posts arent 
         self.assertContains(resp4,"this is my post data")
@@ -364,7 +362,7 @@ class ApiUrlsTestCase(TestCase):
 
         #check that my friends private post is hidden but the public one is public
 
-        #resp6/8/10 should not be viewable
+        #resp6/8/10 should not be viewable so we dont need to check what they contain
 
         #check that the viewable posts contain what they should
         self.assertContains(resp7,"this is my friends public post data")

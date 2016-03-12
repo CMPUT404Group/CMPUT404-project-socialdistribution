@@ -109,7 +109,7 @@ def my_stream(request):
             friend_posts = Post.objects.filter(author=friend_pairs[i].friend)
             for j in range(len(friend_posts)):
                 if isAllowed(request.user, friend_posts[j].id):
-                    pks.append(friend_posts[j])
+                    pks.append(friend_posts[j].id)
 
         #sort the posts so that the most recent is at the top
         posts2 = Post.objects.filter(id__in=pks)
