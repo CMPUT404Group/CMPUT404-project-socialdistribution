@@ -217,13 +217,15 @@ def user_profile(request, username):
                     pass
 
         # --- TODO : FILTER POSTS BY VISIBILITY TO LOGGED IN USER --- #
+        profile_owner = Author.objects.get(user=user)
         author = Author.objects.get(user=request.user)
-        posts = Post.objects.filter(author=author).order_by('-published')
+        posts = Post.objects.filter(author=profile_owner, visibility='PUBLIC').order_by('-published')
 
         form = PostForm()
         return render(request, "user_profile.html",
-                      {'posts': posts, 'form': form, 'user_account': user, 'author': author})
-
+                      {'posts': posts, 'form': form, 'user_account': user, 'profile_owner': profile_owner, 'author': author})
+        # user_account is profile's owner
+        # author is the one who logged into the system 
 
     else:
         return HttpResponseRedirect(reverse('accounts_login'))

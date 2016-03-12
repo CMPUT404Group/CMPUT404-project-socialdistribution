@@ -3,10 +3,12 @@
 {% block content %}
 {% load widget_tweaks %}
 
+<div id="logged-in-author" data="{{author.id}}"></div>
+
 <div class="row profile-header">
 
     <!-- Display profile image -->
-    {% if author.picture %}
+    {% if profile_owner.picture %}
     <img id="id-user-profile-image" src="/media/{{ author.picture }}" class="profile-photo img-circle img-responsive img-center pull-left create-post" alt="Profile Image"/>
     {% else %}
     <img id="id-user-profile-image" class="profile-photo img-circle img-responsive img-center pull-left create-post" src="http://placehold.it/175x175">
@@ -14,7 +16,7 @@
     
     <div class="media-body" style="padding-left: 3em;">
         <!-- Do some logic here : follow, unfollow, accept etc -->
-        <button class="btn btn-success pull-right" style="position: relative; top: 1.5em; right: 1.5em;">Follow</button>
+        <button id='follow-btn-{{profile_owner.id}}'  class="follow-btn btn btn-success pull-right" style="position: relative; top: 1.5em; right: 1.5em;">Follow</button>
 
         <!-- Display required user info on profile page -->
         <h1> {{ user_account.username }} </h1>
