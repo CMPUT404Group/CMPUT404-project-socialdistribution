@@ -24,6 +24,6 @@ admin.site.register(User, UserAdmin)
 # admin.site.register(Post)
 # admin.site.register(Comment)
 # admin.site.register(Upload)
-# admin.site.register(Friending)
-# admin.site.register(Following)
+admin.site.register(Friending)
+admin.site.register(Following)
 
