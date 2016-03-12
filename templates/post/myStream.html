@@ -14,50 +14,47 @@ document.getElementById("my_stream").setAttribute("class", "active");
 <div class="row post">
 
     <!-- Display post's author's profile image -->
-    {% if post.author.picture %}
     <img id="id-user-profile-image"
-         src="/media/{{ post.author.picture }}"
          class="profile-photo-icon img-circle img-responsive img-center pull-left"
          data-popover="true" data-html=true data-toggle="popover" title="{{ post.author }}"
-         data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"
-         alt="Profile Image"/>
-    {% else %}
-    <img id="id-user-profile-image" class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/50x50"
-         data-popover="true" data-html=true data-toggle="popover" title="{{ post.author }}"
-         data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"
-         alt="Profile Image"/>
-    {% endif %}
+         data-content="<button class='btn btn-default btn-sm'>Unfollow Me</button>"
+         alt="Profile Image"
+        {% if post.author.picture %}
+         src="/media/{{ post.author.picture }}"/>
+        {% else %}
+         src="http://placehold.it/50x50"/>
+        {% endif %}
 
     <div class="panel panel-primary media-body">
-    	<div class='panel-heading'> <a class='title' href='{% url "post_detail" post.id %}'> {{ post.title }} </a> <span class='date'> {{ post.published }} </span> </div>
-    	<div class='panel-body'> 
-    		{% if post.contentType == "text/x-markdown" %}
-    			{{ post.content|markdown }}
-			{% else %}
-				{{ post.content|urlize }}
-    		{% endif %}
+        <div class='panel-heading'> <a class='title' href='{% url "post_detail" post.id %}'> {{ post.title }} </a> <span class='date'> {{ post.published }} </span> </div>
+        <div class='panel-body'> 
+            {% if post.contentType == "text/x-markdown" %}
+                {{ post.content|markdown }}
+            {% else %}
+                {{ post.content|urlize }}
+            {% endif %}
 
             <br/>
             {% if post.image_url %}
                 <img src="{{ post.image_url }}"/>
             {% endif %}
-    	</div>
-    	<hr class='post-hr'>
-    	<div class='panel-body'>
-    		<a href='{% url "post_detail" post.id %}#comments' class='comments'> {{ post.comments.count }} Comments </a>
-			<a href='{% url "post_detail" post.id %}' class='pull-right'><i class="fa fa-plus"></i></a>
-    	</div>
+        </div>
+        <hr class='post-hr'>
+        <div class='panel-body'>
+            <a href='{% url "post_detail" post.id %}#comments' class='comments'> {{ post.comments.count }} Comments </a>
+            <a href='{% url "post_detail" post.id %}' class='pull-right'><i class="fa fa-plus"></i></a>
+        </div>
     </div>
 
     {% if post.author == loggedInAuthor %}
-	<div class="media-body post-action-icons">
-		<a href="{% url 'post_edit' post.id %}"><button class="btn btn-default action-icon edit-post"><i class="fa fa-pencil-square-o"></i></button></a>
-		<button class="btn btn-default action-icon delete-post" id='delete-post-{{ post.id }}'><i class="fa fa-trash-o"></i></button>
-	</div>
-	{% else %}
-	<div class="media-body post-action-icons placeholder">
-	</div>
-	{% endif %}
+    <div class="media-body post-action-icons">
+        <a href="{% url 'post_edit' post.id %}"><button class="btn btn-default action-icon edit-post"><i class="fa fa-pencil-square-o"></i></button></a>
+        <button class="btn btn-default action-icon delete-post" id='delete-post-{{ post.id }}'><i class="fa fa-trash-o"></i></button>
+    </div>
+    {% else %}
+    <div class="media-body post-action-icons placeholder">
+    </div>
+    {% endif %}
 </div>
 {% endfor %}
 {% endblock %}
