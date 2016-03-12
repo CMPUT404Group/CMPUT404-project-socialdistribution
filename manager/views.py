@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from api.models import Author
+from api.models import Author, Notification
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from manager.forms import AuthorForm
@@ -141,8 +142,23 @@ def user_logout(request):
 
 def manager(request):
     if request.user.is_staff:
+        loggedInAuthor = Author.objects.get(user=request.user)
         authors = Author.objects.all()
-        return render(request, 'manager/admin.html', {'authors': authors, 'message': "This is manager page."})
+        return render(request, 'manager/admin.html', {'authors': authors, 'loggedInAuthor': loggedInAuthor, 'message': "This is manager page."})
 
 # def list_friends(request):
 
+def friendRequest(request, username):
+    if request.user.is_authenticated():
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist as e:
+            return render(request, "404_page.html", {'message': "User does not exist."})
+
+        author = Author.objects.get(user=request.user)
+        notis = Notification.objects.filter(notificatee=author)
+
+        return render(request, "manager/friendRequest.html",
+                      {'notis': notis, 'user_account': user, 'author': author})
+    else:
+        return HttpResponseRedirect(reverse('accounts_login')) 
