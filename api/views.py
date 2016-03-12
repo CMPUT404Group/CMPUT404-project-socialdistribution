@@ -505,7 +505,7 @@ class AuthorDetail(generics.GenericAPIView):
                     author = get_object_or_404(Author, pk=author_pk)
                     # only allow author of the post to modify it
                     if request.user == author.user:
-                        #serializer = AuthorSerializer(author, data=request.data)
+                        serializer = AuthorSerializer(author, data=request.data)
                     # if logged in user is not author of the post
                     else:
                         return Response(status=status.HTTP_403_FORBIDDEN)
