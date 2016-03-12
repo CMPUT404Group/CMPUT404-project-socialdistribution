@@ -14,19 +14,16 @@ document.getElementById("public_stream").setAttribute("class", "active");
 <div class="row post">
 
     <!-- Display post's author's profile image -->
-    {% if post.author.picture %}
     <img id="id-user-profile-image"
-         src="/media/{{ post.author.picture }}"
          class="profile-photo-icon img-circle img-responsive img-center pull-left"
          data-popover="true" data-html=true data-toggle="popover" title="{{ post.author }}"
-         data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"
-         alt="Profile Image"/>
-    {% else %}
-    <img id="id-user-profile-image" class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/50x50"
-         data-popover="true" data-html=true data-toggle="popover" title="{{ post.author }}"
-         data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"
-         alt="Profile Image"/>
-    {% endif %}
+         data-content="<button class='btn btn-default btn-sm'>Follow Me</button>"
+         alt="Profile Image"
+        {% if post.author.picture %}
+         src="/media/{{ post.author.picture }}"/>
+        {% else %}
+         src="http://placehold.it/50x50"/>
+        {% endif %}
 
     <div class="panel panel-primary media-body">
     	<div class='panel-heading'> <a class='title' href='{% url "post_detail" post.id %}'> {{ post.title }} </a> <span class='date'> {{ post.published }} </span> </div>
