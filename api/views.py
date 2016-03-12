@@ -26,6 +26,81 @@ def api_root(request, format=None):
     })
 
 
+'''
+Post_pk - the post whose privacy / visibility settings is being checked
+Author_id - author who is wants to view the post
+Returns True if access is allowed, False otherwise
+'''
+def isAllowed(post_pk, author_id):
+    post = Post.objects.get(id=post_pk)
+    privacy = post.visibility
+    viewer = Author.objects.get(id=author_id)
+
+    #if the post was created by the user allow access
+    if viewer == post.author :
+        return True
+    #if it is a public post allow everypne access
+    elif privacy == Post.PUBLIC:
+        return True
+    #check if the user is in the friend list
+    elif privacy == Post.FRIENDS or privacy == Post.FRIENDS_OF_FRIENDS:
+        friend_pairs = Friending.objects.filter(author=post.author)
+        friends = []
+        for i in range(len(friend_pairs)):
+            friends.append(friend_pairs[i].friend)
+        if viewer in friends:
+            return True
+        #check if the user is in the FoaF list
+        elif privacy == Post.FRIENDS_OF_FRIENDS:
+            for i in range(len(friends)):
+                fofriend_pairs = Friending.objects.filter(author=friends[i])
+                fofriends = []
+                for i in range(len(fofriend_pairs)):
+                    fofriends.append(fofriend_pairs[i].friend)
+                if viewer in fofriends:
+                    return True
+        #if not a friend return false
+        else:
+            return False
+    else:
+        return False
+
+
+
+
+
+'''
+Parameters : 
+    * author_id
+Return:
+    * list of all friends (list of Author ids)
+'''
+def getAllFriends(author_id):
+    friendsList = []
+    # return json object so we must extract the friend id
+    aList = Friending.objects.filter(author__id=author_id).values('friend__id')
+    for i in aList:
+        friendsList.append(i["friend__id"])
+    print friendsList
+    return friendsList
+
+
+'''
+Parameters : 
+    * author_id
+Return:
+    * list of all friends of friends (list of Author ids) - no duplicates
+'''
+def getAllFOAF(author_id):
+    friends = getAllFriends(author_id)
+    foaf = []
+    for friend_id in friends:
+        tempFofs = getAllFriends(friend_id)
+        newFriends = list(set(tempFofs) - set(foaf))
+        foaf.extend(newFriends)
+    return foaf
+
+
 class PostList(generics.GenericAPIView):
     '''
     Lists all Posts  / Create a new Post
@@ -93,48 +168,15 @@ class PostDetail(generics.GenericAPIView):
     def get_object(self, pk):
         return get_object_or_404(Post, pk=pk)
 
-    def isAllowed(self,request,pk):
-        post = Post.objects.get(id=pk)
-        privacy = post.visibility
-        viewer = Author.objects.get(user=request.user)
-
-        #if the post was created by the user allow access
-        if viewer == post.author :
-            return True
-        #if it is a public post allow everypne access
-        elif privacy == "PUBLIC":
-            return True
-        #check if the user is in the friend list
-        elif privacy == "FRIENDS" or privacy == "FOAF":
-            friend_pairs = Friending.objects.filter(author=post.author)
-            friends = []
-            for i in range(len(friend_pairs)):
-                friends.append(friend_pairs[i].friend)
-            if viewer in friends:
-                return True
-            #check if the user is in the FoaF list
-            elif privacy == "FOAF":
-                for i in range(len(friends)):
-                    fofriend_pairs = Friending.objects.filter(author=friends[i])
-                    fofriends = []
-                    for i in range(len(fofriend_pairs)):
-                        fofriends.append(fofriend_pairs[i].friend)
-                    if viewer in fofriends:
-                        return True
-            #if not a friend return false
-            else:
-                return False
-        else:
-            return False
-
-
     def get(self, request, pk, format=None):
         # ensure user is authenticated
         if (request.user.is_authenticated()):
-            if (self.isAllowed(request,pk)):
+            author_id = Author.objects.get(user=request.user).id
+            print author_id
+            if (isAllowed(pk, author_id)):
                 post = self.get_object(pk)
                 serializer = PostSerializer(post)
-                return Response(serializer.data)
+                return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_403_FORBIDDEN)
         else:
@@ -150,7 +192,7 @@ class PostDetail(generics.GenericAPIView):
                 serializer = PostSerializer(post, data=request.data)
                 if serializer.is_valid():
                     serializer.save()
-                    return Response(serializer.data)
+                    return Response(serializer.data, status=status.HTTP_200_OK)
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             # if logged in user is not author of the post
@@ -447,6 +489,102 @@ class AuthorList(generics.GenericAPIView):
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
+class AuthorTimeline(generics.GenericAPIView):
+    pagination_class = ListPaginator
+    serializer_class = PostSerializer
+    queryset = Post.objects.all()
+
+    def get(self, request, author_pk=None, format=None):
+        if request.user.is_authenticated():
+            # get currently logged in user
+            try:
+                viewer = Author.objects.get(user=request.user)
+            except DoesNotExist as e:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+            # posts that are visible to the currently authenticated user
+            if author_pk == None:
+                # get author's own posts
+                authorsPosts = Post.objects.filter(author=viewer)
+
+                # get public posts
+                publicPosts = Post.objects.filter(visibility=Post.PUBLIC)
+
+                # get friends posts
+                friends = getAllFriends(viewer.id)
+                friendsPosts = Post.objects.filter(author__id__in=friends, visibility=Post.FRIENDS)
+
+                # get foaf posts
+                foaf = getAllFOAF(viewer.id)
+                foafPosts = Post.objects.filter(author__id__in=foaf, visibility=Post.FRIENDS_OF_FRIENDS)
+
+                # combine all posts into one list w/o duplicates
+                result = list(set(authorsPosts) | set(publicPosts) | set(friendsPosts) | set(foafPosts))
+
+                # put posts in order from most recent to least recent
+                resultPosts = Post.objects.filter(id__in=[post.id for post in result]).order_by('-published')
+
+                page = self.paginate_queryset(resultPosts)
+                if page is not None:
+                    serializer = PostSerializer(page, many=True)
+                    return self.get_paginated_response({"data": serializer.data, "query": "posts"})
+                # else : TODO
+
+            # author pk is provided - all posts made by {AUTHOR_ID} visible to the currently authenticated user
+            else:   # author_pk != None
+                # ensure author exists
+                try:
+                    viewee = Author.objects.get(id=author_pk)
+                except DoesNotExist as e:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+
+                # if viewer is viewee, show all of their posts
+                if (viewee.id == viewer.id):
+                    resultPosts = Post.objects.filter(author=viewee).order_by('-published')
+
+                else:
+                    # get all viewee's friends & foafs
+                    friends = getAllFriends(viewer.id)
+                    foaf = getAllFOAF(viewer.id)
+
+                    friendsPosts = []
+                    foafPosts = []
+
+                    # if viewer is friends or foafs with viewee, get their posts
+                    if (viewer.id in friends):
+                        friendsPosts = Post.objects.filter(author=viewee, visibility=Post.FRIENDS)
+                    if (viewer.id in foaf):
+                        foafPosts = Post.objects.filter(author=viewee, visibility=Post.FRIENDS_OF_FRIENDS)
+
+                    # viewee's public posts
+                    publicPosts = Post.objects.filter(author=viewee, visibility=Post.PUBLIC)
+
+                    # combine all posts into one list w/o duplicates
+                    result = list(set(publicPosts) | set(friendsPosts) | set(foafPosts))
+
+                    # put posts in order from most recent to least recent
+                    resultPosts = Post.objects.filter(id__in=[post.id for post in result]).order_by('-published')
+
+                page = self.paginate_queryset(resultPosts)
+                if page is not None:
+                    serializer = PostSerializer(page, many=True)
+                    return self.get_paginated_response({"data": serializer.data, "query": "posts"})
+                # else : TODO
+
+
+        # only show posts by author_pk that are public - b/c user (viewer) is not logged in
+        else:
+            posts = Post.objects.filter(visibility=Post.PUBLIC).order_by('-published')
+            page = self.paginate_queryset(posts)
+            if page is not None:
+                serializer = PostSerializer(page, many=True)
+                return self.get_paginated_response({"data": serializer.data, "query": "posts"})
+            # else : TODO
+
+
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 ''' Gets Author / Updates Author via POST '''
 class AuthorDetail(generics.GenericAPIView):
     serializer_class = AuthorSerializer
@@ -521,7 +659,6 @@ class AuthorDetail(generics.GenericAPIView):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
-
 class FriendingCheck(generics.GenericAPIView):
     queryset = Friending.objects.all()
     serializer_class = FriendingSerializer
@@ -544,12 +681,7 @@ class FriendingCheck(generics.GenericAPIView):
 
             # returns all friends of author_1
             else:
-                friendsList = []
-                # return json object so we must extract the friend id
-                aList = Friending.objects.filter(author__id=author_id1).values('friend__id')
-                for i in aList:
-                    friendsList.append(i["friend__id"])
-                print friendsList
+                friendsList = getAllFriends(author_id1)
                 return Response({'query':'friends', 'authors': friendsList}, status=status.HTTP_200_OK)
 
         else:
