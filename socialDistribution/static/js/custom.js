@@ -239,12 +239,13 @@ window.onload = function() {
     });
   });
 
-//click button to follow someone
+// click button to follow someone
   $("button.follow-btn").one("click", function(event) {
     var author_id = this.id.slice(11);
     var follower_id = document.getElementById('logged-in-author').getAttribute("data");
     var JSONobject = { "query": "friendrequest", "author":  { "id": follower_id }, "friend": { "id": author_id } };
     var jsonData = JSON.stringify( JSONobject);
+    console.log(jsonData);
     $.ajax({
       url: 'http://' + window.location.host + '/api/friendrequest/',
       type: "POST",
@@ -268,14 +269,7 @@ window.onload = function() {
     });
   });
 
-// change the follow button to followed
-// no working yet
-// $("button.follow-btn").ready(function(){
-//       var author_id = this.id.slice(11);
-//       var follower_id = document.getElementById('logged-in-author').getAttribute("data");
-//       $("button#follow-btn-"+author_id). text("Followed");
-//       $("button#follow-btn-"+author_id). removeClass("follow-btn");
-// });
-
+  // on manager's page, click author's profile pic, shows author's firiends
+  // $("img.")
 
 };

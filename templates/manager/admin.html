@@ -8,35 +8,37 @@ document.getElementById("manager").setAttribute("class", "active");
 
 <h1> manager's page </h1>
 
-<div class="alert alert-danger">
-    Under Construction
-</div>
-
 <div>
-    <a href="/admin">Edit Author</a>
+<h3>
+    <a href="/admin">Admin Site</a>
+  </h3>
 </div>
 
-<div >
-  {{ message }}
-</div>
-
+<div id=authors class="row profile-header"> 
+<h3>Authors on this host: </h3>
 {% for author in authors %}
-
     <!-- Display post's author's profile image -->
-    <a href="{% url 'user_profile' author.user.username %}">
-    <img id="id-user-profile-image"
-         class="profile-photo img-circle img-responsive img-center pull-left create-post"
+    <img id="user-profile-image-{{author.id}}"
+         class="manage profile-photo img-circle img-responsive img-center pull-left create-post"
          data-popover="true" data-html=true data-toggle="popover" title="{{ author }}"
          data-content=""
          alt="Profile Image"
-
     {% if author.picture %}
-         src="/media/{{ author.picture }}"/></a>
+         src="/media/{{ author.picture }}"/>
     {% else %}
-          src="http://placehold.it/175x175"/></a>
+          src="http://placehold.it/175x175"/>
     {% endif %}
-
-
 {% endfor %}
+</div>
+
+<h3>Author's Friends</h3>
+<div id='author_friend'>
+
+</div>
+
+<h3>Posts of Author's Friend</h3>
+<div id='author_friend_posts' class="row post">
+
+</div>
 
 {% endblock %}

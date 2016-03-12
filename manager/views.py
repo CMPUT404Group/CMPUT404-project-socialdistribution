@@ -144,7 +144,7 @@ def manager(request):
     if request.user.is_staff:
         loggedInAuthor = Author.objects.get(user=request.user)
         authors = Author.objects.all()
-        return render(request, 'manager/admin.html', {'authors': authors, 'loggedInAuthor': loggedInAuthor, 'message': "This is manager page."})
+        return render(request, 'manager/admin.html', {'authors': authors, 'loggedInAuthor': loggedInAuthor})
 
 # def list_friends(request):
 
