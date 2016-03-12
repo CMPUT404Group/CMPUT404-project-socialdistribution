@@ -13,11 +13,19 @@ document.getElementById("my_stream").setAttribute("class", "active");
 {% for post in posts %}
 <div class="row post">
 
-    <!-- Display profile image -->
-    {% if author.picture %}
-    <img id="id-user-profile-image" src="/media/{{ author.picture }}" class="profile-photo-icon img-circle img-responsive img-center pull-left" alt="Profile Image"/>
+    <!-- Display post's author's profile image -->
+    {% if post.author.picture %}
+    <img id="id-user-profile-image"
+         src="/media/{{ post.author.picture }}"
+         class="profile-photo-icon img-circle img-responsive img-center pull-left"
+         data-popover="true" data-html=true data-toggle="popover" title="{{ post.author }}"
+         data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"
+         alt="Profile Image"/>
     {% else %}
-    <img id="id-user-profile-image" class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/50x50">
+    <img id="id-user-profile-image" class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/50x50"
+         data-popover="true" data-html=true data-toggle="popover" title="{{ post.author }}"
+         data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"
+         alt="Profile Image"/>
     {% endif %}
 
     <div class="panel panel-primary media-body">
