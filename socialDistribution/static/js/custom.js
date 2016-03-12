@@ -207,7 +207,6 @@ window.onload = function() {
       }
     });
   });
-};
 
   $("#editGithubForm").submit(function(event) {
     event.preventDefault();
