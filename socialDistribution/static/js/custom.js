@@ -239,15 +239,12 @@ window.onload = function() {
     });
   });
 
-  $("button.follow-btn").click(function(event) {
+//click button to follow someone
+  $("button.follow-btn").one("click", function(event) {
     var author_id = this.id.slice(11);
-    console.log(author_id);
     var follower_id = document.getElementById('logged-in-author').getAttribute("data");
-    console.log(follower_id);
     var JSONobject = { "query": "friendrequest", "author":  { "id": follower_id }, "friend": { "id": author_id } };
-    console.log(JSONobject);
     var jsonData = JSON.stringify( JSONobject);
-    console.log(jsonData);
     $.ajax({
       url: 'http://' + window.location.host + '/api/friendrequest/',
       type: "POST",
@@ -260,7 +257,7 @@ window.onload = function() {
       success: function(response) {
         console.log(response);
         toastr.info("Followed!");
-        $("button#follow-btn-"+author_id). text("Unfollow");
+        $("button#follow-btn-"+author_id). text("Followed");
         $("button#follow-btn-"+author_id). removeClass("follow-btn");
       },
       error: function(xhr, ajaxOptions, error) {
@@ -270,6 +267,15 @@ window.onload = function() {
       }
     });
   });
+
+// change the follow button to followed
+// no working yet
+// $("button.follow-btn").ready(function(){
+//       var author_id = this.id.slice(11);
+//       var follower_id = document.getElementById('logged-in-author').getAttribute("data");
+//       $("button#follow-btn-"+author_id). text("Followed");
+//       $("button#follow-btn-"+author_id). removeClass("follow-btn");
+// });
 
 
 };

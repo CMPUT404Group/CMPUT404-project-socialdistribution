@@ -84,3 +84,7 @@ class Friending(models.Model):
 class Following(models.Model):
     author = models.ForeignKey(Author, related_name='follow_author', on_delete=models.CASCADE)
     following = models.ForeignKey(Author, related_name='follow_following', on_delete=models.CASCADE)
+
+class Notification(models.Model):
+    notificatee = models.ForeignKey(Author, related_name='noti_author', on_delete=models.CASCADE)
+    follower = models.ForeignKey(Author, related_name='noti_follower', on_delete=models.CASCADE)

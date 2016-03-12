@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from api.models import Post, Comment, Upload, Image, Following, Friending, Author
+from api.models import Post, Comment, Upload, Image, Following, Friending, Author, Notification
 from api.serializers import PostSerializer, CommentSerializer, ImageSerializer, AuthorSerializer, FriendingSerializer, FollowingSerializer
 from api.serializers import UserSerializer
 from rest_framework.decorators import api_view
@@ -471,17 +471,17 @@ class Images(generics.GenericAPIView):
     queryset = Image.objects.all()
 
     def get(self, request, format=None):
-    	# ensure user is authenticated
-    	if (request.user.is_authenticated()):
-    		images = Image.objects.order_by('-upload_date')
-    		page = self.paginate_queryset(images)
-    		if page is not None:
-    			serializer = ImageSerializer(page, many=True)
-    			return self.get_paginated_response({"data":serializer.data, "query": "images"})
-    		#else:
+        # ensure user is authenticated
+        if (request.user.is_authenticated()):
+            images = Image.objects.order_by('-upload_date')
+            page = self.paginate_queryset(images)
+            if page is not None:
+                serializer = ImageSerializer(page, many=True)
+                return self.get_paginated_response({"data":serializer.data, "query": "images"})
+            #else:
 
-    	else:
-    		return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
+        else:
+            return Response(serializer.errors, status=HTTP_401_UNAUTHORIZED)
 
     def post(self, request, format=None):
         # ensure user is authenticated
@@ -756,15 +756,15 @@ class RequestList(generics.GenericAPIView):
     def get(self, request, author_id1, format=None):
         # ensure user is authenticated
         if (request.user.is_authenticated()):
-	    # return all auother_ids who author_id1 are following
+        # return all auother_ids who author_id1 are following
             if author_id1 is not None:
-		followerList = []
-		aList = Following.objects.filter(following__id=author_id1).values('author__id')
-		for i in aList:
-		    followerList.append(i["author__id"])
-		return Response({'query':'following', 'followers':followerList}, status=status.HTTP_200_OK)
-	else:
-	    return Response(status=status.HTTP_401_UNAUTHORIZED)
+                followerList = []
+                aList = Following.objects.filter(following__id=author_id1).values('author__id')
+                for i in aList:
+                    followerList.append(i["author__id"])
+            return Response({'query':'following', 'followers':followerList}, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class FriendRequest(generics.GenericAPIView):
@@ -772,27 +772,28 @@ class FriendRequest(generics.GenericAPIView):
     queryset = Following.objects.all()
 
     def post(self, request, format=None):
-	# if (request.user.is_authenticated()):
-	    if request.data is not None:
-
-		authorid = request.data["author"]["id"]
-		followid = request.data["friend"]["id"] 
-		
-#		author1 = Author.objects.get(id=authorid)
-#		follow1 = Author.objects.get(id=friendid)
-#		try:
-#		    Author.objects.get(id=author1)
-#		    Author.objects.get(id=friend1)
-#		except:
-#		    return Response(status=status.HTTP_400_BAD_REQUEST)
-		serializer = FollowingSerializer(data=request.data)
-		if serializer.is_valid():
-		    serializer.validated_data["author"] = Author.objects.get(id=authorid)
-		    serializer.validated_data["following"] = Author.objects.get(id=followid)
-		    serializer.save()
-		    return Response(serializer.data, status=status.HTTP_201_CREATED)
-	# else:
-	#    return Response(status=status.HTTP_401_UNAUTHORIZED)
+    # if (request.user.is_authenticated()):
+        if request.data is not None:
+            authorid = request.data["author"]["id"]
+            followid = request.data["friend"]["id"] 
+        
+#       author1 = Author.objects.get(id=authorid)
+#       follow1 = Author.objects.get(id=friendid)
+#       try:
+#           Author.objects.get(id=author1)
+#           Author.objects.get(id=friend1)
+#       except:
+#           return Response(status=status.HTTP_400_BAD_REQUEST)
+            serializer = FollowingSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.validated_data["author"] = Author.objects.get(id=authorid)
+            serializer.validated_data["following"] = Author.objects.get(id=followid)
+            serializer.save()
+            noti = Notification.objects.create(notificatee=Author.objects.get(id=followid), follower=Author.objects.get(id=authorid))
+            noti.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    # else:
+    #    return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class BeFriend(generics.GenericAPIView):
@@ -800,27 +801,26 @@ class BeFriend(generics.GenericAPIView):
     queryset = Friending.objects.all()
 
     def post(self, request, format=None):
-	# if (request.user.is_authenticated()):
-	    if request.data is not None:
-
-		authorid = request.data["author"]["id"]
-		friendid = request.data["friend"]["id"] 
-		
-#		author1 = Author.objects.get(id=authorid)
-#		follow1 = Author.objects.get(id=friendid)
-#		try:
-#		    Author.objects.get(id=author1)
-#		    Author.objects.get(id=friend1)
-#		except:
-#		    return Response(status=status.HTTP_400_BAD_REQUEST)
-		serializer = FriendingSerializer(data=request.data)
-		if serializer.is_valid():
-		    serializer.validated_data["author"] = Author.objects.get(id=authorid)
-		    serializer.validated_data["friend"] = Author.objects.get(id=friendid)
-		    serializer.save()
-		    return Response(serializer.data, status=status.HTTP_201_CREATED)
-	# else:
-	#    return Response(status=status.HTTP_401_UNAUTHORIZED)
+    # if (request.user.is_authenticated()):
+        if request.data is not None:
+            authorid = request.data["author"]["id"]
+            friendid = request.data["friend"]["id"] 
+        
+#       author1 = Author.objects.get(id=authorid)
+#       follow1 = Author.objects.get(id=friendid)
+#       try:
+#           Author.objects.get(id=author1)
+#           Author.objects.get(id=friend1)
+#       except:
+#           return Response(status=status.HTTP_400_BAD_REQUEST)
+        serializer = FriendingSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.validated_data["author"] = Author.objects.get(id=authorid)
+            serializer.validated_data["friend"] = Author.objects.get(id=friendid)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    # else:
+    #    return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 
