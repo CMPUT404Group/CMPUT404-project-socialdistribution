@@ -28,7 +28,9 @@
             <p id="id-email" style="color: grey;">email: {{user_account.email}} </p>
             <p id="id-github" style="color: grey;">github: http://github.com/{{ author.github_name }}
             <!-- Triggers editGithubModal -->
+            {% if profile_owner == author %}
             <button id='editGithubTrigger' type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#editGithubModal"><i class="fa fa-edit"></i></button> 
+            {% endif %}
             </p>
         </div>
     </div>
