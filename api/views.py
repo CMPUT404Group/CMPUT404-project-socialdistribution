@@ -24,8 +24,8 @@ def api_root(request, format=None):
     return Response({
         'posts': reverse('post-list', request=request, format=format),
         'author': reverse('author-list', request=request, format=format),
-      #  'images': reverse('images', request=request, format=format),
-        'friends': str(request.build_absolute_uri) + '<author_id>/friends',
+        'images': reverse('images', request=request, format=format),
+        
     })
 
 
