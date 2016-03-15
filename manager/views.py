@@ -1,13 +1,14 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from api.models import Author, Notification
+from api.models import Author
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from manager.forms import AuthorForm
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponseRedirect
+from post.models import Notification
 
 
 # Create your views here.
@@ -144,10 +145,9 @@ def manager(request):
     if request.user.is_staff:
         loggedInAuthor = Author.objects.get(user=request.user)
         authors = Author.objects.all()
-        return render(request, 'manager/admin.html', {'authors': authors, 'loggedInAuthor': loggedInAuthor})
+        return render(request, 'manager/admin.html', {'authors': authors, 'loggedInAuthor': loggedInAuthor})# 
 
-# def list_friends(request):
-
+# display friend request notification 
 def friendRequest(request, username):
     if request.user.is_authenticated():
         try:
@@ -162,3 +162,4 @@ def friendRequest(request, username):
                       {'notis': notis, 'user_account': user, 'author': author})
     else:
         return HttpResponseRedirect(reverse('accounts_login')) 
+

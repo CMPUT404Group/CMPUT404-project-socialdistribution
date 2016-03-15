@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from api.models import Post, Comment, Upload, Image, Following, Friending, Author, Notification
-from api.serializers import PostSerializer, CommentSerializer, ImageSerializer, AuthorSerializer, FriendingSerializer, FollowingSerializer
+from api.models import Post, Comment, Upload, Image, Friending, Author
+from api.serializers import PostSerializer, CommentSerializer, ImageSerializer, AuthorSerializer, FriendingSerializer
 from api.serializers import UserSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -17,6 +17,7 @@ from django.conf import settings
 from itertools import chain
 from django.conf import settings
 from rest_framework.reverse import reverse
+from post.models import Notification
 
 # Create your views here.
 @api_view(('GET',))
@@ -750,8 +751,8 @@ class FriendingCheck(generics.GenericAPIView):
 
 
 class RequestList(generics.GenericAPIView):
-    serializer_class = FollowingSerializer
-    queryset = Following.objects.all()
+    serializer_class = FriendingSerializer
+    queryset = Friending.objects.all()
 
     def get(self, request, author_id1, format=None):
         # ensure user is authenticated
@@ -759,7 +760,7 @@ class RequestList(generics.GenericAPIView):
         # return all auother_ids who author_id1 are following
             if author_id1 is not None:
                 followerList = []
-                aList = Following.objects.filter(following__id=author_id1).values('author__id')
+                aList = Friending.objects.filter(following__id=author_id1).values('author__id')
                 for i in aList:
                     followerList.append(i["author__id"])
             return Response({'query':'following', 'followers':followerList}, status=status.HTTP_200_OK)
@@ -768,14 +769,14 @@ class RequestList(generics.GenericAPIView):
 
 
 class FriendRequest(generics.GenericAPIView):
-    serializer_class = FollowingSerializer
-    queryset = Following.objects.all()
+    serializer_class = FriendingSerializer
+    queryset = Friending.objects.all()
 
     def post(self, request, format=None):
     # if (request.user.is_authenticated()):
         if request.data is not None:
             authorid = request.data["author"]["id"]
-            followid = request.data["friend"]["id"] 
+            friendid = request.data["friend"]["id"] 
         
 #       author1 = Author.objects.get(id=authorid)
 #       follow1 = Author.objects.get(id=friendid)
@@ -784,12 +785,12 @@ class FriendRequest(generics.GenericAPIView):
 #           Author.objects.get(id=friend1)
 #       except:
 #           return Response(status=status.HTTP_400_BAD_REQUEST)
-            serializer = FollowingSerializer(data=request.data)
+            serializer = FriendingSerializer(data=request.data)
         if serializer.is_valid():
             serializer.validated_data["author"] = Author.objects.get(id=authorid)
-            serializer.validated_data["following"] = Author.objects.get(id=followid)
+            serializer.validated_data["friend"] = Author.objects.get(id=friendid)
             serializer.save()
-            noti = Notification.objects.create(notificatee=Author.objects.get(id=followid), follower=Author.objects.get(id=authorid))
+            noti = Notification.objects.create(notificatee=Author.objects.get(id=friendid), follower=Author.objects.get(id=authorid))
             noti.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
     # else:

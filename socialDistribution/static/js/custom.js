@@ -258,8 +258,8 @@ window.onload = function() {
       success: function(response) {
         console.log(response);
         toastr.info("Followed!");
-        $("button#follow-btn-"+author_id). text("Followed");
-        $("button#follow-btn-"+author_id). removeClass("follow-btn");
+        $("button#follow-btn-"+author_id).text("Followed");
+        $("button#follow-btn-"+author_id).removeClass("follow-btn");
       },
       error: function(xhr, ajaxOptions, error) {
         console.log(xhr.status);

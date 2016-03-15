@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.template import RequestContext
 from django.utils import timezone
-from api.models import Post, Author, Comment, Friending, Following
+from api.models import Post, Author, Comment, Friending
 from .forms import UploadFileForm, PostForm, CommentForm
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.core.urlresolvers import reverse
@@ -95,13 +95,15 @@ def my_stream(request):
 
         pks = []
 
-        #add the posts by the people we are following into our myStream
-        following_pairs = Following.objects.filter(author=author)
-        for i in range(len(following_pairs)):
-            following_posts = Post.objects.filter(author=following_pairs[i].following)
-            for j in range(len(following_posts)):
-                if isAllowed(request.user, following_posts[j].id):
-                    pks.append(following_posts[j].id)
+        # we treat friending as following
+        # mutaul following is true friending
+        # #add the posts by the people we are following into our myStream
+        # following_pairs = Friending.objects.filter(author=author)
+        # for i in range(len(following_pairs)):
+        #     following_posts = Post.objects.filter(author=following_pairs[i].following)
+        #     for j in range(len(following_posts)):
+        #         if isAllowed(request.user, following_posts[j].id):
+        #             pks.append(following_posts[j].id)
 
         #add the posts by the people we are friends with into our myStream
         friend_pairs = Friending.objects.filter(author=author)

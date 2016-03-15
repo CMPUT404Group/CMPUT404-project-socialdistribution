@@ -76,15 +76,13 @@ class Image(models.Model):
     photo = models.ImageField("Image", upload_to="images/")
     upload_date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey('Author')
-    
+
+# we are only using friending model
+# when you friend someone, you follow him
+# when he follows back, you guys become friends
+# A friends B: A follows B
+# B friends A: B follows A
+# A and B mutually followed each other, they are considered and friends.  
 class Friending(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     friend = models.ForeignKey(Author, related_name='friend', on_delete=models.CASCADE)
-
-class Following(models.Model):
-    author = models.ForeignKey(Author, related_name='follow_author', on_delete=models.CASCADE)
-    following = models.ForeignKey(Author, related_name='follow_following', on_delete=models.CASCADE)
-
-class Notification(models.Model):
-    notificatee = models.ForeignKey(Author, related_name='noti_author', on_delete=models.CASCADE)
-    follower = models.ForeignKey(Author, related_name='noti_follower', on_delete=models.CASCADE)
