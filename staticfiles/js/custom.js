@@ -207,4 +207,69 @@ window.onload = function() {
       }
     });
   });
+
+  $("#editGithubForm").submit(function(event) {
+    event.preventDefault();
+    var formData = new FormData($("#editGithubForm")[0]);
+    formData.append("host", "");
+    var authorID = $("#editGithubForm").data("author-id");
+    $.ajax({
+      url: 'http://' + window.location.host + '/api/author/' + authorID + '/',
+      type: "POST",
+      data: formData,
+      contentType: false,
+      processData: false,
+      beforeSend: function(xhr, settings) {
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function(response) {
+        // close modal
+        $("button#closeeditGithubForm").click();
+        // clear editgithub form
+        $("form#editGithubForm").trigger("reset");
+        // change wuthor github
+        $("p#id-github").html("github: http://github.com/" + response.github_name);
+        toastr.info("Github Updated!");
+      },
+      error: function(xhr, ajaxOptions, error) {
+        console.log(xhr.status);
+        console.log(xhr.responseText);
+        console.log(error);
+      }
+    });
+  });
+
+// click button to follow someone
+  $("button.follow-btn").one("click", function(event) {
+    var author_id = this.id.slice(11);
+    var follower_id = document.getElementById('logged-in-author').getAttribute("data");
+    var JSONobject = { "query": "friendrequest", "author":  { "id": follower_id }, "friend": { "id": author_id } };
+    var jsonData = JSON.stringify( JSONobject);
+    console.log(jsonData);
+    $.ajax({
+      url: 'http://' + window.location.host + '/api/friendrequest/',
+      type: "POST",
+      data:  jsonData,
+      contentType: 'application/json; charset=utf-8',
+      dataType: 'json',
+      beforeSend: function(xhr, response) {
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function(response) {
+        console.log(response);
+        toastr.info("Followed!");
+        $("button#follow-btn-"+author_id).text("Followed");
+        $("button#follow-btn-"+author_id).removeClass("follow-btn");
+      },
+      error: function(xhr, ajaxOptions, error) {
+        console.log(xhr.status);
+        console.log(xhr.responseText);
+        console.log(error);
+      }
+    });
+  });
+
+  // on manager's page, click author's profile pic, shows author's firiends
+  // $("img.")
+
 };
