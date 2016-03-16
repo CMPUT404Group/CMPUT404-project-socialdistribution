@@ -94,7 +94,9 @@ def getAllFriends(author_id):
     # return json object so we must extract the friend id
     aList = Friending.objects.filter(author__id=author_id).values('friend__id')
     for i in aList:
-        friendsList.append(i["friend__id"])
+        # if both people are following eachother (so two-way friendship)
+        if author_id in Friending.objects.filter(author__id= i["friend__id"]).values('friend__id'):
+            friendsList.append(i["friend__id"])
     return friendsList
 
 
@@ -671,7 +673,7 @@ class FriendingCheck(generics.GenericAPIView):
                 aList = Friending.objects.filter(author__id=author_id1, friend__id=author_id2)
                 bList = Friending.objects.filter(author__id=author_id2, friend__id=author_id1)
                 result = list(chain(aList, bList))
-                if (result != []):
+                if (aList != [] and bList != []):
                     friends = True
                 else:
                     friends = False
