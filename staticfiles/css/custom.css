@@ -163,3 +163,8 @@ button.padding {
 .panel-body > p > img {
     max-width: 75% !important;
 }
+
+.read_more {
+    color: black;
+    font-weight: 900;
+}

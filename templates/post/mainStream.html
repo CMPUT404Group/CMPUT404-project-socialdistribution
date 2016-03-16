@@ -40,7 +40,10 @@ document.getElementById("public_stream").setAttribute("class", "active");
     		{% if post.contentType == "text/x-markdown" %}
     			{{ post.content|markdown }}
 			{% else %}
-				{{ post.content|urlize }}
+				{{ post.content|urlize|slice:"500" }}
+                {% if post.content|length > 500 %}
+                <a class='read_more' href='{% url "post_detail" post.id %}'> Continue Reading... </a> 
+                {% endif %}
     		{% endif %}
 
             <br/>
