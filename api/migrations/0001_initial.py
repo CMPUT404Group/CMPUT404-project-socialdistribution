@@ -35,22 +35,6 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='Following',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('author', models.ForeignKey(related_name='follow_author', to='api.Author')),
-                ('following', models.ForeignKey(related_name='follow_following', to='api.Author')),
-            ],
-        ),
-        migrations.CreateModel(
-            name='Friend',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('friend', models.ForeignKey(related_name='friends', to=settings.AUTH_USER_MODEL)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
-            ],
-        ),
-        migrations.CreateModel(
             name='Friending',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
