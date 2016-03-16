@@ -62,8 +62,11 @@ def public_stream(request):
             author.save()
 
         # author = Author.objects.get(user=request.user)
-
-        return render(request, 'post/mainStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author})
+        followList = []
+        followRelationships = Friending.objects.filter(author=author)
+        for relationship in followRelationships:
+            followList.append(relationship.friend)
+        return render(request, 'post/mainStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList })
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
