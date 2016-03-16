@@ -19,6 +19,7 @@ pid5 = uuid.uuid4()
 pid6 = uuid.uuid4()
 pid7 = uuid.uuid4()
 pid8 = uuid.uuid4()
+pid9 = uuid.uuid4()
 
 # testing creating and getting posts
 class ApiPostModelTestCase(TestCase):
@@ -129,33 +130,43 @@ class ApiUrlsTestCase(TestCase):
                             content="this is my post data",
                             author=tester, published=date, visibility="PUBLIC")
 
-        post1 = Post.objects.create(id=pid1, title="Title", contentType="text/plain", 
+        post1 = Post.objects.create(id=pid1, title="Title1", contentType="text/plain", 
                             content="this is my hidden post data",
                             author=tester, published=date, visibility="PRIVATE")
 
-        post2 = Post.objects.create(id=pid2, title="Title", contentType="text/plain", 
+        post2 = Post.objects.create(id=pid2, title="Title2", contentType="text/plain", 
                             content="this is my friends private post data",
                             author=john, published=date, visibility="PRIVATE")
 
-        post3 = Post.objects.create(id=pid3, title="Title", contentType="text/plain", 
+        post3 = Post.objects.create(id=pid3, title="Title3", contentType="text/plain", 
                             content="this is my friends public post data",
                             author=john, published=date, visibility="FRIENDS")
 
-        post4 = Post.objects.create(id=pid4, title="Title", contentType="text/plain", 
+        post4 = Post.objects.create(id=pid4, title="Title4", contentType="text/plain", 
                             content="this is my FoaF friend post",
                             author=bob, published=date, visibility="FRIENDS")
 
-        post5 = Post.objects.create(id=pid5, title="Title", contentType="text/plain", 
+        post5 = Post.objects.create(id=pid5, title="Title5", contentType="text/plain", 
                             content="this is my FoaF foaf post",
                             author=bob, published=date, visibility="FOAF")
 
-        post6 = Post.objects.create(id=pid6, title="Title", contentType="text/plain", 
+        post6 = Post.objects.create(id=pid6, title="Title6", contentType="text/plain", 
                             content="this is my following private post data",
                             author=sam, published=date, visibility="PRIVATE")
 
-        post7 = Post.objects.create(id=pid7, title="Title", contentType="text/plain", 
+        post7 = Post.objects.create(id=pid7, title="Title7", contentType="text/plain", 
                             content="this is my following public post data",
                             author=sam, published=date, visibility="PUBLIC")
+
+        post8 = Post.objects.create(id=pid8, title="Title8", contentType="text/plain", 
+                            content="this is the message i sent to tester",
+                            author=sam, published=date, visibility="OTHERAUTHOR",
+                            other_author=tester)
+
+        post9 = Post.objects.create(id=pid9, title="Title8", contentType="text/plain", 
+                            content="this is the message i didnt sent to tester",
+                            author=john, published=date, visibility="OTHERAUTHOR",
+                            other_author=bob)
 
         Comment.objects.create(id=c_id, post=post7, author=bob, contentType="text/plain",
                             comment="this is my comment", published=date)
@@ -302,6 +313,8 @@ class ApiUrlsTestCase(TestCase):
         resp10 = self.client.get("/post/"+str(pid6)+"/")
         resp11 = self.client.get("/post/"+str(pid7)+"/")
         resp12 = self.client.get("/author/bob/")
+        resp13 = self.client.get("/post/"+str(pid8)+"/")
+        resp14 = self.client.get("/post/"+str(pid9)+"/")
 
         u = User.objects.get(username="tester")
         user = Author.objects.get(user=u)
@@ -326,12 +339,16 @@ class ApiUrlsTestCase(TestCase):
         self.assertEqual(resp11.status_code, 200)
         #this is bobs profile and is visible       
         self.assertEqual(resp12.status_code, 200)
-         #this should be viewable since i am a foaf and the status is foaf
+        #this should be viewable since it was sent to me
+        self.assertEqual(resp13.status_code, 200)
+        #this should not be viewable since it was sent to someone else
+        self.assertEqual(resp14.status_code, 403)
 
         #check that the content of the post and comment are viewable along 
         #with their authors from the page url ./post/<post id>
         self.assertContains(resp1,"this is my post data")
         self.assertContains(resp1, "tester")
+        self.assertFalse("this is the message i sent to tester" in str(resp1))
 
         #check thats the public post is also viewable from the main page, 
         #but that the private stuff is not viewable
@@ -341,6 +358,7 @@ class ApiUrlsTestCase(TestCase):
         self.assertFalse("this is my friends private post data" in str(resp2)) 
         self.assertFalse("this is my FoaF friend post" in str(resp2))
         self.assertFalse("this is my FoaF foaf post" in str(resp2))
+        self.assertFalse("this is the message i sent to tester" in str(resp2))
 
         #check that both my posts are viewable from the myStream page   
         #check also that the posts from my friends and FOFs and the people i am 
@@ -350,17 +368,19 @@ class ApiUrlsTestCase(TestCase):
         self.assertContains(resp3,"this is my friends public post data")
         self.assertContains(resp3,"this is my following public post data")
         self.assertFalse("this is my friends private post data" in str(resp3))
+        self.assertContains(resp3, "this is the message i sent to tester")
      
         #check that my posts are on my profile page and that other posts arent 
         self.assertContains(resp4,"this is my post data")
         self.assertFalse("this is my following public post data" in str(resp4))
+        self.assertFalse("this is the message i sent to tester" in str(resp4))
 
         #the page for my private post
         self.assertContains(resp5,"this is my hidden post data")
 
         #check that my friends private post is hidden but the public one is public
 
-        #resp6/8/10 should not be viewable so we dont need to check what they contain
+        #resp6/8/10/14 should not be viewable so we dont need to check what they contain
 
         #check that the viewable posts contain what they should
         self.assertContains(resp7,"this is my friends public post data")
@@ -369,4 +389,7 @@ class ApiUrlsTestCase(TestCase):
         #check the comment is there too
         self.assertContains(resp11, "this is my comment")
         #self.assertContains(resp12,"this is my FoaF foaf post")
+        self.assertFalse("this is the message i sent to tester" in str(resp12))
         self.assertFalse("this is my FoaF friend post" in str(resp12))
+        #this is the private post to tester
+        self.assertContains(resp13, "this is the message i sent to tester")

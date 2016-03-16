@@ -53,6 +53,15 @@ def isAllowed(post_pk, author_id):
     #if it is a public post allow everypne access
     elif privacy == Post.PUBLIC:
         return True
+    elif privacy == Post.SERVER_ONLY:
+        #TODO
+        return True
+    #checks if another post is being shared with you
+    elif privacy == Post.OTHERAUTHOR:
+        if post.other_author.id == author_id:
+            return True
+        else:
+            return False
     #check if the user is in the friend list
     elif privacy == Post.FRIENDS or privacy == Post.FRIENDS_OF_FRIENDS:
         friend_pairs = Friending.objects.filter(author=post.author)

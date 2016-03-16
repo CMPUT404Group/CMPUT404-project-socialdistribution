@@ -6,7 +6,7 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ('title', 'content', 
-                  'published', 'author', 
+                  'published', 'author', 'other_author', 
                   'visibility', 'contentType', 'image_url')
         exclude = ['published', 'author']
         widgets = {

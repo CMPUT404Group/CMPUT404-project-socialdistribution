@@ -30,14 +30,16 @@ class Post(models.Model):
     FRIENDS_OF_FRIENDS = 'FOAF'
     FRIENDS = 'FRIENDS'
     ME_ONLY = 'PRIVATE'
-    SERVER_ONLY = "SERVERONLY"
+    SERVER_ONLY = 'SERVERONLY'
+    OTHER_AUTHOR = 'OTHERAUTHOR'
 
     VISIBILITY_SETTING_CHOICES = (
         (PUBLIC, 'Public'),
         (FRIENDS_OF_FRIENDS, 'Friends of Friends'),
         (FRIENDS, 'Friends'),
         (ME_ONLY, 'Only Me'),
-        (SERVER_ONLY, "Only Server")
+        (SERVER_ONLY, 'Only Server'),
+        (OTHER_AUTHOR, 'Other Author')
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -54,6 +56,7 @@ class Post(models.Model):
     visibility = models.CharField(max_length=18, choices=VISIBILITY_SETTING_CHOICES, default=FRIENDS)
     # comments = models.ForeignKey('api.Comment', related_name='post')
     image_url = models.CharField(max_length=200, blank=True, null=True)
+    other_author = models.ForeignKey('Author',related_name="Share_with_user",blank=True,null=True)
 
 
 class Comment(models.Model):
