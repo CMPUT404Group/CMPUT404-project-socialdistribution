@@ -24,9 +24,16 @@
 				    Privacy <span class="caret"></span>
 				  </button>
 
-				  <ul class="dropdown-menu" data-toggle="buttons">
+				  <ul id="privacy-dropdown" class="dropdown-menu">
 					{% for option in form.visibility %}
+				  	{% if option.value == 'OTHERAUTHOR' %}
+				  	<li>
+				  		<label for={{option.id}}>
+				  			<input id={{option.id}} name="visibility" type="radio" value={{option.value}} data-toggle="modal" data-target="#chooseAuthorModal"/></label>
+				  	</li>
+				  	{% else %}
 				  	<li>{{ option }}</li>
+				  	{% endif %}
 				  	{% endfor %}
 				  </ul>
 				</div>
@@ -64,3 +71,4 @@
 
 
 {% include "post/uploadImageModal.html" %}
+{% include "post/chooseAuthorModal.html" %}

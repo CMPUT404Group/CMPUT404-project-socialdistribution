@@ -272,4 +272,15 @@ window.onload = function() {
   // on manager's page, click author's profile pic, shows author's firiends
   // $("img.")
 
+  //hide the choose author modal
+  $("#chooseAuthorModal").hide();
+
+  //when other_author is selected, open a pop up box so they can choose which author
+  //http://stackoverflow.com/questions/9744288/django-jquery-dialog-box-when-specific-radio-button-selected 2016/03/16
+  $('#id_visibility_5').click(function(e){
+    if(e.target.value ==='OTHERAUTHOR') {
+      $("#chooseAuthorModal").modal('show');
+    }
+  });
+
 };
