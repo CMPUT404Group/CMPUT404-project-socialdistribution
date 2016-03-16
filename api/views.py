@@ -58,7 +58,10 @@ def isAllowed(post_pk, author_id):
         friend_pairs = Friending.objects.filter(author=post.author)
         friends = []
         for i in range(len(friend_pairs)):
-            friends.append(friend_pairs[i].friend)
+            #make sure they are mutual friends
+            backwards = Friending.objects.filter(author=friend_pairs[i].friend,friend=post.author)
+            if len(backwards) > 0:
+                friends.append(friend_pairs[i].friend)
         if viewer in friends:
             return True
         #check if the user is in the FoaF list
@@ -66,8 +69,11 @@ def isAllowed(post_pk, author_id):
             for i in range(len(friends)):
                 fofriend_pairs = Friending.objects.filter(author=friends[i])
                 fofriends = []
-                for i in range(len(fofriend_pairs)):
-                    fofriends.append(fofriend_pairs[i].friend)
+                for j in range(len(fofriend_pairs)):
+                    #make sure they are mutual friends
+                    backwards = Friending.objects.filter(friend=friends[i],author=fofriend_pairs[j].friend)
+                    if len(backwards) > 0:
+                        fofriends.append(fofriend_pairs[j].friend)
                 if viewer in fofriends:
                     return True
         #if not a friend return false
@@ -75,9 +81,6 @@ def isAllowed(post_pk, author_id):
             return False
     else:
         return False
-
-
-
 
 
 '''
@@ -276,45 +279,12 @@ class CommentList(generics.GenericAPIView):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
 
-    def isAllowed(self,request,pk):
-        post = Post.objects.get(id=pk)
-        privacy = post.visibility
-        viewer = Author.objects.get(user=request.user)
-
-        #if the post was created by the user allow access
-        if viewer == post.author :
-            return True
-        #if it is a public post allow everypne access
-        elif privacy == "PUBLIC":
-            return True
-        #check if the user is in the friend list
-        elif privacy == "FRIENDS" or privacy == "FOAF":
-            friend_pairs = Friending.objects.filter(author=post.author)
-            friends = []
-            for i in range(len(friend_pairs)):
-                friends.append(friend_pairs[i].friend)
-            if viewer in friends:
-                return True
-            #check if the user is in the FoaF list
-            elif privacy == "FOAF":
-                for i in range(len(friends)):
-                    fofriend_pairs = Friending.objects.filter(author=friends[i])
-                    fofriends = []
-                    for i in range(len(fofriend_pairs)):
-                        fofriends.append(fofriend_pairs[i].friend)
-                    if viewer in fofriends:
-                        return True
-            #if not a friend return false
-            else:
-                return False
-        else:
-            return False
-
     def get(self, request, post_pk, format=None):
         # ensure user is authenticated
         if (request.user.is_authenticated()):
             # --- TODO : Only authorize users to read/get this post if visibility/privacy settings allow it
-            if(self.isAllowed(request, post_pk)):
+            author_id = Author.objects.get(user=request.user).id
+            if(isAllowed(post_pk, author_id)):
                 comments = Comment.objects.filter(post=post_pk).order_by('-published')
                 page = self.paginate_queryset(comments)
                 if page is not None:
@@ -331,7 +301,8 @@ class CommentList(generics.GenericAPIView):
         if (request.user.is_authenticated()):
 
             # -- TODO : Only authorize user who can view the corresponding post to comment
-            if(self.isAllowed(request,post_pk)):
+            author_id = Author.objects.get(user=request.user).id
+            if(isAllowed(post_pk, author_id)):
                 serializer = CommentSerializer(data=request.data)
                 if serializer.is_valid():
                     print "DEBUG : API - views.py - CommentList"
@@ -365,40 +336,6 @@ class CommentDetail(generics.GenericAPIView):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
 
-    def isAllowed(self,request,pk):
-        post = Post.objects.get(id=pk)
-        privacy = post.visibility
-        viewer = Author.objects.get(user=request.user)
-
-        #if the post was created by the user allow access
-        if viewer == post.author :
-            return True
-        #if it is a public post allow everypne access
-        elif privacy == "PUBLIC":
-            return True
-        #check if the user is in the friend list
-        elif privacy == "FRIENDS" or privacy == "FOAF":
-            friend_pairs = Friending.objects.filter(author=post.author)
-            friends = []
-            for i in range(len(friend_pairs)):
-                friends.append(friend_pairs[i].friend)
-            if viewer in friends:
-                return True
-            #check if the user is in the FoaF list
-            elif privacy == "FOAF":
-                for i in range(len(friends)):
-                    fofriend_pairs = Friending.objects.filter(author=friends[i])
-                    fofriends = []
-                    for i in range(len(fofriend_pairs)):
-                        fofriends.append(fofriend_pairs[i].friend)
-                    if viewer in fofriends:
-                        return True
-            #if not a friend return false
-            else:
-                return False
-        else:
-            return False
-
     def get_object(self, pk):
         return get_object_or_404(Comment, pk=pk)
 
@@ -407,7 +344,8 @@ class CommentDetail(generics.GenericAPIView):
         if (request.user.is_authenticated()):
 
             # --- TODO : Only authorize users to read/get this comment if visibility/privacy settings of the corresponding post allow it
-            if(self.isAllowed(request,post_pk)):
+            author_id = Author.objects.get(user=request.user).id
+            if(isAllowed(post_pk, author_id)):
                 comment = self.get_object(comment_pk)
                 serializer = CommentSerializer(comment)
                 return Response(serializer.data, status=status.HTTP_200_OK)

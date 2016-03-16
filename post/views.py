@@ -95,16 +95,6 @@ def my_stream(request):
 
         pks = []
 
-        # we treat friending as following
-        # mutaul following is true friending
-        # #add the posts by the people we are following into our myStream
-        # following_pairs = Friending.objects.filter(author=author)
-        # for i in range(len(following_pairs)):
-        #     following_posts = Post.objects.filter(author=following_pairs[i].following)
-        #     for j in range(len(following_posts)):
-        #         if isAllowed(request.user, following_posts[j].id):
-        #             pks.append(following_posts[j].id)
-
         #add the posts by the people we are friends with into our myStream
         friend_pairs = Friending.objects.filter(author=author)
         for i in range(len(friend_pairs)):
@@ -265,7 +255,9 @@ def isAllowed(user,pk):
         friend_pairs = Friending.objects.filter(author=post.author)
         friends = []
         for i in range(len(friend_pairs)):
-            friends.append(friend_pairs[i].friend)
+            backwards = Friending.objects.filter(author=friend_pairs[i].friend,friend=post.author)
+            if len(backwards) > 0:
+                friends.append(friend_pairs[i].friend)
         if viewer in friends:
             return True
         #check if the user is in the FoaF list
@@ -273,8 +265,10 @@ def isAllowed(user,pk):
             for i in range(len(friends)):
                 fofriend_pairs = Friending.objects.filter(author=friends[i])
                 fofriends = []
-                for i in range(len(fofriend_pairs)):
-                    fofriends.append(fofriend_pairs[i].friend)
+                for j in range(len(fofriend_pairs)):
+                    backwards = Friending.objects.filter(friend=friends[i],author=fofriend_pairs[j].friend)
+                    if len(backwards) > 0:
+                        fofriends.append(fofriend_pairs[j].friend)
                 if viewer in fofriends:
                     return True
         #if not a friend return false
