@@ -102,8 +102,10 @@ def getAllFriends(author_id):
     friendsList = []
     # return json object so we must extract the friend id
     aList = Friending.objects.filter(author__id=author_id).values('friend__id')
-    for i in aList:
-        friendsList.append(i["friend__id"])
+    bList = Friending.objects.filter(friend__id=author_id).values('author__id')
+    for person_id in aList:
+        if person_id in bList:
+            friendsList.append(person_id)
     return friendsList
 
 
