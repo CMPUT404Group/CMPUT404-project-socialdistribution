@@ -610,12 +610,12 @@ class AuthorDetail(generics.GenericAPIView):
             responseData = serializer.data
             friendsList = []
             # return json object so we must extract the friend
-            aList = Friending.objects.filter(author=author).select_related('friend')
+            aList = Friending.objects.filter(author=author)
             # friendsList = getAllFriends(author.id)
-            for object in aList:
+            for person_pair in aList:
                 # backwards check
-                if len(Friending.objects.filter(author=object.author, friend=author)) > 0:
-                    friendsList.append(i.friend)
+                if len(Friending.objects.filter(author=person_pair.friend, friend=author)) > 0:
+                    friendsList.append(person_pair.friend)
             serializer = AuthorSerializer(friendsList, many=True)
             responseData["friends"] = serializer.data
 
