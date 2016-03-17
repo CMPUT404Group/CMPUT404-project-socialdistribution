@@ -17,7 +17,11 @@
     <div class="media-body" style="padding-left: 3em;">
         <!-- Do some logic here : follow, unfollow, accept etc -->
         {% if profile_owner != author %}
-        <button id='follow-btn-{{profile_owner.id}}'  class="follow-btn btn btn-success pull-right" style="position: relative; top: 1.5em; right: 1.5em;">Follow</button>
+            {% if profile_owner not in followList %}
+            <button id='follow-btn-{{profile_owner.id}}'  class="follow-btn btn btn-success pull-right" style="position: relative; top: 1.5em; right: 1.5em;">Follow</button>
+            {% else %}
+            <button id='unfollow-btn-{{profile_owner.id}}'  class="unfollow-btn btn btn-warning pull-right" style="position: relative; top: 1.5em; right: 1.5em;">Unfollow</button>
+            {% endif %}
         {% endif %}
         <!-- Display required user info on profile page -->
         <h1> {{ user_account.username }} </h1>
@@ -46,12 +50,31 @@
 
 </div>
 
- 
+<div class="main-body" style="position: relative; float: left; width: 70%;">
+<!-- Display profile owner's follower list --> 
+<div id=followers class="panel panel-primary"> 
+      <div class="panel-heading">Follower </div>
+      <div class="panel-body">
+        {% for follower in followers %}
+        <a href="{% url 'user_profile' follower.user.username %}">
+        <img id="user-profile-image-{{follower.id}}"
+         class="profile-photo-icon img-circle img-responsive img-center pull-left create-post"
+         data-toggle="tooltip" title="{{ follower }}"
+         alt="Profile Image"
+        {% if author.picture %}
+         src="/media/{{ follower.picture }}"/></a>
+         {% else %}
+          src="http://placehold.it/175x175"/></a>
+         {% endif %}
+        {% endfor %}
+        </div>
+</div>
 
 <!-- If this is the logged in user's profile page, show a create post component -->
 {% if user_account == user %}
 {% include "post/createPost.html" with icon=False %}
 {% endif %}
+
 
 {% for post in posts %}
 <div class="row post">
@@ -69,7 +92,10 @@
             {% if post.contentType == "text/x-markdown" %}
                 {{ post.content|markdown }} 
             {% else %}
-                {{ post.content|urlize }}
+                {{ post.content|urlize|slice:"500" }}
+                {% if post.content|length > 500 %}
+                <a class='read_more' href='{% url "post_detail" post.id %}'> Continue Reading... </a> 
+                {% endif %}
             {% endif %}
             
             <br/>
@@ -98,4 +124,23 @@
 
 {% include "post/editProfileFieldModal.html" %}
 {% include "post/uploadProfileImageModal.html" %}
+</div>
+
+<div class="list-group sidebar" style="position: relative; float:right; width: 30%; padding-left: 1.5em;">
+    <h4 class="list-group-item list-group-item-info">Friends</h4>
+    {% for friend in friends|slice:":3" %}
+     <a class="list-group-item" style="height: 75px;" href="{% url 'user_profile' friend.user.username %}">
+    <img src={% if friend.picture %} '/media/{{friend.picture}}' {% else %} "http://placehold.it/50x50" {% endif%} class="friend-profile-icon img-circle img-responsive img-center pull-left list-group-item-text" alt="Profile Image"/>
+    <span>
+    <h4 class="list-group-item-heading">{{friend}}</h4>
+    <p class="list-group-item-text">{{friend.host}}</p>
+</span>
+    </a>
+    {% endfor %}
+    {% if friends|length > 3 %}
+    <a class="list-group-item" href='#'>See More Friends ...</a>
+    {% elif friends|length == 0 %}
+    <label class="list-group-item" href='#'>No Friends</label>
+    {% endif %}
+</div>
 {% endblock %}

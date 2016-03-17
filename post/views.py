@@ -215,13 +215,37 @@ def user_profile(request, username):
         profile_owner = Author.objects.get(user=user)
         author = Author.objects.get(user=request.user)
         posts = Post.objects.filter(author=profile_owner, visibility='PUBLIC').order_by('-published')
-
         form = PostForm()
+        r1List = Friending.objects.filter(author=profile_owner).select_related()
+        r2List = Friending.objects.filter(friend=profile_owner).select_related()
+        aList = []
+        bList = []
+        for relationship in r1List:
+            aList.append(relationship.friend)
+        for relationship in r2List:
+            bList.append(relationship.author)
+
+        friends = list(set(aList) & set(bList))
+
+        # show follow or unfollow button according to the relationship between
+        # logged author and profile's owner
+        followList = []
+        followRelationships = Friending.objects.filter(author=author)
+        for relationship in followRelationships:
+            followList.append(relationship.friend)
+
+        # follower_list
+        # display profile owner 's follower'
+        followers = []
+        followersRelationships = Friending.objects.filter(author=profile_owner)
+        for relationship in followersRelationships:
+            followers.append(relationship.friend)
+
         return render(request, "user_profile.html",
-                      {'posts': posts, 'form': form, 'user_account': user, 'profile_owner': profile_owner, 'author': author})
+                      {'posts': posts, 'form': form, 'user_account': user, 'profile_owner': profile_owner, 'author': author, 'followList': followList, 'followers': followers, 'friends': friends})
+        
         # user_account is profile's owner
         # author is the one who logged into the system 
-
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 

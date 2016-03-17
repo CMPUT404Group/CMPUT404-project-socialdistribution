@@ -7,27 +7,24 @@
 document.getElementById("manager").setAttribute("class", "active");
 </script>
 
-<h1> Friend Requests / People Who Followed Me </h1>
-
-{% for noti in notis %}
-
-    <!-- Display post's author's profile image -->
-    <a href="{% url 'user_profile' noti.follower.user.username %}">
-    <img id="id-user-profile-image"
+<!-- to do: currently display all my followers
+should display ones who are following me but not my friends-->
+<div id=requests class="panel panel-primary"> 
+      <div class="panel-heading">Friend Requests / People Who Followed Me</div>
+      <div class="panel-body">
+        {% for noti in notis %}
+        <a href="{% url 'user_profile' noti.follower.user.username %}">
+        <img id="id-user-profile-image"
          class="profile-photo img-circle img-responsive img-center pull-left create-post"
-         data-popover="true" data-html=true data-toggle="popover" title="{{ noti.follower.user.username}}"
-         data-content=""
+         data-toggle="tooltip" title="{{ noti.follower.user.username}}"
          alt="Profile Image"
-
-{% if noti.follower.picture %}
-         src="/media/{{ noti.follower.picture }}"/>
-         </a>
-{% else %}
-         src="http://placehold.it/175x175"/>
-         </a>
-{% endif %}
-
-
-{% endfor %}
+        {% if noti.follower.picture %}
+         src="/media/{{ noti.follower.picture }}"/></a>
+        {% else %}
+         src="http://placehold.it/175x175"/></a>
+        {% endif %}
+        {% endfor %}
+        </div>
+</div>
 
 {% endblock %}

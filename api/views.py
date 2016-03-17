@@ -26,7 +26,6 @@ def api_root(request, format=None):
         'posts': reverse('post-list', request=request, format=format),
         'author': reverse('author-list', request=request, format=format),
         'images': reverse('images', request=request, format=format),
-        'befriend': reverse('befriend', request=request, format=format),
         'friendrequest': reverse('friendrequest', request=request, format=format),
     })
 
@@ -104,7 +103,7 @@ def getAllFriends(author_id):
     aList = Friending.objects.filter(author__id=author_id).values('friend__id')
     for i in aList:
         # if both people are following eachother (so two-way friendship)
-        if author_id in Friending.objects.filter(author__id= i["friend__id"]).values('friend__id'):
+        if Friending.objects.filter(author__id=i["friend__id"], friend__id=author_id) != []:
             friendsList.append(i["friend__id"])
     return friendsList
 
@@ -635,13 +634,22 @@ class AuthorDetail(generics.GenericAPIView):
                 else:
                    return Response(status=status.HTTP_403_FORBIDDEN)
 
-            # Haven't tested this part below yet
+
+
+            # NOT WORKING YET STILL DREADED KEYERROR
+
+
             else:   
                 if author_pk != None:
                     author = get_object_or_404(Author, pk=author_pk)
                     # only allow author of the post to modify it
                     if request.user == author.user:
-                        serializer = AuthorSerializer(author, data=request.data)
+                        try:
+                            author.github = request.data("github_name", "something")
+                            author.save()
+                            serializer = AuthorSerializer(author)
+                        except KeyError:
+                            print("what tyhe fuck?")
                     # if logged in user is not author of the post
                     else:
                         return Response(status=status.HTTP_403_FORBIDDEN)
