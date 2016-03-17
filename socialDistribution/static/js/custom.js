@@ -328,15 +328,9 @@ window.onload = function() {
     }
   }
 
-};
-
-
 // use bootstrap tooltip to display the small pop-up box
   $(document).ready(function(){
       $('[data-toggle="tooltip"]').tooltip(); 
   });
 
-
-
 };
-
