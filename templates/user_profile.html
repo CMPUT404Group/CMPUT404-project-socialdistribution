@@ -51,7 +51,7 @@
 </div>
 
 <!-- Display profile owner's follower list --> 
-<div id=authors class="panel panel-primary"> 
+<div id=followers class="panel panel-primary"> 
       <div class="panel-heading">Follower </div>
       <div class="panel-body">
         {% for follower in followers %}
@@ -73,6 +73,11 @@
 {% if user_account == user %}
 {% include "post/createPost.html" with icon=False %}
 {% endif %}
+
+
+<div id=posts class="panel panel-default"> 
+    <div class="panel-heading">Posts</div>
+          <div class="panel-body">
 
 {% for post in posts %}
 <div class="row post">
@@ -116,6 +121,8 @@
     {% endif %}
 </div>
 {% endfor %}
+    </div>
+</div>
 
 {% include "post/editProfileFieldModal.html" %}
 {% include "post/uploadProfileImageModal.html" %}
