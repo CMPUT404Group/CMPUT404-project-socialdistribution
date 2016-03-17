@@ -210,15 +210,15 @@ window.onload = function() {
 
   $("#editGithubForm").submit(function(event) {
     event.preventDefault();
-    var formData = new FormData($("#editGithubForm")[0]);
-    formData.append("host", "");
+    var formData = document.getElementById('id_github').value;
     var authorID = $("#editGithubForm").data("author-id");
+    var Data = JSON.stringify({"author":  { "id": authorID ,"github_name": "http://github.com/"+formData}});
     $.ajax({
       url: 'http://' + window.location.host + '/api/author/' + authorID + '/',
       type: "POST",
-      data: formData,
-      contentType: false,
-      processData: false,
+      data: Data,
+      contentType: 'application/json; charset=utf-8',
+      dataType: 'json',
       beforeSend: function(xhr, settings) {
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
       },
@@ -260,6 +260,8 @@ window.onload = function() {
         toastr.info("Followed!");
         $("button#follow-btn-"+author_id).text("Followed");
         $("button#follow-btn-"+author_id).removeClass("follow-btn");
+        $("button#follow-btn-"+author_id).removeClass("btn-success");
+        $("button#follow-btn-"+author_id).addClass("btn-info");
       },
       error: function(xhr, ajaxOptions, error) {
         console.log(xhr.status);
@@ -271,5 +273,13 @@ window.onload = function() {
 
   // on manager's page, click author's profile pic, shows author's firiends
   // $("img.")
+
+
+// use bootstrap tooltip to display the small pop-up box
+  $(document).ready(function(){
+      $('[data-toggle="tooltip"]').tooltip(); 
+  });
+
+
 
 };

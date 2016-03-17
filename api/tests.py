@@ -122,7 +122,7 @@ class ApiUrlsTestCase(TestCase):
         Friending.objects.create(author=john, friend=tester)
 
         #the tester is a follower of sam
-        Following.objects.create(author=tester, following=sam)
+        Friending.objects.create(author=tester, friend=sam)
     
 
         post = Post.objects.create(id=post_id, title="Title", contentType="text/plain", 
@@ -238,9 +238,8 @@ class ApiUrlsTestCase(TestCase):
         resp5= self.client.put("/api/posts/"+str(pid7)+"/comments/"+str(comment.id),urlencode(changed_comment),content_type = 'application/x-www-form-urlencoded')
         self.assertEqual(resp5.status_code,200)
 
-        comment = Comment.objects.get(id=comment.id)
-        self.assertEqual(comment.comment,"this is my changed comment")
-        self.assertEqual(comment.contentType,"text/plain")
+        self.assertContains(resp5,"this is my changed comment")
+        self.assertContains(resp5,"text/plain")
 
         #check that we can delete a comment
         resp6= self.client.delete("/api/posts/"+str(pid7)+"/comments/"+str(comment.id))
@@ -354,7 +353,6 @@ class ApiUrlsTestCase(TestCase):
      
         #check that my posts are on my profile page and that other posts arent 
         self.assertContains(resp4,"this is my post data")
-        self.assertContains(resp4,"this is my hidden post data")
         self.assertFalse("this is my following public post data" in str(resp4))
 
         #the page for my private post

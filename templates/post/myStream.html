@@ -16,8 +16,7 @@ document.getElementById("my_stream").setAttribute("class", "active");
     <!-- Display post's author's profile image -->
     <img id="id-user-profile-image"
          class="profile-photo-icon img-circle img-responsive img-center pull-left"
-         data-popover="true" data-html=true data-toggle="popover" title="{{ post.author }}"
-         data-content=""
+         data-toggle="tooltip" title="{{ post.author }}"
          alt="Profile Image"
         {% if post.author.picture %}
          src="/media/{{ post.author.picture }}"/>
@@ -26,7 +25,7 @@ document.getElementById("my_stream").setAttribute("class", "active");
         {% endif %}
 
     {% if  loggedInAuthor.id != post.author.id %}    
-    <button  id='follow-btn-{{post.author.id}}' class="follow-btn btn-sm btn-success pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;">Unfollow</button>
+    <button  id='unfollow-btn-{{post.author.id}}' class="unfollow-btn btn-sm btn-warning pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;">Unfollow</button>
     {% endif %}   
 
     <div class="panel panel-primary media-body">
