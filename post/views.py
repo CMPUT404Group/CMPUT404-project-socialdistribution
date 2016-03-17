@@ -284,7 +284,7 @@ def isAllowed(user,pk):
     elif privacy == "OTHERAUTHOR":
         user = User.objects.get(username=post.other_author)
         other_author = Author.objects.get(user=user)
-        if other_author.id == author_id:
+        if other_author.id == viewer.id:
             return True
         else:
             return False
