@@ -225,10 +225,25 @@ def user_profile(request, username):
         profile_owner = Author.objects.get(user=user)
         author = Author.objects.get(user=request.user)
         posts = Post.objects.filter(author=profile_owner, visibility='PUBLIC').order_by('-published')
-
         form = PostForm()
+        r1List = Friending.objects.filter(author=profile_owner).select_related()
+        r2List = Friending.objects.filter(friend=profile_owner).select_related()
+        aList = []
+        bList = []
+        for relationship in r1List:
+            aList.append(relationship.friend)
+        for relationship in r2List:
+            bList.append(relationship.author)
+
+        friends = list(set(aList) & set(bList))
+        print friends
+        for i in friends:
+            print i
+            print i.picture
+            print i.github_name
+            print i.host
         return render(request, "user_profile.html",
-                      {'posts': posts, 'form': form, 'user_account': user, 'profile_owner': profile_owner, 'author': author})
+                      {'posts': posts, 'form': form, 'user_account': user, 'profile_owner': profile_owner, 'author': author, 'friends': friends})
         # user_account is profile's owner
         # author is the one who logged into the system 
 

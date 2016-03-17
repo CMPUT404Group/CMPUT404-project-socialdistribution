@@ -46,12 +46,13 @@
 
 </div>
 
- 
+<div class="main-body" style="position: relative; float: left; width: 75%;">
 
 <!-- If this is the logged in user's profile page, show a create post component -->
 {% if user_account == user %}
 {% include "post/createPost.html" with icon=False %}
 {% endif %}
+
 
 {% for post in posts %}
 <div class="row post">
@@ -101,4 +102,19 @@
 
 {% include "post/editProfileFieldModal.html" %}
 {% include "post/uploadProfileImageModal.html" %}
+</div>
+
+<!-- <div class="sidebar" style="position: relative; float:left; width: 25%; padding-left: 1.5em;"> -->
+<div class="list-group sidebar" style="position: relative; float:right; width: 25%; padding-left: 1.5em;">
+    <h4 class="list-group-item list-group-item-info">Friends</h4>
+    {% for friend in friends %}
+     <a class="list-group-item" style="height: 75px;" href="{% url 'user_profile' friend.user.username %}">
+    <img src={% if friend.picture %} '/media/{{friend.picture}}' {% else %} "http://placehold.it/50x50" {% endif%} class="friend-profile-icon img-circle img-responsive img-center pull-left list-group-item-text" alt="Profile Image"/>
+    <span>
+    <h4 class="list-group-item-heading">{{friend}}</h4>
+    <p class="list-group-item-text">{{friend.github_name}}</p>
+</span>
+    </a>
+    {% endfor %}
+</div>
 {% endblock %}
