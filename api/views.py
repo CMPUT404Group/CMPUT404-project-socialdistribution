@@ -18,6 +18,7 @@ from itertools import chain
 from django.conf import settings
 from rest_framework.reverse import reverse
 from post.models import Notification
+import json
 
 # Create your views here.
 @api_view(('GET',))
@@ -105,7 +106,8 @@ def getAllFriends(author_id):
     aList = Friending.objects.filter(author__id=author_id).values('friend__id')
     for i in aList:
         # if both people are following eachother (so two-way friendship)
-        if Friending.objects.filter(author__id=i["friend__id"], friend__id=author_id) != []:
+        blist = Friending.objects.filter(author__id=i["friend__id"], friend__id=author_id)
+        if len(blist) > 0:
             friendsList.append(i["friend__id"])
     return friendsList
 
@@ -609,9 +611,11 @@ class AuthorDetail(generics.GenericAPIView):
             friendsList = []
             # return json object so we must extract the friend
             aList = Friending.objects.filter(author=author).select_related('friend')
-            friendsList = []
-            for i in aList:
-                friendsList.append(i.friend)
+            # friendsList = getAllFriends(author.id)
+            for object in aList:
+                # backwards check
+                if len(Friending.objects.filter(author=object.author, friend=author)) > 0:
+                    friendsList.append(i.friend)
             serializer = AuthorSerializer(friendsList, many=True)
             responseData["friends"] = serializer.data
 
@@ -647,7 +651,7 @@ class AuthorDetail(generics.GenericAPIView):
                     # only allow author of the post to modify it
                     if request.user == author.user:
                         try:
-                            author.github = request.data("github_name", "something")
+                            author.github = request.data["github_name"]
                             author.save()
                             serializer = AuthorSerializer(author)
                         except KeyError:
@@ -692,7 +696,7 @@ class FriendingCheck(generics.GenericAPIView):
                 aList = Friending.objects.filter(author__id=author_id1, friend__id=author_id2)
                 bList = Friending.objects.filter(author__id=author_id2, friend__id=author_id1)
                 result = list(chain(aList, bList))
-                if (aList != [] and bList != []):
+                if len(result) > 1:
                     friends = True
                 else:
                     friends = False
