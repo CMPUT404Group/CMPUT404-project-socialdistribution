@@ -6,38 +6,30 @@
 document.getElementById("manager").setAttribute("class", "active");
 </script>
 
-<h1> manager's page </h1>
-
-<div>
-<h3>
-    <a href="/admin">Admin Site</a>
-  </h3>
+<div id=authors class="panel panel-primary"> 
+      <div class="panel-heading">Django Admin Site </div>
+      <div class="panel-body">
+            <a href="/admin">Admin Site</a>
+      </div>
 </div>
 
-<div id=authors class="row profile-header"> 
-<h3>Authors on this host: </h3>
-{% for author in authors %}
-    <!-- Display post's author's profile image -->
-    <img id="user-profile-image-{{author.id}}"
+<div id=authors class="panel panel-primary"> 
+      <div class="panel-heading">Authors on this host: </div>
+      <div class="panel-body">
+        {% for author in authors %}
+        <!-- Display post's author's profile image -->
+        <a href="{% url 'user_profile' author.user.username %}">
+        <img id="user-profile-image-{{author.id}}"
          class="manage profile-photo img-circle img-responsive img-center pull-left create-post"
          data-toggle="tooltip" title="{{ author }}"
          alt="Profile Image"
-    {% if author.picture %}
-         src="/media/{{ author.picture }}"/>
-    {% else %}
-          src="http://placehold.it/175x175"/>
-    {% endif %}
-{% endfor %}
-</div>
-
-<h3>Author's Friends</h3>
-<div id='author_friend'>
-
-</div>
-
-<h3>Posts of Author's Friend</h3>
-<div id='author_friend_posts' class="row post">
-
+        {% if author.picture %}
+         src="/media/{{ author.picture }}"/></a>
+         {% else %}
+          src="http://placehold.it/175x175"/></a>
+         {% endif %}
+        {% endfor %}
+        </div>
 </div>
 
 {% endblock %}

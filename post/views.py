@@ -224,8 +224,15 @@ def user_profile(request, username):
         for relationship in followRelationships:
             followList.append(relationship.friend)
 
+        # follower_list
+        # display profile owner 's follower'
+        followers = []
+        followersRelationships = Friending.objects.filter(author=profile_owner)
+        for relationship in followersRelationships:
+            followers.append(relationship.friend)
+
         return render(request, "user_profile.html",
-                      {'posts': posts, 'form': form, 'user_account': user, 'profile_owner': profile_owner, 'author': author, 'followList': followList})
+                      {'posts': posts, 'form': form, 'user_account': user, 'profile_owner': profile_owner, 'author': author, 'followList': followList, 'followers': followers})
         # user_account is profile's owner
         # author is the one who logged into the system 
 

@@ -50,7 +50,24 @@
 
 </div>
 
- 
+<!-- Display profile owner's follower list --> 
+<div id=authors class="panel panel-primary"> 
+      <div class="panel-heading">Follower </div>
+      <div class="panel-body">
+        {% for follower in followers %}
+        <a href="{% url 'user_profile' follower.user.username %}">
+        <img id="user-profile-image-{{follower.id}}"
+         class="profile-photo-icon img-circle img-responsive img-center pull-left create-post"
+         data-toggle="tooltip" title="{{ follower }}"
+         alt="Profile Image"
+        {% if author.picture %}
+         src="/media/{{ follower.picture }}"/></a>
+         {% else %}
+          src="http://placehold.it/175x175"/></a>
+         {% endif %}
+        {% endfor %}
+        </div>
+</div>
 
 <!-- If this is the logged in user's profile page, show a create post component -->
 {% if user_account == user %}
