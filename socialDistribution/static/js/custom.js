@@ -146,20 +146,15 @@ window.onload = function() {
     event.preventDefault();
     var formData = new FormData($("#uploadImageForm")[0]);
     $.ajax({
-      url: 'http://' + window.location.host + '/api/images/',
-      type: "POST",
-      data: formData,
-      contentType: false,
-      processData: false,
       beforeSend: function(xhr, settings) {
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
       },
       success: function(response) {
         console.log(response);
         // close modal
-        $("button#closeUploadImageModal").click();
+        $("button#closeChooseAuthorModal").click();
         // clear upload image form
-        $("form#uploadImageForm").trigger("reset");
+        $("form#chooseAuthorForm").trigger("reset");
         // append "Image Attached" element
         $("#uploadImageTrigger").after('<span class="label label-primary imageAttachedIcon">Image Attached!</span>');
         // disable add image button in create post form
@@ -282,5 +277,52 @@ window.onload = function() {
       $("#chooseAuthorModal").modal('show');
     }
   });
+
+  //after the author is typd in, check if it is an actual username
+  $("#submitChooseAuthor").click(function(event){
+    event.preventDefault();
+    var username = $("#friend_username").val();
+    if (username === "") {
+      $("button#closeChooseAuthorModal").click();
+    } else {
+      checkUserName(username);
+    }
+  });
+
+  //if nothing is entered. reset the radio button
+  $(".reset_radio").click(function(e) {
+      var username = $("#friend_username").val();
+      if (username === "") {
+        $('#id_visibility_5').prop('checked', false);
+        $('#id_visibility_2').prop('checked', true);
+        toastr.info("No Friend Added! Resetting Privacy settings.");
+      }
+  });
+
+  //send an ajax request to see if that userpae exists
+  function checkUserName(username){
+    $.ajax({
+      url: "/author/"+username+"/",
+      complete: function(e,xhr,settings){
+        if(e.status === 200) {
+          callback(true, username);
+        } else if (e.status === 404) {
+          callback(false, username);
+        }
+      }
+    });
+  }
+
+  //respond correctly if it is an actual user or not
+  function callback(result,username){
+    if (result) {
+      $("#author_added").html("For Author: "+ username);
+      $("input#other_author").val(username);
+      toastr.info("Friend Added!");
+      $("button#closeChooseAuthorModal").click();
+    } else {
+      alert("That is not a valid username. Try again");
+    }
+  }
 
 };
