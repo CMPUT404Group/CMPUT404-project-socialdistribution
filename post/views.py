@@ -215,10 +215,17 @@ def user_profile(request, username):
         profile_owner = Author.objects.get(user=user)
         author = Author.objects.get(user=request.user)
         posts = Post.objects.filter(author=profile_owner, visibility='PUBLIC').order_by('-published')
-
         form = PostForm()
+
+        # show follow or unfollow button according to the relationship between
+        # logged author and profile's owner
+        followList = []
+        followRelationships = Friending.objects.filter(author=author)
+        for relationship in followRelationships:
+            followList.append(relationship.friend)
+
         return render(request, "user_profile.html",
-                      {'posts': posts, 'form': form, 'user_account': user, 'profile_owner': profile_owner, 'author': author})
+                      {'posts': posts, 'form': form, 'user_account': user, 'profile_owner': profile_owner, 'author': author, 'followList': followList})
         # user_account is profile's owner
         # author is the one who logged into the system 
 
