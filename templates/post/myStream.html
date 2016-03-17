@@ -26,7 +26,7 @@ document.getElementById("my_stream").setAttribute("class", "active");
         {% endif %}
 
     {% if  loggedInAuthor.id != post.author.id %}    
-    <button  id='follow-btn-{{post.author.id}}' class="follow-btn btn-sm btn-success pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;">Unfollow</button>
+    <button  id='follow-btn-{{post.author.id}}' class="unfollow-btn btn-sm btn-danger pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;">Unfollow</button>
     {% endif %}   
 
     <div class="panel panel-primary media-body">

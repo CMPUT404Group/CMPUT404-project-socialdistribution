@@ -260,6 +260,8 @@ window.onload = function() {
         toastr.info("Followed!");
         $("button#follow-btn-"+author_id).text("Followed");
         $("button#follow-btn-"+author_id).removeClass("follow-btn");
+        $("button#follow-btn-"+author_id).removeClass("btn-success");
+        $("button#follow-btn-"+author_id).addClass("btn-info");
       },
       error: function(xhr, ajaxOptions, error) {
         console.log(xhr.status);
