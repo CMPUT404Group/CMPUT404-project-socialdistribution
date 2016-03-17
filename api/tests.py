@@ -36,18 +36,6 @@ class ApiPostModelTestCase(TestCase):
         Comment.objects.create(id=c_id, post=post, author=author1, contentType="text/plain",
         					comment="this is my comment", published=date)
 
-    # we only use friending model
-    # #check that two authors can follow each other
-    # def test_following(self):
-    #     user = User.objects.create(username="rob")
-    #     user1 = User.objects.create(username="tammy")
-    #     author1 = Author.objects.create(user=user1, github_name="tammy")
-    #     author = Author.objects.create(user=user, github_name="rob")
-    #     Following.objects.create(author=author, following=author1)
-    #     following = Following.objects.get(author=author)
-    #     self.assertEqual(following.author,author)
-    #     self.assertEqual(following.following,author1)
-
     #check that two authors can friend each other
     def test_friending(self):
         user = User.objects.create(username="cam")

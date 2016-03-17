@@ -785,6 +785,3 @@ class BeFriend(generics.GenericAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
     # else:
     #    return Response(status=status.HTTP_401_UNAUTHORIZED)
-
-
-
