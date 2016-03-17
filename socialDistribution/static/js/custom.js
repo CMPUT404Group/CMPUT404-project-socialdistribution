@@ -210,15 +210,15 @@ window.onload = function() {
 
   $("#editGithubForm").submit(function(event) {
     event.preventDefault();
-    var formData = new FormData($("#editGithubForm")[0]);
-    formData.append("host", "");
+    var formData = document.getElementById('id_github').value;
     var authorID = $("#editGithubForm").data("author-id");
+    var Data = JSON.stringify({"author":  { "id": authorID ,"github_name": "http://github.com/"+formData}});
     $.ajax({
       url: 'http://' + window.location.host + '/api/author/' + authorID + '/',
       type: "POST",
-      data: formData,
-      contentType: false,
-      processData: false,
+      data: Data,
+      contentType: 'application/json; charset=utf-8',
+      dataType: 'json',
       beforeSend: function(xhr, settings) {
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
       },
