@@ -320,6 +320,7 @@ window.onload = function() {
       $("input#other_author").val(username);
       toastr.info("Friend Added!");
       $("button#closeChooseAuthorModal").click();
+      $("input#friend_username").val("");
     } else {
       alert("That is not a valid username. Try again");
     }

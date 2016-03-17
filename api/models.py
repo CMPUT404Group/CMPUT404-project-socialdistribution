@@ -56,7 +56,7 @@ class Post(models.Model):
     visibility = models.CharField(max_length=18, choices=VISIBILITY_SETTING_CHOICES, default=FRIENDS)
     # comments = models.ForeignKey('api.Comment', related_name='post')
     image_url = models.CharField(max_length=200, blank=True, null=True)
-    other_author = models.ForeignKey('Author',related_name="Share_with_user",blank=True,null=True)
+    other_author = models.CharField(max_length=30,blank=True,null=True)
 
 
 class Comment(models.Model):

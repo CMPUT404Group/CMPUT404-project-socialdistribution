@@ -193,7 +193,7 @@ def user_profile(request, username):
             user = User.objects.get(username=username)
         except User.DoesNotExist as e:
             # return render(request, "user_profile.html", {'posts': None, 'form': None, 'user_account': None})
-            return render(request, "404_page.html", {'message': "User does not exist."})
+            return render(request, "404_page.html", {'message': "User does not exist."},status=404)
 
         # Delegates create post form submission
         if request.method == "POST":
