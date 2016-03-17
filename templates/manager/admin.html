@@ -20,8 +20,7 @@ document.getElementById("manager").setAttribute("class", "active");
     <!-- Display post's author's profile image -->
     <img id="user-profile-image-{{author.id}}"
          class="manage profile-photo img-circle img-responsive img-center pull-left create-post"
-         data-popover="true" data-html=true data-toggle="popover" title="{{ author }}"
-         data-content=""
+         data-toggle="tooltip" title="{{ author }}"
          alt="Profile Image"
     {% if author.picture %}
          src="/media/{{ author.picture }}"/>

@@ -274,4 +274,12 @@ window.onload = function() {
   // on manager's page, click author's profile pic, shows author's firiends
   // $("img.")
 
+
+// use bootstrap tooltip to display the small pop-up box
+  $(document).ready(function(){
+      $('[data-toggle="tooltip"]').tooltip(); 
+  });
+
+
+
 };

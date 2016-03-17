@@ -15,8 +15,7 @@ document.getElementById("manager").setAttribute("class", "active");
     <a href="{% url 'user_profile' noti.follower.user.username %}">
     <img id="id-user-profile-image"
          class="profile-photo img-circle img-responsive img-center pull-left create-post"
-         data-popover="true" data-html=true data-toggle="popover" title="{{ noti.follower.user.username}}"
-         data-content=""
+         data-toggle="tooltip" title="{{ noti.follower.user.username}}"
          alt="Profile Image"
 
 {% if noti.follower.picture %}

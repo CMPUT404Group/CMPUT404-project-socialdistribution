@@ -20,7 +20,7 @@
             {% if profile_owner not in followList %}
             <button id='follow-btn-{{profile_owner.id}}'  class="follow-btn btn btn-success pull-right" style="position: relative; top: 1.5em; right: 1.5em;">Follow</button>
             {% else %}
-            <button id='unfollow-btn-{{profile_owner.id}}'  class="unfollow-btn btn btn-danger pull-right" style="position: relative; top: 1.5em; right: 1.5em;">Unfollow</button>
+            <button id='unfollow-btn-{{profile_owner.id}}'  class="unfollow-btn btn btn-warning pull-right" style="position: relative; top: 1.5em; right: 1.5em;">Unfollow</button>
             {% endif %}
         {% endif %}
         <!-- Display required user info on profile page -->
