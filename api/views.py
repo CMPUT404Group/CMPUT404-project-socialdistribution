@@ -316,7 +316,6 @@ class CommentList(generics.GenericAPIView):
         # ensure user is authenticated
         if (request.user.is_authenticated()):
 
-            # -- TODO : Only authorize user who can view the corresponding post to comment
             author_id = Author.objects.get(user=request.user).id
             if(isAllowed(post_pk, author_id)):
                 serializer = CommentSerializer(data=request.data)
@@ -629,7 +628,8 @@ class AuthorDetail(generics.GenericAPIView):
         if (request.user.is_authenticated()):
 
             # update profile picture only
-            if (request.data["github_name"] == "" and request.data['host'] == "" and request.data["picture"] != ""):
+            if (request.data["github_name"] == "" and 
+                request.data['host'] == "" and request.data["picture"] != ""):
                 author = get_object_or_404(Author, pk=author_pk)
                 if request.user == author.user:
                     author.picture = request.data["picture"]
@@ -650,7 +650,7 @@ class AuthorDetail(generics.GenericAPIView):
                     # only allow author of the post to modify it
                     if request.user == author.user:
                         try:
-                            author.github = request.data["github_name"]
+                            author.github_name = request.data["github_name"]
                             author.save()
                             serializer = AuthorSerializer(author)
                         except KeyError:
@@ -661,13 +661,14 @@ class AuthorDetail(generics.GenericAPIView):
                 else:
                     serializer = AuthorSerializer(data=request.data)
 
-                if serializer.is_valid():
-                    print "DEBUG : API - views.py - AuthorDetail"
-                    # serializer.save()
-                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                    if serializer.is_valid():
+                        print "DEBUG : API - views.py - AuthorDetail"
+                        # serializer.save()
+                        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-                else:
-                    Response(status=status.HTTP_400_BAD_REQUEST)
+                    else:
+                        Response(status=status.HTTP_400_BAD_REQUEST)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)

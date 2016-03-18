@@ -207,7 +207,7 @@ window.onload = function() {
     event.preventDefault();
     var formData = document.getElementById('id_github').value;
     var authorID = $("#editGithubForm").data("author-id");
-    var Data = JSON.stringify({"author":  { "id": authorID ,"github_name": "http://github.com/"+formData}});
+    var Data = JSON.stringify({ "id": authorID ,"github_name": "http://github.com/"+formData});
     $.ajax({
       url: 'http://' + window.location.host + '/api/author/' + authorID + '/',
       type: "POST",
@@ -219,11 +219,12 @@ window.onload = function() {
       },
       success: function(response) {
         // close modal
-        $("button#closeeditGithubForm").click();
+        $("button#closeeditGithubModal").click();
         // clear editgithub form
         $("form#editGithubForm").trigger("reset");
         // change wuthor github
-        $("p#id-github").html("github: http://github.com/" + response.github_name);
+        $("#id-github").empty();
+        $("#id-github").html("github: " + response.github_name);
         toastr.info("Github Updated!");
       },
       error: function(xhr, ajaxOptions, error) {
