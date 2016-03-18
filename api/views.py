@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from api.models import Post, Comment, Upload, Image, Friending, Author
+from api.models import Post, Comment, Image, Friending, Author
 from api.serializers import PostSerializer, CommentSerializer, ImageSerializer, AuthorSerializer, FriendingSerializer
 from api.serializers import UserSerializer
 from rest_framework.decorators import api_view
@@ -478,13 +478,10 @@ class AuthorList(generics.GenericAPIView):
 
 class AuthorTimeline(generics.GenericAPIView):
     '''
-    Lists all Images / Posts a new image
+    Lists all Posts an author has made
 
-    GET : http://service/api/images/
-        * Returns a list of all images on the server (not including profile pictures) - most recent to least recent order
-
-    POST : http://service/api/images/
-        * Creates a new image
+    GET : http://service/api/author/<author_id>/posts
+        * Returns a list of all posts on the server made by author specified by <author_id> - most recent to least recent order
 
     '''
     pagination_class = ListPaginator
@@ -759,29 +756,3 @@ class FriendRequest(generics.GenericAPIView):
     # else:
     #    return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-
-class BeFriend(generics.GenericAPIView):
-    serializer_class = FriendingSerializer
-    queryset = Friending.objects.all()
-
-    def post(self, request, format=None):
-    # if (request.user.is_authenticated()):
-        if request.data is not None:
-            authorid = request.data["author"]["id"]
-            friendid = request.data["friend"]["id"] 
-        
-#       author1 = Author.objects.get(id=authorid)
-#       follow1 = Author.objects.get(id=friendid)
-#       try:
-#           Author.objects.get(id=author1)
-#           Author.objects.get(id=friend1)
-#       except:
-#           return Response(status=status.HTTP_400_BAD_REQUEST)
-        serializer = FriendingSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.validated_data["author"] = Author.objects.get(id=authorid)
-            serializer.validated_data["friend"] = Author.objects.get(id=friendid)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-    # else:
-    #    return Response(status=status.HTTP_401_UNAUTHORIZED)

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.template import RequestContext
 from django.utils import timezone
-from api.models import Post, Author, Comment, Friending
+from api.models import Post, Author, Upload, Comment, Friending
 from .forms import UploadFileForm, PostForm, CommentForm
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.core.urlresolvers import reverse
@@ -254,15 +254,17 @@ def user_profile(request, username):
 
 
 # for image uploads to save
-def file(request):
-    if request.method == "POST":
-        img = UploadFileForm(request.POST, request.FILES)
-        if img.is_valid():
-            img.save()
-            return HttpResponseRedirect(reverse('imageupload'))
-    else:
-        img = UploadFileForm()
-    return render(request, 'file.html', {'form': img})
+
+def file(request):                                              
+    if request.method == "POST":                                
+        img = UploadFileForm(request.POST, request.FILES)       
+        if img.is_valid():                                     
+            img.save()                                          
+            return HttpResponseRedirect(reverse('imageupload')) 
+    else:                                                       
+        img = UploadFileForm()                                  
+    return render(request, 'file.html', {'form': img})          
+
 
 
 '''
