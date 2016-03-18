@@ -214,7 +214,10 @@ def user_profile(request, username):
         # --- TODO : FILTER POSTS BY VISIBILITY TO LOGGED IN USER --- #
         profile_owner = Author.objects.get(user=user)
         author = Author.objects.get(user=request.user)
-        posts = Post.objects.filter(author=profile_owner, visibility='PUBLIC').order_by('-published')
+        if author.user.is_staff:
+            posts = Post.objects.filter(author=profile_owner,).order_by('-published')
+        else:
+            posts = Post.objects.filter(author=profile_owner, visibility='PUBLIC').order_by('-published')
         form = PostForm()
         r1List = Friending.objects.filter(author=profile_owner).select_related()
         r2List = Friending.objects.filter(friend=profile_owner).select_related()
