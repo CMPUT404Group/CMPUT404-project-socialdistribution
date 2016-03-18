@@ -20,6 +20,8 @@ pid6 = uuid.uuid4()
 pid7 = uuid.uuid4()
 pid8 = uuid.uuid4()
 pid9 = uuid.uuid4()
+pid10 = uuid.uuid4()
+pid11 = uuid.uuid4()
 
 # testing creating and getting posts
 class ApiPostModelTestCase(TestCase):
@@ -95,10 +97,12 @@ class ApiUrlsTestCase(TestCase):
         user.set_password('hello') 
         user.save()
 
-        sam = Author.objects.create(user=user2, github_name="sammy")
+        sam = Author.objects.create(user=user2, github_name="sammy", host="differenthost")
         bob = Author.objects.create(user=user1, github_name="bobby")
-        john = Author.objects.create(user=user3, github_name="johnny")
-        tester = Author.objects.create(user=user)
+        john = Author.objects.create(user=user3, github_name="johnny", host="same")
+        tester = Author.objects.create(user=user, host="same")
+
+        self.assertEqual(tester.host, john.host)
 
         #the tester has no relation to sam, is a FoaF with Bob, and is friends with john
         Friending.objects.create(author=sam, friend=bob)
@@ -155,6 +159,14 @@ class ApiUrlsTestCase(TestCase):
                             content="this is the message i didnt sent to tester",
                             author=john, published=date, visibility="OTHERAUTHOR",
                             other_author=bob)
+
+        post10 = Post.objects.create(id=pid10, title="Title8", contentType="text/plain", 
+                            content="this is a message for on our server",
+                            author=john, published=date, visibility="SERVER_ONLY")
+
+        post11 = Post.objects.create(id=pid11, title="Title8", contentType="text/plain", 
+                            content="this is a message for on MY server",
+                            author=sam, published=date, visibility="SERVER_ONLY")
 
         Comment.objects.create(id=c_id, post=post7, author=bob, contentType="text/plain",
                             comment="this is my comment", published=date)
@@ -303,6 +315,8 @@ class ApiUrlsTestCase(TestCase):
         resp12 = self.client.get("/author/bob/")
         resp13 = self.client.get("/post/"+str(pid8)+"/")
         resp14 = self.client.get("/post/"+str(pid9)+"/")
+        resp15 = self.client.get("/post/"+str(pid8)+"/")
+        resp16 = self.client.get("/post/"+str(pid9)+"/")
 
         u = User.objects.get(username="tester")
         user = Author.objects.get(user=u)
@@ -331,6 +345,10 @@ class ApiUrlsTestCase(TestCase):
         self.assertEqual(resp13.status_code, 200)
         #this should not be viewable since it was sent to someone else
         self.assertEqual(resp14.status_code, 403)
+        #this should be viewable since it is for our server
+        self.assertEqual(resp15.status_code, 200)
+        #this should not be viewable since it is for a different server
+        self.assertEqual(resp16.status_code, 403)
 
         #check that the content of the post and comment are viewable along 
         #with their authors from the page url ./post/<post id>
@@ -347,6 +365,7 @@ class ApiUrlsTestCase(TestCase):
         self.assertFalse("this is my FoaF friend post" in str(resp2))
         self.assertFalse("this is my FoaF foaf post" in str(resp2))
         self.assertFalse("this is the message i sent to tester" in str(resp2))
+        self.assertFalse("this is a message for on our server" in str(resp2))
 
         #check that both my posts are viewable from the myStream page   
         #check also that the posts from my friends and FOFs and the people i am 
@@ -357,6 +376,7 @@ class ApiUrlsTestCase(TestCase):
         self.assertContains(resp3,"this is my following public post data")
         self.assertFalse("this is my friends private post data" in str(resp3))
         self.assertContains(resp3, "this is the message i sent to tester")
+        self.assertContains(resp3,"this is a message for on our server")
      
         #check that my posts are on my profile page and that other posts arent 
         self.assertContains(resp4,"this is my post data")

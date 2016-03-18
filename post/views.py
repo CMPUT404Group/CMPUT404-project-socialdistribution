@@ -282,7 +282,7 @@ def isAllowed(user,pk):
     #if it is a public post allow everypne access
     elif privacy == "PUBLIC":
         return True
-    elif privacy == Post.SERVER_ONLY:
+    elif privacy == "SERVER_ONLY":
         if viewer.host == post.author.host:
             return True
         else:
