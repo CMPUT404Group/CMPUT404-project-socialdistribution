@@ -74,7 +74,7 @@
 
 <!-- If this is the logged in user's profile page, show a create post component -->
 {% if user_account == user %}
-{% include "post/createPost.html" with icon=False %}
+{% include "post/createPost.html" with icon=author.picture %}
 {% endif %}
 
 
