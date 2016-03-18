@@ -9,7 +9,7 @@ document.getElementById("public_stream").setAttribute("class", "active");
 
 <div id="logged-in-author" data="{{loggedInAuthor.id}}"></div>
 
-{% include "post/createPost.html" with icon=True %}
+{% include "post/createPost.html" with icon=loggedInAuthor.picture %}
 
 {% for post in posts %}
 <div class="row post">
