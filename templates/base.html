@@ -43,7 +43,10 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-plus"></i> <b class="caret"></b></a>
 
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bell"></i> <b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bell">
+                        <!-- <span class="badge">10</span> -->
+                        <span class="label label-default">New</span>
+                        </i> <b class="caret"></b></a>
                         <ul class="dropdown-menu message-dropdown">
                             <li class="message-preview">
                                 <a href="#">
@@ -66,7 +69,9 @@
                                 </a>
                             </li>
                             <li class="message-footer">
-                                <a href="{% url 'friendRequest' user.get_username%}">See All New Friend Requests</a>
+                                <a href="{% url 'friendRequest' user.get_username%}">See All New Friend Requests
+                                <span class="label label-default">New</span>
+                                </a>
                             </li>
                         </ul>
                     </li>
