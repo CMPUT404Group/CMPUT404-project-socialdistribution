@@ -54,8 +54,10 @@ def isAllowed(post_pk, author_id):
     elif privacy == Post.PUBLIC:
         return True
     elif privacy == Post.SERVER_ONLY:
-        #TODO
-        return True
+        if viewer.host == post.author.host:
+            return True
+        else:
+            return False
     #checks if another post is being shared with you
     elif privacy == Post.OTHERAUTHOR:
         user = User.objects.get(username=post.other_author)
