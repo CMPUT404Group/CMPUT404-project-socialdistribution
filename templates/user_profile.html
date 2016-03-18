@@ -9,7 +9,7 @@
 
     <!-- Display profile image -->
     {% if profile_owner.picture %}
-    <img id="id-user-profile-image" src="/media/{{ author.picture }}" class="profile-photo img-circle img-responsive img-center pull-left create-post" alt="Profile Image"/>
+    <img id="id-user-profile-image" src="/media/{{ profile_owner.picture }}" class="profile-photo img-circle img-responsive img-center pull-left create-post" alt="Profile Image"/>
     {% else %}
     <img id="id-user-profile-image" class="profile-photo img-circle img-responsive img-center pull-left create-post" src="http://placehold.it/175x175">
     {% endif %}
@@ -51,6 +51,8 @@
 </div>
 
 <div class="main-body" style="position: relative; float: left; width: 70%;">
+
+
 <!-- Display profile owner's follower list --> 
 <div id=followers class="panel panel-primary"> 
       <div class="panel-heading">Follower </div>
@@ -61,7 +63,7 @@
          class="profile-photo-icon img-circle img-responsive img-center pull-left create-post"
          data-toggle="tooltip" title="{{ follower }}"
          alt="Profile Image"
-        {% if author.picture %}
+        {% if follower.picture %}
          src="/media/{{ follower.picture }}"/></a>
          {% else %}
           src="http://placehold.it/175x175"/></a>
