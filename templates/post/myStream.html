@@ -8,7 +8,7 @@ document.getElementById("my_stream").setAttribute("class", "active");
 </script>
 
 
-{% include "post/createPost.html" with icon=True %}
+{% include "post/createPost.html" with icon=loggedInAuthor.picture %}
 
 {% for post in posts %}
 <div class="row post">
