@@ -152,9 +152,9 @@ window.onload = function() {
       success: function(response) {
         console.log(response);
         // close modal
-        $("button#closeChooseAuthorModal").click();
+        $("button#closeUploadImageModal").click();
         // clear upload image form
-        $("form#chooseAuthorForm").trigger("reset");
+        $("form#uploadImageForm").trigger("reset");
         // append "Image Attached" element
         $("#uploadImageTrigger").after('<span class="label label-primary imageAttachedIcon">Image Attached!</span>');
         // disable add image button in create post form
@@ -307,16 +307,16 @@ window.onload = function() {
       url: "/author/"+username+"/",
       complete: function(e,xhr,settings){
         if(e.status === 200) {
-          callback(true, username);
+          authorCallback(true, username);
         } else if (e.status === 404) {
-          callback(false, username);
+          authorCallback(false, username);
         }
       }
     });
   }
 
   //respond correctly if it is an actual user or not
-  function callback(result,username){
+  function authorCallback(result,username){
     if (result) {
       $("#author_added").html("For Author: "+ username);
       $("input#other_author").val(username);
@@ -332,5 +332,4 @@ window.onload = function() {
   $(document).ready(function(){
       $('[data-toggle="tooltip"]').tooltip(); 
   });
-
 };
