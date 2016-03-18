@@ -15,6 +15,8 @@ document.getElementById("public_stream").setAttribute("class", "active");
 <div class="row post">
 
     <!-- Display post's author's profile image -->
+    <div>
+    <a href="{% url 'user_profile' post.author.user.username %}">
     <img id="user-profile-image-{{ post.author.id }}"
          class="profile-photo-icon img-circle img-responsive img-center pull-left"
          data-toggle="tooltip" title="{{ post.author }}"
@@ -24,6 +26,7 @@ document.getElementById("public_stream").setAttribute("class", "active");
         {% else %}
          src="http://placehold.it/50x50"/>
         {% endif %}
+    </div>
         
     {% if  loggedInAuthor.id != post.author.id %}
         {% if post.author not in followList %}

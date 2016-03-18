@@ -14,6 +14,8 @@ document.getElementById("my_stream").setAttribute("class", "active");
 <div class="row post">
 
     <!-- Display post's author's profile image -->
+    <div>
+    <a href="{% url 'user_profile' post.author.user.username %}">
     <img id="id-user-profile-image"
          class="profile-photo-icon img-circle img-responsive img-center pull-left"
          data-toggle="tooltip" title="{{ post.author }}"
@@ -23,6 +25,7 @@ document.getElementById("my_stream").setAttribute("class", "active");
         {% else %}
          src="http://placehold.it/50x50"/>
         {% endif %}
+    </div>
 
     {% if  loggedInAuthor.id != post.author.id %}    
     <button  id='unfollow-btn-{{post.author.id}}' class="unfollow-btn btn-sm btn-warning pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;">Unfollow</button>
