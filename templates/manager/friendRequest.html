@@ -13,7 +13,7 @@ should display ones who are following me but not my friends-->
       <div class="panel-heading">Friend Requests / People Who Followed Me</div>
       <div class="panel-body">
         {% for noti in notis %}
-        <a href="{% url 'user_profile' noti.follower.user.username %}">
+        <a href="{% url 'user_profile' noti.follower.id %}">
         <img id="id-user-profile-image"
          class="profile-photo img-circle img-responsive img-center pull-left create-post"
          data-toggle="tooltip" title="{{ noti.follower.user.username}}"
