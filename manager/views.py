@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from api.models import Author
+from api.models import Author, Node
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from manager.forms import AuthorForm
@@ -146,7 +146,8 @@ def manager(request):
     if request.user.is_staff:
         loggedInAuthor = Author.objects.get(user=request.user)
         authors = Author.objects.all()
-        return render(request, 'manager/admin.html', {'authors': authors, 'loggedInAuthor': loggedInAuthor})# 
+        nodes = Node.objects.all()
+        return render(request, 'manager/admin.html', {'authors': authors, 'loggedInAuthor': loggedInAuthor, 'nodes': nodes})# 
 
 # display friend request notification 
 def friendRequest(request, username):

@@ -32,4 +32,19 @@ document.getElementById("manager").setAttribute("class", "active");
         </div>
 </div>
 
+
+<div>
+    <h4 class="list-group-item list-group-item-info">Nodes Allowed</h4>
+    <ul class="list-group">
+    {% for node in nodes %}
+     <li class="list-group-item" style="padding: 0.5em; padding-bottom: 1.5em;">
+    <img src={% if friend.picture %} '/media/{{friend.picture}}' {% else %} "http://placehold.it/50x50" {% endif%} class="friend-profile-icon img-circle img-responsive img-center pull-left list-group-item-text" alt="Profile Image"/></a>
+    <span>
+    <h4 class="list-group-item-heading">{{node.hostname}}</h4>
+    <p class="list-group-item-text" style="font-size: smaller;">{{node.url}}</p>
+    </span>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
 {% endblock %}
