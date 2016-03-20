@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User, Group
-from .models import Post, Comment, Upload, Author, Friending, Node
+from .models import Post, Comment, Author, Friending, Node
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from post.models import Notification
 

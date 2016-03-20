@@ -78,13 +78,6 @@ class Comment(models.Model):
     contentType = models.CharField(max_length=15, choices=CONTENT_TYPE_CHOICES, default=PLAINTEXT)
     published = models.DateTimeField(default=timezone.now)
 
-
-# for files like images (hopefully will work for posting images)
-class Upload(models.Model):
-    pic = models.ImageField("Image", upload_to="images/")
-    upload_date = models.DateTimeField(auto_now_add=True)
-
-
 class Image(models.Model):
     photo = models.ImageField("Image", upload_to="images/")
     upload_date = models.DateTimeField(auto_now_add=True)

@@ -18,7 +18,6 @@ urlpatterns = patterns('',
     url(r'^api/', include('api.urls')),
     url(r'', include('post.urls')),
     url(r'', include('manager.urls')),
-    url(r'^upload/$', 'post.views.file', name='imageupload'),
     # url(r'^register/$', 'manager.views.register', name='register'),  # ADD NEW PATTERN!
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     # see https://docs.djangoproject.com/en/dev/howto/static-files/#django.conf.urls.static.static for why this static part should be here for adding media files
