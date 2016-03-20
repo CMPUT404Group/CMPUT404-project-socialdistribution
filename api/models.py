@@ -16,14 +16,24 @@ CONTENT_TYPE_CHOICES = (
 # create Author model with a one-to-one association with the the `User` model
 class Author(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     github_name = models.CharField(max_length=40, blank=True)
     picture = models.ImageField(upload_to='profile_images/', blank=True)
     host = models.CharField(max_length=40, default="http://127.0.0.1:8080/")
+    displayname = models.CharField(max_length=40, default="defaultUsername")
 
     def __unicode__(self):
-        return self.user.username
+        # return self.user.username
+        return self.displayname
 
+class Node(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    hostname = models.CharField(max_length=40)
+    url = models.CharField(max_length=200)
+
+    def __unicode__(self):
+        return self.hostname
 
 class Post(models.Model):
     PUBLIC = 'PUBLIC'

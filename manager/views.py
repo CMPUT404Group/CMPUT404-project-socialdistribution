@@ -41,6 +41,7 @@ def register(request):
             # This delays saving the model until we're ready to avoid integrity problems.
             author = author_form.save(commit=False)
             author.user = user
+            author.host = "http://" + request.get_host() + "/"
 
             # Did the user provide a profile picture?
             # If so, we need to get it from the input form and put it in the UserProfile model.

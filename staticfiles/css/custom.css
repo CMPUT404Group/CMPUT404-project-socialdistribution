@@ -168,3 +168,9 @@ button.padding {
     color: black;
     font-weight: 900;
 }
+
+img.friend-profile-icon {
+    margin-right: 0.5em;
+    max-width: 50px;
+    max-height: 50px;
+}

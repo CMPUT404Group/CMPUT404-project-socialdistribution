@@ -6,19 +6,19 @@
 document.getElementById("manager").setAttribute("class", "active");
 </script>
 
-<div id=authors class="panel panel-primary"> 
+<div class="panel panel-primary"> 
       <div class="panel-heading">Django Admin Site </div>
       <div class="panel-body">
             <a href="/admin">Admin Site</a>
       </div>
 </div>
 
-<div id=authors class="panel panel-primary"> 
+<div class="panel panel-primary"> 
       <div class="panel-heading">Authors on this host: </div>
       <div class="panel-body">
         {% for author in authors %}
         <!-- Display post's author's profile image -->
-        <a href="{% url 'user_profile' author.user.username %}">
+        <a href="{% url 'user_profile' author.id %}">
         <img id="user-profile-image-{{author.id}}"
          class="manage profile-photo img-circle img-responsive img-center pull-left create-post"
          data-toggle="tooltip" title="{{ author }}"

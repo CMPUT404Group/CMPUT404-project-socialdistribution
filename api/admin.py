@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User, Group
-from .models import Post, Comment, Upload, Author, Friending
+from .models import Post, Comment, Upload, Author, Friending, Node
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from post.models import Notification
 
@@ -22,9 +22,10 @@ admin.site.unregister(Group)
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(Friending)
-# admin.site.register(Author)
-# admin.site.register(Post)
+admin.site.register(Author)
+admin.site.register(Post)
 # admin.site.register(Comment)
 # admin.site.register(Upload)
 admin.site.register(Notification)
+admin.site.register(Node)
 

@@ -21,7 +21,8 @@ class Migration(migrations.Migration):
                 ('github_name', models.CharField(max_length=40, blank=True)),
                 ('picture', models.ImageField(upload_to=b'profile_images/', blank=True)),
                 ('host', models.CharField(default=b'http://127.0.0.1:8080/', max_length=40)),
-                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
+                ('username', models.CharField(default=b'defaultUsername', max_length=40)),
+                ('user', models.OneToOneField(null=True, blank=True, to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.CreateModel(

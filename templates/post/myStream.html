@@ -15,7 +15,11 @@ document.getElementById("my_stream").setAttribute("class", "active");
 
     <!-- Display post's author's profile image -->
     <div>
-    <a href="{% url 'user_profile' post.author.user.username %}">
+    {% if request.get_host not in post.author.host %}
+        <a href={{post.author.url}}>
+    {% else %}
+        <a href="{% url 'user_profile' post.author.displayname %}">
+    {% endif %}
     <img id="id-user-profile-image"
          class="profile-photo-icon img-circle img-responsive img-center pull-left"
          data-toggle="tooltip" title="{{ post.author }}"
@@ -25,6 +29,7 @@ document.getElementById("my_stream").setAttribute("class", "active");
         {% else %}
          src="http://placehold.it/50x50"/>
         {% endif %}
+    </a>
     </div>
 
     {% if  loggedInAuthor.id != post.author.id %}    

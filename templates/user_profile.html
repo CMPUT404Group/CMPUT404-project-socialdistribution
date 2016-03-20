@@ -58,7 +58,7 @@
       <div class="panel-heading">Follower </div>
       <div class="panel-body">
         {% for follower in followers %}
-        <a href="{% url 'user_profile' follower.user.username %}">
+        <a href="{% url 'user_profile' follower.id %}">
         <img id="user-profile-image-{{follower.id}}"
          class="profile-photo-icon img-circle img-responsive img-center pull-left create-post"
          data-toggle="tooltip" title="{{ follower }}"
@@ -74,7 +74,7 @@
 
 <!-- If this is the logged in user's profile page, show a create post component -->
 {% if user_account == user %}
-{% include "post/createPost.html" with icon=author.picture %}
+{% include "post/createPost.html" %}
 {% endif %}
 
 
@@ -131,11 +131,11 @@
 <div class="list-group sidebar" style="position: relative; float:right; width: 30%; padding-left: 1.5em;">
     <h4 class="list-group-item list-group-item-info">Friends</h4>
     {% for friend in friends|slice:":3" %}
-     <a class="list-group-item" style="height: 75px;" href="{% url 'user_profile' friend.user.username %}">
+     <a class="list-group-item" style="height: 75px;" href="{% url 'user_profile' friend.id %}">
     <img src={% if friend.picture %} '/media/{{friend.picture}}' {% else %} "http://placehold.it/50x50" {% endif%} class="friend-profile-icon img-circle img-responsive img-center pull-left list-group-item-text" alt="Profile Image"/>
     <span>
     <h4 class="list-group-item-heading">{{friend}}</h4>
-    <p class="list-group-item-text">{{friend.host}}</p>
+    <p class="list-group-item-text" style="font-size: smaller;">{{friend.host}}</p>
 </span>
     </a>
     {% endfor %}
