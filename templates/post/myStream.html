@@ -18,7 +18,7 @@ document.getElementById("my_stream").setAttribute("class", "active");
     {% if request.get_host not in post.author.host %}
         <a href={{post.author.url}}>
     {% else %}
-        <a href="{% url 'user_profile' post.author.displayname %}">
+        <a href="{% url 'user_profile' post.author.id %}">
     {% endif %}
     <img id="id-user-profile-image"
          class="profile-photo-icon img-circle img-responsive img-center pull-left"

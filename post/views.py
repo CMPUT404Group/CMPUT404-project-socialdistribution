@@ -187,13 +187,13 @@ def post_edit(request, post_pk):
         return HttpResponseRedirect(reverse('accounts_login'))
 
 
-def user_profile(request, username):
+def user_profile(request, user_id):
     if request.user.is_authenticated():
         try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist as e:
+            profile_owner = Author.objects.get(id=user_id)
+        except Author.DoesNotExist as e:
             # return render(request, "user_profile.html", {'posts': None, 'form': None, 'user_account': None})
-            return render(request, "404_page.html", {'message': "User does not exist."},status=404)
+            return render(request, "404_page.html", {'message': "Author does not exist."},status=404)
 
         # Delegates create post form submission
         if request.method == "POST":
@@ -206,15 +206,14 @@ def user_profile(request, username):
             else:
                 # -- TODO : display post success or failure on mainStream.html -- #
                 if response.status_code == 201:
-                    return HttpResponseRedirect(reverse('user_profile_success', kwargs={'username': username}))
+                    return HttpResponseRedirect(reverse('user_profile_success', kwargs={'user_id': user_id}))
                 else:  # 400 error
                     # alert user of the error
                     pass
 
-        # --- TODO : FILTER POSTS BY VISIBILITY TO LOGGED IN USER --- #
-        profile_owner = Author.objects.get(user=user)
-        author = Author.objects.get(user=request.user)
-        if author.user.is_staff:
+        # FILTER POSTS BY VISIBILITY TO LOGGED IN USER --- #
+        logged_author = Author.objects.get(user=request.user)
+        if logged_author.user.is_staff:
             posts = Post.objects.filter(author=profile_owner,).order_by('-published')
         else:
             posts = Post.objects.filter(author=profile_owner, visibility='PUBLIC').order_by('-published')
@@ -233,7 +232,7 @@ def user_profile(request, username):
         # show follow or unfollow button according to the relationship between
         # logged author and profile's owner
         followList = []
-        followRelationships = Friending.objects.filter(author=author)
+        followRelationships = Friending.objects.filter(author=logged_author)
         for relationship in followRelationships:
             followList.append(relationship.friend)
 
@@ -245,7 +244,7 @@ def user_profile(request, username):
             followers.append(relationship.author)
 
         return render(request, "user_profile.html",
-                      {'posts': posts, 'form': form, 'user_account': user, 'profile_owner': profile_owner, 'author': author, 'followList': followList, 'followers': followers, 'friends': friends})
+                      {'posts': posts, 'form': form, 'profile_owner': profile_owner, 'author': logged_author, 'followList': followList, 'followers': followers, 'friends': friends})
         
         # user_account is profile's owner
         # author is the one who logged into the system 

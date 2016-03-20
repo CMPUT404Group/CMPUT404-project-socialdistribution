@@ -19,7 +19,7 @@ class Author(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     github_name = models.CharField(max_length=40, blank=True)
     picture = models.ImageField(upload_to='profile_images/', blank=True)
-    host = models.CharField(max_length=40, default="http://127.0.0.1:8080/")
+    host = models.CharField(max_length=40, default="http://127.0.0.1:8000/")
     displayname = models.CharField(max_length=40, default="defaultUsername")
 
     def __unicode__(self):
