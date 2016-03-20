@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from django.template import RequestContext
 from django.utils import timezone
-from api.models import Post, Author, Upload, Comment, Friending
-from .forms import UploadFileForm, PostForm, CommentForm
+from api.models import Post, Author, Comment, Friending
+from .forms import PostForm, CommentForm
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.core.urlresolvers import reverse
 from api.views import PostList, CommentList, PostDetail
@@ -250,21 +250,6 @@ def user_profile(request, user_id):
         # author is the one who logged into the system 
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
-
-
-# for image uploads to save
-
-def file(request):                                              
-    if request.method == "POST":                                
-        img = UploadFileForm(request.POST, request.FILES)       
-        if img.is_valid():                                     
-            img.save()                                          
-            return HttpResponseRedirect(reverse('imageupload')) 
-    else:                                                       
-        img = UploadFileForm()                                  
-    return render(request, 'file.html', {'form': img})          
-
-
 
 '''
 checks if a user is allowed access to a file

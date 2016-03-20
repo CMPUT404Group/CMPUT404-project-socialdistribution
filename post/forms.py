@@ -1,5 +1,5 @@
 from django import forms
-from api.models import Post, Comment, Upload
+from api.models import Post, Comment
 from django.contrib.auth.models import User
 
 class PostForm(forms.ModelForm):
@@ -22,9 +22,3 @@ class CommentForm(forms.ModelForm):
         widgets = {
             'contentType': forms.RadioSelect,
         }
-
-# FileUpload form class.
-class UploadFileForm(forms.ModelForm):
-    class Meta:
-        model = Upload
-        fields = "__all__"
