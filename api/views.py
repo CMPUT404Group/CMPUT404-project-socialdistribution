@@ -139,7 +139,7 @@ def getRemoteAuthorProfile(node_url, request, our_credentials):
     request = urllib2.Request(url)
 
     # fill this with OUR authentication credentials provided by OTHER TEAMS
-    encodedValue = base64.b64encode("nodeCity@nodeCity:city")
+    encodedValue = base64.b64encode("nodeHost4B@nodeHost4B:host4b")
 
     # do basic auth
     request.add_header("Authorization", "Basic " + encodedValue ) #Header, Value 
