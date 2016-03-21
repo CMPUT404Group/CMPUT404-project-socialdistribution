@@ -52,26 +52,6 @@
 
 <div class="main-body" style="position: relative; float: left; width: 70%;">
 
-
-<!-- Display profile owner's follower list --> 
-<div id=followers class="panel panel-primary"> 
-      <div class="panel-heading">Follower </div>
-      <div class="panel-body">
-        {% for follower in followers %}
-        <a href="{% url 'user_profile' follower.id %}">
-        <img id="user-profile-image-{{follower.id}}"
-         class="profile-photo-icon img-circle img-responsive img-center pull-left create-post"
-         data-toggle="tooltip" title="{{ follower }}"
-         alt="Profile Image"
-        {% if follower.picture %}
-         src="/media/{{ follower.picture }}"/></a>
-         {% else %}
-          src="http://placehold.it/175x175"/></a>
-         {% endif %}
-        {% endfor %}
-        </div>
-</div>
-
 <!-- If this is the logged in user's profile page, show a create post component -->
 {% if user_account == user %}
 {% include "post/createPost.html" %}
@@ -126,23 +106,45 @@
 
 {% include "post/editProfileFieldModal.html" %}
 {% include "post/uploadProfileImageModal.html" %}
+
+</div>
+<div style="position: relative; float:right; width: 30%; padding-left: 1.5em;">
+    <div class="list-group sidebar" >
+        <h4 class="list-group-item list-group-item-info">Friends</h4>
+        {% for friend in friends|slice:":3" %}
+         <a class="list-group-item" style="height: 75px;" href="{% url 'user_profile' friend.id %}">
+        <img src={% if friend.picture %} '/media/{{friend.picture}}' {% else %} "http://placehold.it/50x50" {% endif%} class="friend-profile-icon img-circle img-responsive img-center pull-left list-group-item-text" alt="Profile Image"/>
+        <span>
+        <h4 class="list-group-item-heading">{{friend}}</h4>
+        <p class="list-group-item-text" style="font-size: smaller;">{{friend.host}}</p>
+    </span>
+        </a>
+        {% endfor %}
+        {% if friends|length > 3 %}
+        <a class="list-group-item" href='#'>See More Friends ...</a>
+        {% elif friends|length == 0 %}
+        <label class="list-group-item" href='#'>No Friends</label>
+        {% endif %}
+    </div>
+
+    <!-- Display profile owner's follower list --> 
+    <div class="list-group sidebar" >
+        <h4 class="list-group-item list-group-item-info">Followers</h4>
+        {% for follower in followers|slice:":3" %}
+         <a class="list-group-item" style="height: 75px;" href="{% url 'user_profile' follower.id %}">
+        <img src={% if follower.picture %} '/media/{{follower.picture}}' {% else %} "http://placehold.it/50x50" {% endif%} class="friend-profile-icon img-circle img-responsive img-center pull-left list-group-item-text" alt="Profile Image"/>
+        <span>
+        <h4 class="list-group-item-heading">{{follower}}</h4>
+        <p class="list-group-item-text" style="font-size: smaller;">{{follower.host}}</p>
+    </span>
+        </a>
+        {% endfor %}
+        {% if followers|length > 3 %}
+        <a class="list-group-item" href='#'>See More Followerss ...</a>
+        {% elif friends|length == 0 %}
+        <label class="list-group-item" href='#'>No Followers</label>
+        {% endif %}
+    </div>
 </div>
 
-<div class="list-group sidebar" style="position: relative; float:right; width: 30%; padding-left: 1.5em;">
-    <h4 class="list-group-item list-group-item-info">Friends</h4>
-    {% for friend in friends|slice:":3" %}
-     <a class="list-group-item" style="height: 75px;" href="{% url 'user_profile' friend.id %}">
-    <img src={% if friend.picture %} '/media/{{friend.picture}}' {% else %} "http://placehold.it/50x50" {% endif%} class="friend-profile-icon img-circle img-responsive img-center pull-left list-group-item-text" alt="Profile Image"/>
-    <span>
-    <h4 class="list-group-item-heading">{{friend}}</h4>
-    <p class="list-group-item-text" style="font-size: smaller;">{{friend.host}}</p>
-</span>
-    </a>
-    {% endfor %}
-    {% if friends|length > 3 %}
-    <a class="list-group-item" href='#'>See More Friends ...</a>
-    {% elif friends|length == 0 %}
-    <label class="list-group-item" href='#'>No Friends</label>
-    {% endif %}
-</div>
 {% endblock %}
