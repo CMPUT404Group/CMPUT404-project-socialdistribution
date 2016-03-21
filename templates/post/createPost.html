@@ -4,11 +4,13 @@
 
 	<!-- No Icon on profile page -->
 	{% if icon %}
-	<img class="profile-photo-icon img-circle img-responsive img-center pull-right create-post" 
-	src="/media/{{ icon }}"/>
-	{% else %}
-	src="http://placehold.it/50x50">
+	          <img class="profile-photo-icon img-circle img-responsive img-center pull-right create-post" 
+              {% if author.picture %}
+	               src="/media/{{ icon }}"/>
+	          {% else %}
+	          src="https://placehold.it/50x50"/>
 	{% endif %}
+    {% endif %}
 
 	<form id="postForm" method="POST" action='{{ action }}'> {% csrf_token %}
 		<div class="panel panel-primary media-body form-group">
