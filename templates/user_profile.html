@@ -24,7 +24,7 @@
             {% endif %}
         {% endif %}
         <!-- Display required user info on profile page -->
-        <h1> {{ user_account.username }} </h1>
+        <h1> {{ profile_owner.user.username }} </h1>
         <div>
             <p style="color: grey;">host: {{ profile_owner.host }} </p>
             <p style="color: grey;">username: {{ profile_owner.user.username }} </p>
@@ -40,7 +40,7 @@
         </div>
     </div>
 
-    {% if user_account == user %}
+    {% if profile_owner.user == user %}
     <!-- Triggers uploadImageModal -->
     <span>
         <button id='uploadProfileImageTrigger' type="button" class="btn btn-default" data-toggle="modal" data-target="#uploadProfileImageModal"><i class="fa fa-picture-o"></i></button>
@@ -53,7 +53,7 @@
 <div class="main-body" style="position: relative; float: left; width: 70%;">
 
 <!-- If this is the logged in user's profile page, show a create post component -->
-{% if user_account == user %}
+{% if profile_owner.user == user %}
 {% include "post/createPost.html" %}
 {% endif %}
 
