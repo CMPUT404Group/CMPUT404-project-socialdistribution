@@ -225,6 +225,7 @@ class PostList(generics.GenericAPIView):
 
 
         statusCode = status.HTTP_201_CREATED
+        serializer = PostSerializer(data=data)
 
         '''
         Handles : EDIT Posts via POST method
@@ -241,10 +242,9 @@ class PostList(generics.GenericAPIView):
                 return Response({"message":"Only the author of this post can make changes to it"}, status=status.HTTP_403_FORBIDDEN)
 
             statusCode = status.HTTP_200_OK
+            serializer = PostSerializer(post, data=data)
 
 
-
-        serializer = PostSerializer(data=data)
 
         if serializer.is_valid():
             print "DEBUG : API - views.py - PostList"
