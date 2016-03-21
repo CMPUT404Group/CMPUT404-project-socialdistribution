@@ -101,6 +101,7 @@ def explore(request, node_id=None):
             return render(request, 'explore.html', {'loggedInAuthor': author, 'nodes': nodes, 'all':True})
         else:
             #checks what node it is on and returns the public posts from that node
+            
             node = Node.objects.get(id=node_id)
             url = node.url + "api/posts/"
             opener = urllib2.build_opener(urllib2.HTTPHandler)
@@ -114,14 +115,17 @@ def explore(request, node_id=None):
             elif node.url == "http://disporia-cmput404.rhcloud.com/":
                     creds = credentials[node.url]
                     req.add_header("Authorization", "JWT " + creds)
-            x = opener.open(req)
-            y = x.read()
-            jsonResponse = json.loads(y)
-            postSerializer = PostSerializer(jsonResponse["posts"], many=True)
-            posts = postSerializer.data
+            try:
+                x = opener.open(req)
+                y = x.read()
+                jsonResponse = json.loads(y)
+                postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+                posts = postSerializer.data
 
-            form = PostForm()
-            return render(request, 'explore.html', {'node':node,'posts': posts, 'form': form, 'loggedInAuthor': author, 'nodes': nodes, 'all':False})
+                form = PostForm()
+                return render(request, 'explore.html', {'node':node,'posts': posts, 'form': form, 'loggedInAuthor': author, 'nodes': nodes, 'all':False})
+            except urllib2.HTTPError, e:
+                return render(request, "404_page.html", {'message': "HTTP ERROR: "+str(e.code)+" "+e.reason, 'loggedInAuthor': author},status=404)
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
@@ -158,14 +162,14 @@ def explore_post(request, node_id, post_id):
                     post = postSerializer.data
                     commentForm = CommentForm()
                     return render(request, 'post/postDetail.html', {'post': post, 'commentForm': commentForm, 'loggedInAuthor': author, 'node': node})
-                except:
-                    return render(request, "404_page.html", {'message': "Post Not Found."},status=404)
+                except urllib2.HTTPError, e:
+                    return render(request, "404_page.html", {'message': "HTTP ERROR: "+str(e.code)+" "+e.reason, 'loggedInAuthor': author},status=404)
             elif request.method == "POST":
                 try:
                     #TODO
                     pass
-                except:
-                    return render(request, "404_page.html", {'message': "Post Not Found."},status=404)
+                except urllib2.HTTPError, e:
+                    return render(request, "404_page.html", {'message': "HTTP ERROR: "+str(e.code)+" "+e.reason, 'loggedInAuthor': author},status=404)
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
