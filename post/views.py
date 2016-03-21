@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.template import RequestContext
 from django.utils import timezone
-from api.models import Post, Author, Comment, Friending
+from api.models import Post, Author, Comment, Friending, Node
 from .forms import PostForm, CommentForm
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.core.urlresolvers import reverse
@@ -82,6 +82,55 @@ def public_stream(request):
         author.save()
 
         return render(request, 'post/mainStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList })
+    else:
+        return HttpResponseRedirect(reverse('accounts_login'))
+
+
+'''
+Renders the explore Stream
+'''
+def explore(request, node_id=None):
+    if (request.user.is_authenticated()):
+        nodes = Node.objects.all()
+        author = Author.objects.get(user=request.user)
+        if node_id == None:
+            return render(request, 'explore.html', {'loggedInAuthor': author, 'nodes': nodes})
+        else:
+            #TODO Pull public posts from another server
+
+            ########### Copied from the MyStream page need to change implementation (just temporary so the page doesnt break)
+            posts1 = Post.objects.filter(author=author).order_by('-published')
+
+            pks = []
+
+            #add the posts by the people we are friends with into our myStream
+            friend_pairs = Friending.objects.filter(author=author)
+            for i in range(len(friend_pairs)):
+                friend_posts = Post.objects.filter(author=friend_pairs[i].friend)
+                for j in range(len(friend_posts)):
+                    if isAllowed(request.user, friend_posts[j].id):
+                        pks.append(friend_posts[j].id)
+
+            #sort the posts so that the most recent is at the top
+            posts2 = Post.objects.filter(id__in=pks)
+            posts = posts1 | posts2
+            posts.order_by('-published')
+
+            # notification on if logged in author has new follower
+            followList = []
+            followRelationships = Friending.objects.filter(friend=author)
+            for relationship in followRelationships:
+                followList.append(relationship.friend)
+
+            if len(followList) > author.previous_follower_num:
+                author.noti = True
+                author.previous_follower_num = len(followList)
+            else:
+                author.noti = False
+            author.save()
+            ################################## 
+            form = PostForm()
+            return render(request, 'explore.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'nodes': nodes})
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
