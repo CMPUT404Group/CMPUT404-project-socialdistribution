@@ -1033,7 +1033,7 @@ class FriendRequest(generics.GenericAPIView):
 
             # if friend is remote user
             else:
-            return Response({"message":"Friend is not an author on this node"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message":"Friend is not an author on this node"}, status=status.HTTP_400_BAD_REQUEST)
 
         except Author.DoesNotExist as e:
             return Response({"message":"Friend is not an author on this node"}, status=status.HTTP_400_BAD_REQUEST)
