@@ -176,13 +176,13 @@ def postChangeUserPassword(request):
         reset_password = request.POST['reset_password'].strip()
         new_password = request.POST['new_password'].strip()
        
-        if old_password && reset_password && reset_password == new_password:
-        saveuser = User.objects.get(id=request.user.id)
-        if user.check_password(old_password):
-            saveuser.set_password(request.POST['reset_password']);
-            saveuser.save()
+        if (old_password & reset_password & reset_password == new_password):
+            saveuser = User.objects.get(id=request.user.id)
+            if user.check_password(old_password):
+                saveuser.set_password(request.POST['reset_password']);
+                saveuser.save()
 
-        return Response(responseData, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_200_OK)
 
 
 class PostList(generics.GenericAPIView):
