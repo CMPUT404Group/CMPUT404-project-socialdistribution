@@ -324,7 +324,8 @@ def post_edit(request, post_pk):
 
         post = Post.objects.get(pk=post_pk)
         form = PostForm(instance=post)
-        return render(request, 'post/postDetail.html', {'post': post, 'form': form})
+        author = Author.objects.get(user=request.user)    
+        return render(request, 'post/postDetail.html', {'post': post, 'form': form, 'loggedInAuthor': author})
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
