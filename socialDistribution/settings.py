@@ -88,7 +88,7 @@ WSGI_APPLICATION = 'socialDistribution.wsgi.application'
 #         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 #     }
 # }
-os.environ["HEROKU_POSTGRESQL_ONYX_URL"] = 'postgres://tceyokgvpchyrj:oZ52fv0kYXyp0d8DnHiZmeiA9f@ec2-107-22-248-209.compute-1.amazonaws.com:5432/d5agp6rfdjr670'
+os.environ["HEROKU_POSTGRESQL_ONYX_URL"] = 'postgres://wfjyvbnexldgqs:D1Om6QsMnjXbBW5bkDNOPwo-WZ@ec2-107-22-246-250.compute-1.amazonaws.com:5432/d8e2sfk802am89'
 DATABASES = {
     'default': dj_database_url.config(default=os.environ["HEROKU_POSTGRESQL_ONYX_URL"])
 }
