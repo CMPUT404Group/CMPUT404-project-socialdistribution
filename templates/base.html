@@ -34,18 +34,17 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="{% url 'public_stream' %}">[LOGO]</a>
                 </div>
 
                 <!-- Top Menu Items -->
                 <ul class="nav navbar-right top-nav">
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-plus"></i> <b class="caret"></b></a>
 
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bell">
                         <!-- <span class="badge">10</span> -->
+                        {% if loggedInAuthor.noti %}
                         <span class="label label-default">New</span>
+                        {% endif %}
                         </i> <b class="caret"></b></a>
                         <ul class="dropdown-menu message-dropdown">
                             <li class="message-preview">
@@ -63,14 +62,16 @@
                                             <h5 class="media-heading"><strong>{{user.username}}</strong>
                                             </h5>
                                             <p class="small text-muted"><i class="fa fa-clock-o"></i>{{user.last_login}}</p>
-                                            <p>https://github.com/{{loggedInAuthor.github_name}}</p>
+                                            <p>{{loggedInAuthor.github_name}}</p>
                                         </div>
                                     </div>
                                 </a>
                             </li>
                             <li class="message-footer">
-                                <a href="{% url 'friendRequest' user.get_username%}">See All New Friend Requests
-                                <span class="label label-default">New</span>
+                                <a href="{% url 'friendRequest' user.get_username%}">See All Friend Requests
+                                    {% if loggedInAuthor.noti %}
+                                    <span class="label label-default">New</span>
+                                    {% endif %}
                                 </a>
                             </li>
                         </ul>
@@ -79,13 +80,7 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> {{ user.get_username }} <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             <li>
-                                <a href="{% url 'user_profile' user.get_username %}"><i class="fa fa-fw fa-user"></i> Profile</a>
-                            </li>
-                            <li>
-                                <a href="#"><i class="fa fa-fw fa-envelope"></i> Inbox</a>
-                            </li>
-                            <li>
-                                <a href="#"><i class="fa fa-fw fa-gear"></i> Settings</a>
+                                <a href="{% url 'user_profile' loggedInAuthor.id %}"><i class="fa fa-fw fa-user"></i> Profile</a>
                             </li>
                             <li class="divider"></li>
                             <li>
@@ -107,6 +102,9 @@
                         </li>
                         <li id="my_stream">
                             <a href="{% url 'my_stream' %}"><i class="fa fa-fw fa-dashboard"></i> My Stream </a>
+                        </li>
+                        <li id="explore">
+                            <a href="{% url 'explore' %}"><i class="fa fa-fw fa-dashboard"></i> Explore </a>
                         </li>
                     </ul>
                 </div>

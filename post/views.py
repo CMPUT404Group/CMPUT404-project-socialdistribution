@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.template import RequestContext
 from django.utils import timezone
-from api.models import Post, Author, Comment, Friending
+from api.models import Post, Author, Comment, Friending, Node
 from .forms import PostForm, CommentForm
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.core.urlresolvers import reverse
@@ -14,6 +14,7 @@ from api.serializers import *
 import urllib2
 import json
 import base64
+from django.http import HttpResponse
 
 # Create your views here.
 '''
@@ -70,7 +71,69 @@ def public_stream(request):
         followRelationships = Friending.objects.filter(author=author)
         for relationship in followRelationships:
             followList.append(relationship.friend)
+            
+        # notification on if logged in author has new follower
+        followerList = []
+        followerRelationships = Friending.objects.filter(friend=author)
+        for relationship in followerRelationships:
+            followerList.append(relationship.friend)
+        if len(followerList) > author.previous_follower_num:
+            author.noti = True
+            author.previous_follower_num = len(followerList)
+        else:
+            author.noti = False
+        author.save()
+
         return render(request, 'post/mainStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList })
+    else:
+        return HttpResponseRedirect(reverse('accounts_login'))
+
+
+'''
+Renders the explore Stream
+'''
+def explore(request, node_id=None):
+    if (request.user.is_authenticated()):
+        nodes = Node.objects.all()
+        author = Author.objects.get(user=request.user)
+        if node_id == None:
+            return render(request, 'explore.html', {'loggedInAuthor': author, 'nodes': nodes})
+        else:
+            #TODO Pull public posts from another server
+
+            ########### Copied from the MyStream page need to change implementation (just temporary so the page doesnt break)
+            posts1 = Post.objects.filter(author=author).order_by('-published')
+
+            pks = []
+
+            #add the posts by the people we are friends with into our myStream
+            friend_pairs = Friending.objects.filter(author=author)
+            for i in range(len(friend_pairs)):
+                friend_posts = Post.objects.filter(author=friend_pairs[i].friend)
+                for j in range(len(friend_posts)):
+                    if isAllowed(request.user, friend_posts[j].id):
+                        pks.append(friend_posts[j].id)
+
+            #sort the posts so that the most recent is at the top
+            posts2 = Post.objects.filter(id__in=pks)
+            posts = posts1 | posts2
+            posts.order_by('-published')
+
+            # notification on if logged in author has new follower
+            followList = []
+            followRelationships = Friending.objects.filter(friend=author)
+            for relationship in followRelationships:
+                followList.append(relationship.friend)
+
+            if len(followList) > author.previous_follower_num:
+                author.noti = True
+                author.previous_follower_num = len(followList)
+            else:
+                author.noti = False
+            author.save()
+            ################################## 
+            form = PostForm()
+            return render(request, 'explore.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'nodes': nodes})
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
@@ -98,36 +161,36 @@ def my_stream(request):
                     pass
 
         author = Author.objects.get(user=request.user)
-        # posts1 = Post.objects.filter(author=author).order_by('-published')
+        posts1 = Post.objects.filter(author=author).order_by('-published')
 
-        # pks = []
+        pks = []
 
-        # #add the posts by the people we are friends with into our myStream
-        # friend_pairs = Friending.objects.filter(author=author)
-        # for i in range(len(friend_pairs)):
-        #     friend_posts = Post.objects.filter(author=friend_pairs[i].friend)
-        #     for j in range(len(friend_posts)):
-        #         if isAllowed(request.user, friend_posts[j].id):
-        #             pks.append(friend_posts[j].id)
+        #add the posts by the people we are friends with into our myStream
+        friend_pairs = Friending.objects.filter(author=author)
+        for i in range(len(friend_pairs)):
+            friend_posts = Post.objects.filter(author=friend_pairs[i].friend)
+            for j in range(len(friend_posts)):
+                if isAllowed(request.user, friend_posts[j].id):
+                    pks.append(friend_posts[j].id)
 
-        # #sort the posts so that the most recent is at the top
-        # posts2 = Post.objects.filter(id__in=pks)
-        # posts = posts1 | posts2
-        # posts.order_by('-published')
+        #sort the posts so that the most recent is at the top
+        posts2 = Post.objects.filter(id__in=pks)
+        posts = posts1 | posts2
+        posts.order_by('-published')
 
-        #bring in posts from node4A
-        url = "http://cmput404team4b.herokuapp.com/api/posts"
-        opener = urllib2.build_opener(urllib2.HTTPHandler)
-        req = urllib2.Request(url)
-        encodedValue = base64.b64encode("ab432861-f7bc-4b5b-9261-86c167615d6@nodeTeam4A:nodeTeam4A")
-        req.add_header("Authorization", "Basic " + encodedValue)
-        x = opener.open(req)
-        y = x.read()
-        jsonResponse = json.loads(y)
-        postSerializer = PostSerializer(jsonResponse["posts"], many=True)
-        posts = postSerializer.data
-
+        # notification on if logged in author has new follower
         followList = []
+        followRelationships = Friending.objects.filter(friend=author)
+        for relationship in followRelationships:
+            followList.append(relationship.friend)
+
+        if len(followList) > author.previous_follower_num:
+            author.noti = True
+            author.previous_follower_num = len(followList)
+        else:
+            author.noti = False
+        author.save()
+
         form = PostForm()
         return render(request, 'post/myStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList})
     else:
@@ -261,7 +324,7 @@ def user_profile(request, user_id):
             followers.append(relationship.author)
 
         return render(request, "user_profile.html",
-                      {'posts': posts, 'form': form, 'profile_owner': profile_owner, 'author': logged_author, 'followList': followList, 'followers': followers, 'friends': friends})
+                      {'posts': posts, 'form': form, 'profile_owner': profile_owner, 'loggedInAuthor': logged_author, 'followList': followList, 'followers': followers, 'friends': friends})
         
         # user_account is profile's owner
         # author is the one who logged into the system 

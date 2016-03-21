@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load markdown_deux_tags %}
+
+{% block content %}
+
+<script>
+document.getElementById("explore").setAttribute("class", "active");
+</script>
+
+<div>
+    <h4 class="list-group-item list-group-item-info">Nodes</h4>
+    <ul class="list-group" >
+    {% for node in nodes %}
+     <li class="list-group-item" style="padding: 1.5em">
+    <span>
+        <a href={% url 'explore_host' node.id %}>
+        <h4 id="node_name" class="list-group-item-heading">{{node.hostname}}</h4>
+        </a>
+    </span>
+    </li>
+    {% endfor %}
+  
+    {% if nodes|length > 8 %}
+    <a class="list-group-item" href='#'>See More Nodes ...</a>
+    {% elif nodes|length == 0 %}
+    <label class="list-group-item" href='#'>No Nodes</label>
+    {% endif %}
+    </ul>
+</div>
+
+{% for post in posts %}
+<div class="row post">
+
+    <!-- Display post's author's profile image -->
+    <div>
+    {% if request.get_host not in post.author.host %}
+        <a href={{post.author.url}}>
+    {% else %}
+        <a href="{% url 'user_profile' post.author.id %}">
+    {% endif %}
+    <img id="id-user-profile-image"
+         class="profile-photo-icon img-circle img-responsive img-center pull-left"
+         data-toggle="tooltip" title="{{ post.author }}"
+         alt="Profile Image"
+        {% if post.author.picture %}
+         src="/media/{{ post.author.picture }}"/>
+        {% else %}
+         src="http://placehold.it/50x50"/>
+        {% endif %}
+    </a>
+    </div>
+
+    {% if  loggedInAuthor.id != post.author.id %}    
+    <button  id='unfollow-btn-{{post.author.id}}' class="unfollow-btn btn-sm btn-warning pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;">Unfollow</button>
+    {% endif %}   
+
+    <div class="panel panel-primary media-body">
+        <div class='panel-heading'> <a class='title' href='{% url "post_detail" post.id %}'> {{ post.title }} </a> <span class='date'> {{ post.published }} </span> </div>
+        <div class='panel-body'> 
+            {% if post.contentType == "text/x-markdown" %}
+                {{ post.content|markdown }}
+            {% else %}
+                {{ post.content|urlize|slice:"500" }}
+                {% if post.content|length > 500 %}
+                <a class='read_more' href='{% url "post_detail" post.id %}'> Continue Reading... </a> 
+                {% endif %}
+            {% endif %}
+
+            <br/>
+            {% if post.image_url %}
+                <img src="{{ post.image_url }}"/>
+            {% endif %}
+        </div>
+        <hr class='post-hr'>
+        <div class='panel-body'>
+            <a href='{% url "post_detail" post.id %}#comments' class='comments'> {{ post.comments.count }} Comments </a>
+            <a href='{% url "post_detail" post.id %}' class='pull-right'><i class="fa fa-plus"></i></a>
+        </div>
+    </div>
+
+    {% if post.author == loggedInAuthor %}
+    <div class="media-body post-action-icons">
+        <a href="{% url 'post_edit' post.id %}"><button class="btn btn-default action-icon edit-post"><i class="fa fa-pencil-square-o"></i></button></a>
+        <button class="btn btn-default action-icon delete-post" id='delete-post-{{ post.id }}'><i class="fa fa-trash-o"></i></button>
+    </div>
+    {% else %}
+    <div class="media-body post-action-icons placeholder">
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
+{% endblock %}

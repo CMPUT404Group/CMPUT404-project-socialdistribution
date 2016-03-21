@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from api.models import Author, Node
+from api.models import Author, Node, Friending
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from manager.forms import AuthorForm
@@ -160,8 +160,21 @@ def friendRequest(request, username):
         author = Author.objects.get(user=request.user)
         notis = Notification.objects.filter(notificatee=author)
 
+        # notification on if logged in author has new follower
+        followList = []
+        followRelationships = Friending.objects.filter(friend=author)
+        for relationship in followRelationships:
+            followList.append(relationship.friend)
+
+        if len(followList) > author.previous_follower_num:
+            author.noti = True
+            author.previous_follower_num = len(followList)
+        else:
+            author.noti = False
+        author.save()
+
         return render(request, "manager/friendRequest.html",
-                      {'notis': notis, 'user_account': user, 'author': author})
+                      {'notis': notis, 'user_account': user, 'loggedInAuthor': author})
     else:
         return HttpResponseRedirect(reverse('accounts_login')) 
 

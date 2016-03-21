@@ -18,9 +18,11 @@ class Author(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     github_name = models.CharField(max_length=40, blank=True)
-    picture = models.ImageField(upload_to='profile_images/', blank=True)
+    picture = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     host = models.CharField(max_length=40, default="http://127.0.0.1:8000/")
     displayname = models.CharField(max_length=40, default="defaultUsername")
+    previous_follower_num = models.PositiveIntegerField(default=0)
+    noti = models.BooleanField(default=False)
 
     def __unicode__(self):
         # return self.user.username
@@ -92,3 +94,5 @@ class Image(models.Model):
 class Friending(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     friend = models.ForeignKey(Author, related_name='friend', on_delete=models.CASCADE)
+    # class Meta:
+    #     unique_together = ["author", "friend"]

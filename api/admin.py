@@ -9,6 +9,7 @@ from post.models import Notification
 
 class AuthorInline(admin.TabularInline):
     model = Author
+    exclude = ('noti', 'previous_follower_num')
 
 class UserAdmin(UserAdmin):
     inlines = [
