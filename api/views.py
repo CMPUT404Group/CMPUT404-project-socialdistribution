@@ -986,22 +986,22 @@ class FriendRequest(generics.GenericAPIView):
         if data == None:
             return Response({"message": "no body given."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # check if request is from remote node, if so handle it
-        remoteNode = getRemoteNode(request.user)
-        if remoteNode != None:
-            author_serializer = getRemoteAuthorProfile(remoteNode.url, request, "") # put credentials in ""
-            # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
-            # else, create a new author object w/o user
-            # author_of_request = remoteAuthor here
-            try:
-                author_of_request = Author.objects.get(id=author_serializer.data["id"])
-            except Author.DoesNotExist as e:
-                author_of_request = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
-                author_of_request.save()
+        # # check if request is from remote node, if so handle it
+        # remoteNode = getRemoteNode(request.user)
+        # if remoteNode != None:
+        #     author_serializer = getRemoteAuthorProfile(remoteNode.url, request, "") # put credentials in ""
+        #     # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
+        #     # else, create a new author object w/o user
+        #     # author_of_request = remoteAuthor here
+        #     try:
+        #         author_of_request = Author.objects.get(id=author_serializer.data["id"])
+        #     except Author.DoesNotExist as e:
+        #         author_of_request = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
+        #         author_of_request.save()
 
-        # local author - get from db
-        else:
-            author_of_request  = Author.objects.get(user=request.user)
+        # # local author - get from db
+        # else:
+        #     author_of_request  = Author.objects.get(user=request.user)
 
 
         try:
@@ -1015,8 +1015,9 @@ class FriendRequest(generics.GenericAPIView):
         try:
             author = Author.objects.get(id=author_req["id"])
             # it's a local user
-            if author.user != None:
+            if request.get_host() in author.host: # author.user != None: 
                 atLeastOneAuthorIsLocal = True
+            # else is remote author sending the request
         except Author.DoesNotExist as e:
             # not local author - create remote author w/o user
             author = Author.objects.create(id=author_req["id"], displayname=author_req["displayname"], host=author_req["host"])
@@ -1024,7 +1025,8 @@ class FriendRequest(generics.GenericAPIView):
 
         try:
             friend = Author.objects.get(id=friend_req["id"])
-            if friend.user != None:
+            # it's a local user
+            if request.get_host() in friend.host: # friend.user != None:
                 if atLeastOneAuthorIsLocal:
                     bothLocalAuthors = True
                 atLeastOneAuthorIsLocal = True
