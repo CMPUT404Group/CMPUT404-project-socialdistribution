@@ -244,7 +244,7 @@ def user_profile(request, user_id):
             followers.append(relationship.author)
 
         return render(request, "user_profile.html",
-                      {'posts': posts, 'form': form, 'profile_owner': profile_owner, 'author': logged_author, 'followList': followList, 'followers': followers, 'friends': friends})
+                      {'posts': posts, 'form': form, 'profile_owner': profile_owner, 'loggedInAuthor': logged_author, 'followList': followList, 'followers': followers, 'friends': friends})
         
         # user_account is profile's owner
         # author is the one who logged into the system 
