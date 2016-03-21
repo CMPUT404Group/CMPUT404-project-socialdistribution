@@ -1041,18 +1041,24 @@ class FriendRequest(generics.GenericAPIView):
         if data == None:
             return Response({"message": "no body given."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # check if the friend request exist
+        # check if the friend exist
         try:
-            unfriend = Friending.objects.get(friend=request_pk)
-        except:
-            return Response({"message":"Friend request does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+            unfriend = Author.objects.get(id=request_pk)
+        except Author.DoesNotExist as e:
+            return Response({"message":"Friend does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
         # check if the author exist
         try:
             loggedInAuthor = Author.objects.get(user=request.user)
         except Author.DoesNotExist as e:
-            return Response({"message":"Author does not exist"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"message":"Author does not exist"},status=status.HTTP_401_UNAUTHORIZED)
+
+        # check if the friendship exist
+        try:
+            friendship = Friending.objects.get(author=loggedInAuthor, friend=unfriend)
+        except Friending.DoesNotExist as e:
+            return Response({"message":"Friend request does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
         # to unfriend simply do it locally
-        unfriend.delete()
+        friendship.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
