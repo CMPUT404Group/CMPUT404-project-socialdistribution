@@ -93,7 +93,6 @@ def public_stream(request):
 '''
 Renders the explore Stream
 '''
-
 def explore(request, node_id=None):
     if (request.user.is_authenticated()):
         nodes = Node.objects.all()
@@ -101,40 +100,7 @@ def explore(request, node_id=None):
         if node_id == None:
             return render(request, 'explore.html', {'loggedInAuthor': author, 'nodes': nodes, 'all':True})
         else:
-            #TODO Pull public posts from another server
-
-            ########### Copied from the MyStream page need to change implementation (just temporary so the page doesnt break)
-            # posts1 = Post.objects.filter(author=author).order_by('-published')
-
-            # pks = []
-
-            # #add the posts by the people we are friends with into our myStream
-            # friend_pairs = Friending.objects.filter(author=author)
-            # for i in range(len(friend_pairs)):
-            #     friend_posts = Post.objects.filter(author=friend_pairs[i].friend)
-            #     for j in range(len(friend_posts)):
-            #         if isAllowed(request.user, friend_posts[j].id):
-            #             pks.append(friend_posts[j].id)
-
-            # #sort the posts so that the most recent is at the top
-            # posts2 = Post.objects.filter(id__in=pks)
-            # posts = posts1 | posts2
-            # posts.order_by('-published')
-
-            # # notification on if logged in author has new follower
-            # followList = []
-            # followRelationships = Friending.objects.filter(friend=author)
-            # for relationship in followRelationships:
-            #     followList.append(relationship.friend)
-
-            # if len(followList) > author.previous_follower_num:
-            #     author.noti = True
-            #     author.previous_follower_num = len(followList)
-            # else:
-            #     author.noti = False
-            # author.save()
-
-            ###################################
+            #checks what node it is on and returns the public posts from that node
             node = Node.objects.get(id=node_id)
             url = node.url + "api/posts/"
             opener = urllib2.build_opener(urllib2.HTTPHandler)
@@ -154,18 +120,58 @@ def explore(request, node_id=None):
             postSerializer = PostSerializer(jsonResponse["posts"], many=True)
             posts = postSerializer.data
 
-            ################################## 
             form = PostForm()
             return render(request, 'explore.html', {'node':node,'posts': posts, 'form': form, 'loggedInAuthor': author, 'nodes': nodes, 'all':False})
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
+'''
+Renders the post clicked from the explore page
+'''
+def explore_post(request, node_id, post_id):
+    if (request.user.is_authenticated()):
+        author = Author.objects.get(user=request.user)
+        node = Node.objects.get(id=node_id)
+        if node_id == None:
+            return render(request, 'postDetail.html', {'loggedInAuthor': author, 'nodes': nodes})
+        else:
+            #checks what node it is on and returns the public posts from that node
+            if request.method == "GET":
+                try:
+                    node = Node.objects.get(id=node_id)
+                    url = node.url + "api/posts/" + post_id +"/"
+                    opener = urllib2.build_opener(urllib2.HTTPHandler)
+                    req = urllib2.Request(url)
+                    credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
+                                "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"}
+                    # set credentials on request
+                    if node.url == "http://project-c404.rhcloud.com/":
+                            creds = base64.b64encode(credentials[node.url])
+                            req.add_header("Authorization", "Basic " + creds)
+                    elif node.url == "http://disporia-cmput404.rhcloud.com/":
+                            creds = credentials[node.url]
+                            req.add_header("Authorization", "JWT " + creds)
+                    x = opener.open(req)
+                    y = x.read()
+                    jsonResponse = json.loads(y)
+                    postSerializer = PostSerializer(jsonResponse)
+                    post = postSerializer.data
+                    commentForm = CommentForm()
+                    return render(request, 'post/postDetail.html', {'post': post, 'commentForm': commentForm, 'loggedInAuthor': author, 'node': node})
+                except:
+                    return render(request, "404_page.html", {'message': "Post Not Found."},status=404)
+            elif request.method == "POST":
+                try:
+                    #TODO
+                    pass
+                except:
+                    return render(request, "404_page.html", {'message': "Post Not Found."},status=404)
+    else:
+        return HttpResponseRedirect(reverse('accounts_login'))
 
 '''
 Renders the My Stream page
 '''
-
-
 def my_stream(request):
     if (request.user.is_authenticated()):
         if request.method == "POST":

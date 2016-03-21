@@ -8,7 +8,7 @@ document.getElementById("explore").setAttribute("class", "active");
 </script>
 
 <div>
-    <h4 class="list-group-item list-group-item-info">ns</h4>
+    <h4 class="list-group-item list-group-item-info">Nodes</h4>
     <ul class="list-group" >  
 
     <!-- Display that there are no available ns -->
@@ -75,14 +75,14 @@ document.getElementById("explore").setAttribute("class", "active");
     {% endif %}   
 
     <div class="panel panel-primary media-body">
-        <div class='panel-heading'> <a class='title' href='{% url "post_detail" post.id %}'> {{ post.title }} </a> <span class='date'> {{ post.published }} </span> </div>
+        <div class='panel-heading'> <a class='title' href='{% url "explore_post" node.id post.id %}'> {{ post.title }} </a> <span class='date'> {{ post.published }} </span> </div>
         <div class='panel-body'> 
             {% if post.contentType == "text/x-markdown" %}
                 {{ post.content|markdown }}
             {% else %}
                 {{ post.content|urlize|slice:"500" }}
                 {% if post.content|length > 500 %}
-                <a class='read_more' href='{% url "post_detail" post.id %}'> Continue Reading... </a> 
+                <a class='read_more' href='{% url "explore_post" node.id  post.id %}'> Continue Reading... </a> 
                 {% endif %}
             {% endif %}
 
@@ -93,8 +93,8 @@ document.getElementById("explore").setAttribute("class", "active");
         </div>
         <hr class='post-hr'>
         <div class='panel-body'>
-            <a href='{% url "post_detail" post.id %}#comments' class='comments'> {{ post.comments.count }} Comments </a>
-            <a href='{% url "post_detail" post.id %}' class='pull-right'><i class="fa fa-plus"></i></a>
+            <a href='{% url "explore_post" node.id  post.id %}#comments' class='comments'> {{ post.comments.count }} Comments </a>
+            <a href='{% url "explore_post" node.id  post.id %}' class='pull-right'><i class="fa fa-plus"></i></a>
         </div>
     </div>
 
