@@ -399,6 +399,8 @@ window.onload = function() {
   $("button.follow-btn").one("click", function(event) {
     var author_id = this.id.slice(11);
     var follower_id = document.getElementById('logged-in-author').getAttribute("data");
+    console.log(author_id)
+    console.log(follower_id)
 
     // we assume that follower_id (loggedInAuthor sending the friend request) is an author on our node
 

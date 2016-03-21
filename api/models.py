@@ -94,3 +94,5 @@ class Image(models.Model):
 class Friending(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     friend = models.ForeignKey(Author, related_name='friend', on_delete=models.CASCADE)
+    # class Meta:
+    #     unique_together = ["author", "friend"]
