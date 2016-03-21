@@ -273,25 +273,43 @@ class PostDetail(generics.GenericAPIView):
         if (not request.user.is_authenticated()):
             return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
+        # # check if request is from remote node, if so handle it
+        # remoteNode = getRemoteNode(request.user)
+        # if remoteNode != None:
+        #     author_serializer = getRemoteAuthorProfile(remoteNode.url, request, "") # put credentials in ""
+        #     # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
+        #     # else, create a new author object w/o user
+        #     # author = remoteAuthor here
+        #     try:
+        #         author = Author.objects.get(id=author_serializer.data["id"])
+        #     except Author.DoesNotExist as e:
+        #         author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
+        #         author.save()
+
+        # # local author - get from db
+        # else:
+        #     author  = Author.objects.get(user=request.user)
+        # author_id = author.id
+
         # check if request is from remote node, if so handle it
         remoteNode = getRemoteNode(request.user)
         if remoteNode != None:
-            author_serializer = getRemoteAuthorProfile(remoteNode.url, request, "") # put credentials in ""
+            # author_serializer = getRemoteAuthorProfile(remoteNode.url, request, "") # put credentials in ""
             # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
             # else, create a new author object w/o user
             # author = remoteAuthor here
-            try:
-                author = Author.objects.get(id=author_serializer.data["id"])
-            except Author.DoesNotExist as e:
-                author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
-                author.save()
+            # try:
+            #     author = Author.objects.get(id=author_serializer.data["id"])
+            # except Author.DoesNotExist as e:
+            #     author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
+            #     author.save()
+            author_id = request.META.get("HTTP_REMOTE_USER")
 
         # local author - get from db
         else:
-            author  = Author.objects.get(user=request.user)
+            # author  = Author.objects.get(user=request.user)
+            return Response({"message":"Node not allowed"},status=status.HTTP_403_FORBIDDEN)
 
-
-        author_id = author.id
         try:
             if (isAllowed(pk, author_id)):
                 post = Post.objects.get(id=pk)
