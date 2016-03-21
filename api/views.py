@@ -944,10 +944,10 @@ class RequestList(generics.GenericAPIView):
         # return all auother_ids who author_id1 are following
         if author_id1 is not None:
             followerList = []
-            aList = Friending.objects.filter(following__id=author_id1).values('author__id')
+            aList = Friending.objects.filter(friending__id=author_id1).values('author__id')
             for i in aList:
                 followerList.append(i["author__id"])
-        return Response({'query':'following', 'followers':followerList}, status=status.HTTP_200_OK)
+        return Response({'query':'friending', 'followers':followerList}, status=status.HTTP_200_OK)
 
 class FriendRequest(generics.GenericAPIView):
     serializer_class = FriendingSerializer
@@ -1032,3 +1032,27 @@ class FriendRequest(generics.GenericAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, request_pk, format=None):
+        # ensure user is authenticated
+        if (not request.user.is_authenticated()):
+            return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        data = request.data
+        if data == None:
+            return Response({"message": "no body given."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # check if the friend request exist
+        try:
+            unfriend = Friending.objects.get(friend=request_pk)
+        except:
+            return Response({"message":"Friend request does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # check if the author exist
+        try:
+            loggedInAuthor = Author.objects.get(user=request.user)
+        except Author.DoesNotExist as e:
+            return Response({"message":"Author does not exist"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        # to unfriend simply do it locally
+        unfriend.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
