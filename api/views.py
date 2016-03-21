@@ -136,17 +136,29 @@ def getAllFOAF(author_id):
         foaf.extend(newFriends)
     return foaf
 
-def getRemoteAuthorProfile(node_url, request, our_credentials):
+def getRemoteAuthorProfile(node_url, request):
     url = node_url + 'api/author/' + request.META.get("HTTP_REMOTE_USER")
     opener = urllib2.build_opener(urllib2.HTTPHandler)
-    request = urllib2.Request(url)
+    req = urllib2.Request(url)
 
-    # fill this with OUR authentication credentials provided by OTHER TEAMS
-    encodedValue = base64.b64encode("nodeHost4B@nodeHost4B:host4b")
+    credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",
+                    "http://disporia-cmput404.rhcloud.com/", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"}
 
-    # do basic auth
-    request.add_header("Authorization", "Basic " + encodedValue ) #Header, Value 
-    x = opener.open(request)
+    # set credentials on request
+    if node_url == "http://project-c404.rhcloud.com/":
+        creds = base64.b64encode(credentials["node_url"])
+        req.add_header("Authorization", "Basic " + creds)
+    elif node_url == "http://disporia-cmput404.rhcloud.com/":
+        creds = credentials["node_url"]
+        req.add_header("Authorization", "JWT " + creds)
+
+    # # fill this with OUR authentication credentials provided by OTHER TEAMS
+    # encodedValue = base64.b64encode("nodeHost4B@nodeHost4B:host4b")
+
+    # # do basic auth
+    # request.add_header("Authorization", "Basic " + encodedValue ) #Header, Value 
+
+    x = opener.open(req)
     y = x.read()
 
     author_serializer = AuthorSerializer(json.loads(y))
@@ -321,6 +333,16 @@ class PostDetail(generics.GenericAPIView):
 
         # is a remote author - assume remote author is already authenticated by remote node
         author_id = request.META.get("HTTP_REMOTE_USER")
+        author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
+        # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
+        # else, create a new author object w/o user
+        # author = remoteAuthor here
+        try:
+            author = Author.objects.get(id=author_serializer.data["id"])
+        except Author.DoesNotExist as e:
+            author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
+            author.save()
+
         if (isAllowed(pk, author_id)):
             serializer = PostSerializer(post)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -397,7 +419,22 @@ class CommentList(generics.GenericAPIView):
     queryset = Comment.objects.all()
 
     def get(self, request, post_pk, format=None):
-        # ensure user is authenticated
+        # Returns post if it's privacy setting is public - no need to be authenticated
+        # returns 404 if post does not exist
+        try:
+            post = Post.objects.get(id=post_pk)
+        except Post.DoesNotExist as e:
+            return Response({"message":"Post does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        if post.visibility == Post.PUBLIC:
+            comments = Comment.objects.filter(post=post_pk).order_by('-published')
+            page = self.paginate_queryset(comments)
+            serializer = CommentSerializer(page, many=True)
+            return self.get_paginated_response({"data": serializer.data, "query": "comments"})
+
+
+
+        # if post is not public - ensure user is authenticated
         if (not request.user.is_authenticated()):
             return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -405,7 +442,7 @@ class CommentList(generics.GenericAPIView):
         # check if request is from remote node, if so handle it
         remoteNode = getRemoteNode(request.user)
         if remoteNode != None:
-            author_serializer = getRemoteAuthorProfile(remoteNode.url, request, "") # put credentials in ""
+            author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
             # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
             # else, create a new author object w/o user
             # author = remoteAuthor here
@@ -444,7 +481,7 @@ class CommentList(generics.GenericAPIView):
         # check if request is from remote node, if so handle it
         remoteNode = getRemoteNode(request.user)
         if remoteNode != None:
-            author_serializer = getRemoteAuthorProfile(remoteNode.url, request, "") # put credentials in ""
+            author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
             # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
             # else, create a new author object w/o user
             # author = remoteAuthor here
@@ -509,7 +546,7 @@ class CommentDetail(generics.GenericAPIView):
         # check if request is from remote node, if so handle it
         remoteNode = getRemoteNode(request.user)
         if remoteNode != None:
-            author_serializer = getRemoteAuthorProfile(remoteNode.url, request, "") # put credentials in ""
+            author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
             # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
             # else, create a new author object w/o user
             # author = remoteAuthor here
@@ -896,7 +933,7 @@ class FriendingCheck(generics.GenericAPIView):
             remoteNode = getRemoteNode(request.user)
             if remoteNode != None:
                 return Response({"message":"This is a remote user on another node, to see their friends, use the api of the remote user's original node"}, status=status.HTTP_400_BAD_REQUEST)
-                # author_serializer = getRemoteAuthorProfile(remoteNode.url, request, "") # put credentials in ""
+                # author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
                 # # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
                 # # else, create a new author object w/o user
                 # # author = remoteAuthor here
@@ -923,7 +960,7 @@ class FriendingCheck(generics.GenericAPIView):
         remoteNode = getRemoteNode(request.user)
         if remoteNode != None:
             return Response({"message":"This is a remote user on another node, to use this service, use the api of the remote user's original node"}, status=status.HTTP_400_BAD_REQUEST)
-            # author_serializer = getRemoteAuthorProfile(remoteNode.url, request, "") # put credentials in ""
+            # author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
             # # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
             # # else, create a new author object w/o user
             # # author = remoteAuthor here
@@ -989,7 +1026,7 @@ class FriendRequest(generics.GenericAPIView):
         # # check if request is from remote node, if so handle it
         # remoteNode = getRemoteNode(request.user)
         # if remoteNode != None:
-        #     author_serializer = getRemoteAuthorProfile(remoteNode.url, request, "") # put credentials in ""
+        #     author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
         #     # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
         #     # else, create a new author object w/o user
         #     # author_of_request = remoteAuthor here
