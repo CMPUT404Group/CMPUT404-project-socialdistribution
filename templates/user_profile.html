@@ -26,12 +26,12 @@
         <!-- Display required user info on profile page -->
         <h1> {{ user_account.username }} </h1>
         <div>
-            <!-- <p style="color: grey;">id: {{ user_account.id }} </p> -->
-            <p style="color: grey;">host: {{ author.host }} </p>
-            <p style="color: grey;">username: {{ user_account.username }} </p>
-            <p style="color: grey;">url: {{ author.host }}user/{{ user_account.username }} </p>
-            <p id="id-email" style="color: grey;">email: {{user_account.email}} </p>
-            <p id="id-github" style="color: grey;">github: {{ author.github_name }}
+            <p style="color: grey;">host: {{ profile_owner.host }} </p>
+            <p style="color: grey;">username: {{ profile_owner.user.username }} </p>
+            <p style="color: grey;">displayname: {{ profile_owner.displayname }} </p>
+            <p style="color: grey;">url: {{ profile_owner.host }}author/{{ profile_owner.id }} </p>
+            <p id="id-email" style="color: grey;">email: {{profile_owner.user.email}} </p>
+            <p id="id-github" style="color: grey;">github: {{ profile_owner.github_name }}
             <!-- Triggers editGithubModal -->
             {% if profile_owner == author %}
             <button id='editGithubTrigger' type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#editGithubModal"><i class="fa fa-edit"></i></button> 
