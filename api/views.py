@@ -1006,8 +1006,8 @@ class FriendRequest(generics.GenericAPIView):
                 atLeastOneAuthorIsLocal = True
         except Author.DoesNotExist as e:
             # not local author - create remote author w/o user
-            author = Author.objects.create(id=friend_req["id"], displayname=friend_req["displayname"], host=friend_req["host"])
-            author.save()
+            friend = Author.objects.create(id=friend_req["id"], displayname=friend_req["displayname"], host=friend_req["host"])
+            friend.save()
 
 
         if not atLeastOneAuthorIsLocal and not bothLocalAuthors:  # both remote users - client error - shouldn't have to handle this
@@ -1031,4 +1031,3 @@ class FriendRequest(generics.GenericAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
