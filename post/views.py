@@ -10,6 +10,8 @@ from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from itertools import chain
+from django.http import HttpResponse
+
 
 # Create your views here.
 '''
@@ -63,9 +65,18 @@ def public_stream(request):
 
         # author = Author.objects.get(user=request.user)
         followList = []
-        followRelationships = Friending.objects.filter(author=author)
+        followRelationships = Friending.objects.filter(friend=author)
         for relationship in followRelationships:
             followList.append(relationship.friend)
+
+        # notification on if logged in author has new follower
+        if len(followList) > author.previous_follower_num:
+            author.noti = True
+            author.previous_follower_num = len(followList)
+        else:
+            author.noti = False
+        author.save()
+
         return render(request, 'post/mainStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList })
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
@@ -110,6 +121,19 @@ def my_stream(request):
         posts2 = Post.objects.filter(id__in=pks)
         posts = posts1 | posts2
         posts.order_by('-published')
+
+        # notification on if logged in author has new follower
+        followList = []
+        followRelationships = Friending.objects.filter(friend=author)
+        for relationship in followRelationships:
+            followList.append(relationship.friend)
+
+        if len(followList) > author.previous_follower_num:
+            author.noti = True
+            author.previous_follower_num = len(followList)
+        else:
+            author.noti = False
+        author.save()
 
         form = PostForm()
         return render(request, 'post/myStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author})

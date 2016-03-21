@@ -263,7 +263,7 @@ class PostDetail(generics.GenericAPIView):
     DELETE : http://service/api/posts/<post_pk>
         * Deletes the post specified by the post_pk
 
-    '''
+    ''' 
 
     serializer_class = PostSerializer
     queryset = Post.objects.all()
