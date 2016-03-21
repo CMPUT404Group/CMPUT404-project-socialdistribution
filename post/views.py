@@ -65,14 +65,18 @@ def public_stream(request):
 
         # author = Author.objects.get(user=request.user)
         followList = []
-        followRelationships = Friending.objects.filter(friend=author)
+        followRelationships = Friending.objects.filter(author=author)
         for relationship in followRelationships:
             followList.append(relationship.friend)
-
+            
         # notification on if logged in author has new follower
-        if len(followList) > author.previous_follower_num:
+        followerList = []
+        followerRelationships = Friending.objects.filter(friend=author)
+        for relationship in followerRelationships:
+            followerList.append(relationship.friend)
+        if len(followerList) > author.previous_follower_num:
             author.noti = True
-            author.previous_follower_num = len(followList)
+            author.previous_follower_num = len(followerList)
         else:
             author.noti = False
         author.save()
