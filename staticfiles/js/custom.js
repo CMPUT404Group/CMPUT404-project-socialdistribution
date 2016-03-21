@@ -326,7 +326,7 @@ window.onload = function() {
             dataType: 'json',
             beforeSend: function(xhr, settings) {
               // put authentication credentials to REMOTE SITES here - may be different for each group
-              xhr.setRequestHeader("Authorization", "Basic " + btoa( follower_id + "@nodeHost4A:host4a"));
+              xhr.setRequestHeader("Authorization", "Basic " + btoa( follower_id + "@nodeHost4B:host4b"));
             },
             success: function(response2, statusText, xhr) {
               console.log(response2);
@@ -393,8 +393,7 @@ window.onload = function() {
   $("button.follow-btn").one("click", function(event) {
     var author_id = this.id.slice(11);
     var follower_id = document.getElementById('logged-in-author').getAttribute("data");
-    var followee_host = this.getAttribute("data-host");
-    console.log(followee_host);
+
     // we assume that follower_id (loggedInAuthor sending the friend request) is an author on our node
 
     // check if followee (person being followed) is a local or remote author
@@ -435,27 +434,10 @@ window.onload = function() {
         console.log(xhr.responseText);
         console.log(error);
         if (xhr.status == 404) {
-          console.log("IN HERE - followee is remote");
-          // get author profile
-          $.ajax({
-            url: followee_host + 'api/author/' + author_id + '/',
-            type: "GET",
-            contentType: "application/json",
-            beforeSend: function(xhr, settings) {
-              // xhr.setRequestHeader("X-CSRFToken", csrftoken);
-              xhr.setRequestHeader("Authorization", "Basic " + btoa( follower_id + "@nodeHost4A:host4a"));
-            },
-            success: function(response, statusText, xhr) {
-              var followee_author_obj = parseProfileResponse(response);
-              // is a remote author - send request to remote node's api
-              sendRemoteFriendRequest(follower_id, followee_author_obj, followee_host);   // parameters : source author id, destination author object, destination/remote host
-            },
-            error: function(xhr, ajaxOptions, error) {
-              console.log(xhr.status);
-              console.log(xhr.responseText);
-              console.log(error);
-            }
-          });
+          console.log("IN HERERLKE*U)*&");
+          // var followee_author_obj = parseProfileResponse(response);
+          // is a remote author - send request to remote node's api
+          // sendRemoteFriendRequest(follower_id, followee_author_obj, host);   // parameters : source author id, destination author object, destination/remote host
         }
 
         toastr.error("Error. Could not send request");
