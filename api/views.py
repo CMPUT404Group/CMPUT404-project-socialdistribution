@@ -1032,3 +1032,30 @@ class FriendRequest(generics.GenericAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, format=None):
+        # ensure user is authenticated
+        if (not request.user.is_authenticated()):
+            return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        data = request.data
+        if data == None:
+            return Response({"message": "no body given."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            author_req= request.data["author"]
+            unfriend_req = request.data["friend"]
+        except:
+            return Response({"message":"missing inputs"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # to unfriend simply do it locally
+
+        serializer = FriendingSerializer(data=data)
+        if serializer.is_valid():
+            serializer.validated_data["author"] = author
+            serializer.validated_data["friend"] = friend
+            serializer.save()
+            noti = Notification.objects.create(notificatee=Author.objects.get(id=friend_req["id"]), follower=Author.objects.get(id=author_req["id"]))
+            noti.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
