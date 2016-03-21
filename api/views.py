@@ -271,7 +271,7 @@ class PostDetail(generics.GenericAPIView):
     DELETE : http://service/api/posts/<post_pk>
         * Deletes the post specified by the post_pk
 
-    '''
+    ''' 
 
     serializer_class = PostSerializer
     queryset = Post.objects.all()
@@ -1003,10 +1003,10 @@ class RequestList(generics.GenericAPIView):
         # return all auother_ids who author_id1 are following
         if author_id1 is not None:
             followerList = []
-            aList = Friending.objects.filter(following__id=author_id1).values('author__id')
+            aList = Friending.objects.filter(friending__id=author_id1).values('author__id')
             for i in aList:
                 followerList.append(i["author__id"])
-        return Response({'query':'following', 'followers':followerList}, status=status.HTTP_200_OK)
+        return Response({'query':'friending', 'followers':followerList}, status=status.HTTP_200_OK)
 
 class FriendRequest(generics.GenericAPIView):
     serializer_class = FriendingSerializer
@@ -1096,3 +1096,34 @@ class FriendRequest(generics.GenericAPIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, request_pk, format=None):
+        # ensure user is authenticated
+        if (not request.user.is_authenticated()):
+            return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        data = request.data
+        if data == None:
+            return Response({"message": "no body given."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # check if the friend exist
+        try:
+            unfriend = Author.objects.get(id=request_pk)
+        except Author.DoesNotExist as e:
+            return Response({"message":"Friend does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # check if the author exist
+        try:
+            loggedInAuthor = Author.objects.get(user=request.user)
+        except Author.DoesNotExist as e:
+            return Response({"message":"Author does not exist"},status=status.HTTP_401_UNAUTHORIZED)
+
+        # check if the friendship exist
+        try:
+            friendship = Friending.objects.get(author=loggedInAuthor, friend=unfriend)
+        except Friending.DoesNotExist as e:
+            return Response({"message":"Friend request does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # to unfriend simply do it locally
+        friendship.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

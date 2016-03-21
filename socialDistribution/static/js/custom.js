@@ -145,11 +145,17 @@ window.onload = function() {
     event.preventDefault();
     var formData = new FormData($("#uploadImageForm")[0]);
     $.ajax({
+      url: 'http://' + window.location.host + '/api/images/',
+      type: "POST",
+      data: formData,
+      contentType: false,
+      processData: false,
       beforeSend: function(xhr, settings) {
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
       },
       success: function(response) {
         console.log(response);
+        console.log(response.photo);
         // close modal
         $("button#closeUploadImageModal").click();
         // clear upload image form
@@ -393,6 +399,8 @@ window.onload = function() {
   $("button.follow-btn").one("click", function(event) {
     var author_id = this.id.slice(11);
     var follower_id = document.getElementById('logged-in-author').getAttribute("data");
+    console.log(author_id)
+    console.log(follower_id)
 
     // we assume that follower_id (loggedInAuthor sending the friend request) is an author on our node
 
@@ -467,7 +475,8 @@ window.onload = function() {
     if (username === "") {
       $("button#closeChooseAuthorModal").click();
     } else {
-      checkUserName(username);
+      authorCallback(true, username);
+      //checkUserName(username); -- problems
     }
   });
 
@@ -481,19 +490,19 @@ window.onload = function() {
       }
   });
 
-  //send an ajax request to see if that userpae exists
-  function checkUserName(username){
-    $.ajax({
-      url: "/author/"+username+"/",
-      complete: function(e,xhr,settings){
-        if(e.status === 200) {
-          authorCallback(true, username);
-        } else if (e.status === 404) {
-          authorCallback(false, username);
-        }
-      }
-    });
-  }
+  //send an ajax request to see if that userpae exists - now we are using the user ids so this wont work
+  // function checkUserName(username){
+  //   $.ajax({
+  //     url: "/author/"+username+"/",
+  //     complete: function(e,xhr,settings){
+  //       if(e.status === 200) {
+  //         authorCallback(true, username);
+  //       } else if (e.status === 404) {
+  //         authorCallback(false, username);
+  //       }
+  //     }
+  //   });
+  // }
 
   //respond correctly if it is an actual user or not
   function authorCallback(result,username){

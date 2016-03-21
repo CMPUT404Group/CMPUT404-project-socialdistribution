@@ -3,7 +3,7 @@
 {% block content %}
 {% load widget_tweaks %}
 
-<div id="logged-in-author" data="{{author.id}}"></div>
+<div id="logged-in-author" data="{{loggedInAuthor.id}}"></div>
 
 <div class="row profile-header">
 
@@ -16,7 +16,7 @@
     
     <div class="media-body" style="padding-left: 3em;">
         <!-- Do some logic here : follow, unfollow, accept etc -->
-        {% if profile_owner != author %}
+        {% if profile_owner != loggedInAuthor %}
             {% if profile_owner not in followList %}
             <button id='follow-btn-{{profile_owner.id}}'  class="follow-btn btn btn-success pull-right" style="position: relative; top: 1.5em; right: 1.5em;">Follow</button>
             {% else %}
@@ -24,23 +24,23 @@
             {% endif %}
         {% endif %}
         <!-- Display required user info on profile page -->
-        <h1> {{ user_account.username }} </h1>
+        <h1> {{ profile_owner.user.username }} </h1>
         <div>
-            <!-- <p style="color: grey;">id: {{ user_account.id }} </p> -->
-            <p style="color: grey;">host: {{ author.host }} </p>
-            <p style="color: grey;">username: {{ user_account.username }} </p>
-            <p style="color: grey;">url: {{ author.host }}user/{{ user_account.username }} </p>
-            <p id="id-email" style="color: grey;">email: {{user_account.email}} </p>
-            <p id="id-github" style="color: grey;">github: {{ author.github_name }}
+            <p style="color: grey;">host: {{ profile_owner.host }} </p>
+            <p style="color: grey;">username: {{ profile_owner.user.username }} </p>
+            <p style="color: grey;">displayname: {{ profile_owner.displayname }} </p>
+            <p style="color: grey;">url: {{ profile_owner.host }}author/{{ profile_owner.id }} </p>
+            <p id="id-email" style="color: grey;">email: {{profile_owner.user.email}} </p>
+            <p id="id-github" style="color: grey;">github: {{ profile_owner.github_name }}
             <!-- Triggers editGithubModal -->
-            {% if profile_owner == author %}
+            {% if profile_owner == loggedInAuthor %}
             <button id='editGithubTrigger' type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#editGithubModal"><i class="fa fa-edit"></i></button> 
             {% endif %}
             </p>
         </div>
     </div>
 
-    {% if user_account == user %}
+    {% if profile_owner.user == user %}
     <!-- Triggers uploadImageModal -->
     <span>
         <button id='uploadProfileImageTrigger' type="button" class="btn btn-default" data-toggle="modal" data-target="#uploadProfileImageModal"><i class="fa fa-picture-o"></i></button>
@@ -52,28 +52,8 @@
 
 <div class="main-body" style="position: relative; float: left; width: 70%;">
 
-
-<!-- Display profile owner's follower list --> 
-<div id=followers class="panel panel-primary"> 
-      <div class="panel-heading">Follower </div>
-      <div class="panel-body">
-        {% for follower in followers %}
-        <a href="{% url 'user_profile' follower.id %}">
-        <img id="user-profile-image-{{follower.id}}"
-         class="profile-photo-icon img-circle img-responsive img-center pull-left create-post"
-         data-toggle="tooltip" title="{{ follower }}"
-         alt="Profile Image"
-        {% if follower.picture %}
-         src="/media/{{ follower.picture }}"/></a>
-         {% else %}
-          src="http://placehold.it/175x175"/></a>
-         {% endif %}
-        {% endfor %}
-        </div>
-</div>
-
 <!-- If this is the logged in user's profile page, show a create post component -->
-{% if user_account == user %}
+{% if profile_owner.user == user %}
 {% include "post/createPost.html" %}
 {% endif %}
 
@@ -82,8 +62,8 @@
 <div class="row post">
 
     <!-- Display profile image -->
-    {% if author.picture %}
-    <img id="id-user-profile-image" src="/media/{{ author.picture }}" class="profile-photo-icon img-circle img-responsive img-center pull-left" alt="Profile Image"/>
+    {% if post.author.picture %}
+    <img id="id-user-profile-image" src="/media/{{ post.author.picture }}" class="profile-photo-icon img-circle img-responsive img-center pull-left" alt="Profile Image"/>
     {% else %}
     <img id="id-user-profile-image" class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/50x50">
     {% endif %}
@@ -112,7 +92,7 @@
         </div>
     </div>
 
-    {% if post.author == author %}
+    {% if post.author == loggedInAuthor %}
     <div class="media-body post-action-icons">
         <a href="{% url 'post_edit' post.id %}"><button class="btn btn-default action-icon edit-post"><i class="fa fa-pencil-square-o"></i></button></a>
         <button id='delete-post-{{ post.id }}' class="btn btn-default action-icon delete-post-single"><i class="fa fa-trash-o"></i></button>
@@ -126,23 +106,45 @@
 
 {% include "post/editProfileFieldModal.html" %}
 {% include "post/uploadProfileImageModal.html" %}
+
+</div>
+<div style="position: relative; float:right; width: 30%; padding-left: 1.5em;">
+    <div class="list-group sidebar" >
+        <h4 class="list-group-item list-group-item-info">Friends</h4>
+        {% for friend in friends|slice:":8" %}
+         <a class="list-group-item" style="height: 75px;" href="{% url 'user_profile' friend.id %}">
+        <img src={% if friend.picture %} '/media/{{friend.picture}}' {% else %} "http://placehold.it/50x50" {% endif%} class="friend-profile-icon img-circle img-responsive img-center pull-left list-group-item-text" alt="Profile Image"/>
+        <span>
+        <h4 class="list-group-item-heading">{{friend}}</h4>
+        <p class="list-group-item-text" style="font-size: smaller;">{{friend.host}}</p>
+    </span>
+        </a>
+        {% endfor %}
+        {% if friends|length > 8 %}
+        <a class="list-group-item" href='#'>See More Friends ...</a>
+        {% elif friends|length == 0 %}
+        <label class="list-group-item" href='#'>No Friends</label>
+        {% endif %}
+    </div>
+
+    <!-- Display profile owner's follower list --> 
+    <div class="list-group sidebar" >
+        <h4 class="list-group-item list-group-item-info">Followers</h4>
+        {% for follower in followers|slice:":8" %}
+         <a class="list-group-item" style="height: 75px;" href="{% url 'user_profile' follower.id %}">
+        <img src={% if follower.picture %} '/media/{{follower.picture}}' {% else %} "http://placehold.it/50x50" {% endif%} class="friend-profile-icon img-circle img-responsive img-center pull-left list-group-item-text" alt="Profile Image"/>
+        <span>
+        <h4 class="list-group-item-heading">{{follower}}</h4>
+        <p class="list-group-item-text" style="font-size: smaller;">{{follower.host}}</p>
+    </span>
+        </a>
+        {% endfor %}
+        {% if followers|length > 8 %}
+        <a class="list-group-item" href='#'>See More Followers ...</a>
+        {% elif friends|length == 0 %}
+        <label class="list-group-item" href='#'>No Followers</label>
+        {% endif %}
+    </div>
 </div>
 
-<div class="list-group sidebar" style="position: relative; float:right; width: 30%; padding-left: 1.5em;">
-    <h4 class="list-group-item list-group-item-info">Friends</h4>
-    {% for friend in friends|slice:":3" %}
-     <a class="list-group-item" style="height: 75px;" href="{% url 'user_profile' friend.id %}">
-    <img src={% if friend.picture %} '/media/{{friend.picture}}' {% else %} "http://placehold.it/50x50" {% endif%} class="friend-profile-icon img-circle img-responsive img-center pull-left list-group-item-text" alt="Profile Image"/>
-    <span>
-    <h4 class="list-group-item-heading">{{friend}}</h4>
-    <p class="list-group-item-text" style="font-size: smaller;">{{friend.host}}</p>
-</span>
-    </a>
-    {% endfor %}
-    {% if friends|length > 3 %}
-    <a class="list-group-item" href='#'>See More Friends ...</a>
-    {% elif friends|length == 0 %}
-    <label class="list-group-item" href='#'>No Friends</label>
-    {% endif %}
-</div>
 {% endblock %}

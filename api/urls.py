@@ -20,5 +20,6 @@ urlpatterns = [
 	
 	url(r'^requestlist/(?P<author_id1>[^/]+)/$',views.RequestList.as_view()),
 	url(r'^friendrequest/$',views.FriendRequest.as_view(), name='friendrequest'),
+	url(r'^friendrequest/(?P<request_pk>[^/]+)$',views.FriendRequest.as_view())
 
 ]

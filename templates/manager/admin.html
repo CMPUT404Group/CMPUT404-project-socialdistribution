@@ -45,6 +45,11 @@ document.getElementById("manager").setAttribute("class", "active");
     </span>
     </li>
     {% endfor %}
+    {% if nodes|length > 8 %}
+    <a class="list-group-item" href='#'>See More Nodes ...</a>
+    {% elif nodes|length == 0 %}
+    <label class="list-group-item" href='#'>No Nodes</label>
+    {% endif %}
   </ul>
 </div>
 {% endblock %}
