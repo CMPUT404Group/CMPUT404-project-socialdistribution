@@ -152,12 +152,9 @@ def getRemoteAuthorProfile(node_url, request):
     elif node_url == "http://disporia-cmput404.rhcloud.com/":
         creds = credentials[node_url]
         req.add_header("Authorization", "JWT " + creds)
-
-    # # fill this with OUR authentication credentials provided by OTHER TEAMS
-    # encodedValue = base64.b64encode("nodeHost4B@nodeHost4B:host4b")
-
-    # # do basic auth
-    # request.add_header("Authorization", "Basic " + encodedValue ) #Header, Value 
+    elif node_url == "":
+        encodedValue = base64.b64encode("nodeHost4B@nodeHost4B:host4b")
+        request.add_header("Authorization", "Basic " + encodedValue ) #Header, Value 
 
     x = opener.open(req)
     y = x.read()

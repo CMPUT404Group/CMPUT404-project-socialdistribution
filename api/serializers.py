@@ -5,7 +5,7 @@ from django.utils import timezone
 
 
 class AuthorSerializer(serializers.ModelSerializer):
-	picture = serializers.ImageField(use_url=True)
+	picture = serializers.ImageField(use_url=True, required=False)
 
 	class Meta:
 		model = Author
