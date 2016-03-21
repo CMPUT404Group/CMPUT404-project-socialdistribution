@@ -1030,22 +1030,21 @@ class FriendRequest(generics.GenericAPIView):
                 if atLeastOneAuthorIsLocal:
                     bothLocalAuthors = True
                 atLeastOneAuthorIsLocal = True
-        except Author.DoesNotExist as e:
-            # not local author - create remote author w/o user
-            friend = Author.objects.create(id=friend_req["id"], displayname=friend_req["displayname"], host=friend_req["host"])
-            friend.save()
 
+            # if friend is remote user
+            else:
+            return Response({"message":"Friend is not an author on this node"}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Author.DoesNotExist as e:
+            return Response({"message":"Friend is not an author on this node"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not atLeastOneAuthorIsLocal and not bothLocalAuthors:  # both remote users - client error - shouldn't have to handle this
             return Response({"message": "both are remote authors."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # one is remote & one is local -  author is remote / friend is local
-        # elif author.user == None:
-
 
         # we don't handle local to remote here - done in javascript - shouldn't hit our api
 
-        # else if both are local
+        # else if both are local or remote to local
                 
         serializer = FriendingSerializer(data=data)
         if serializer.is_valid():
