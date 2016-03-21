@@ -14,6 +14,14 @@ urlpatterns = [
     url(r'^post/(?P<post_pk>[^/]+)/success/$', views.post_detail, name="post_detail_success"),
     url(r'^author/(?P<user_id>[a-zA-z0-9-_]+)/success/$', views.user_profile, name="user_profile_success"),
 
+    #to look at other hosts -> explore stream 
+    #where they can choose the host
+    url(r'^explore/$', views.explore, name='explore'),
+    #to display a specific host
+    url(r'^explore/(?P<node_id>[^/]+)/$', views.explore, name='explore_host'), 
+    #to display an individual post from another host
+    url(r'^explore/(?P<node_id>[^/]+)/post/(?P<post_id>[^/]+)$', views.explore_post, name='explore_post'), 
+
     url(r'^author/(?P<user_id>[a-zA-z0-9-_]+)/$', views.user_profile, name="user_profile"),
     # url(r'^friendsStream/$', views.friends_stream, name='friends_stream'),
     # url(r'^followsStream/$', views.follows_stream, name='follows_stream'),

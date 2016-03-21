@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.template import RequestContext
 from django.utils import timezone
-from api.models import Post, Author, Comment, Friending
+from api.models import Post, Author, Comment, Friending, Node
 from .forms import PostForm, CommentForm
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.core.urlresolvers import reverse
@@ -11,6 +11,10 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from itertools import chain
 from django.http import HttpResponse
+import urllib2
+import json
+import base64
+from api.serializers import PostSerializer
 
 
 # Create your views here.
@@ -87,10 +91,91 @@ def public_stream(request):
 
 
 '''
+Renders the explore Stream
+'''
+def explore(request, node_id=None):
+    if (request.user.is_authenticated()):
+        nodes = Node.objects.all()
+        author = Author.objects.get(user=request.user)
+        if node_id == None:
+            return render(request, 'explore.html', {'loggedInAuthor': author, 'nodes': nodes, 'all':True})
+        else:
+            #checks what node it is on and returns the public posts from that node
+            
+            node = Node.objects.get(id=node_id)
+            url = node.url + "api/posts/"
+            opener = urllib2.build_opener(urllib2.HTTPHandler)
+            req = urllib2.Request(url)
+            credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
+                        "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"}
+            # set credentials on request
+            if node.url == "http://project-c404.rhcloud.com/":
+                    creds = base64.b64encode(credentials[node.url])
+                    req.add_header("Authorization", "Basic " + creds)
+            elif node.url == "http://disporia-cmput404.rhcloud.com/":
+                    creds = credentials[node.url]
+                    req.add_header("Authorization", "JWT " + creds)
+            try:
+                x = opener.open(req)
+                y = x.read()
+                jsonResponse = json.loads(y)
+                postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+                posts = postSerializer.data
+
+                form = PostForm()
+                return render(request, 'explore.html', {'node':node,'posts': posts, 'form': form, 'loggedInAuthor': author, 'nodes': nodes, 'all':False})
+            except urllib2.HTTPError, e:
+                return render(request, "404_page.html", {'message': "HTTP ERROR: "+str(e.code)+" "+e.reason, 'loggedInAuthor': author},status=404)
+    else:
+        return HttpResponseRedirect(reverse('accounts_login'))
+
+'''
+Renders the post clicked from the explore page
+'''
+def explore_post(request, node_id, post_id):
+    if (request.user.is_authenticated()):
+        author = Author.objects.get(user=request.user)
+        node = Node.objects.get(id=node_id)
+        if node_id == None:
+            return render(request, 'postDetail.html', {'loggedInAuthor': author, 'nodes': nodes})
+        else:
+            #checks what node it is on and returns the public posts from that node
+            if request.method == "GET":
+                try:
+                    node = Node.objects.get(id=node_id)
+                    url = node.url + "api/posts/" + post_id +"/"
+                    opener = urllib2.build_opener(urllib2.HTTPHandler)
+                    req = urllib2.Request(url)
+                    credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
+                                "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"}
+                    # set credentials on request
+                    if node.url == "http://project-c404.rhcloud.com/":
+                            creds = base64.b64encode(credentials[node.url])
+                            req.add_header("Authorization", "Basic " + creds)
+                    elif node.url == "http://disporia-cmput404.rhcloud.com/":
+                            creds = credentials[node.url]
+                            req.add_header("Authorization", "JWT " + creds)
+                    x = opener.open(req)
+                    y = x.read()
+                    jsonResponse = json.loads(y)
+                    postSerializer = PostSerializer(jsonResponse)
+                    post = postSerializer.data
+                    commentForm = CommentForm()
+                    return render(request, 'post/postDetail.html', {'post': post, 'commentForm': commentForm, 'loggedInAuthor': author, 'node': node})
+                except urllib2.HTTPError, e:
+                    return render(request, "404_page.html", {'message': "HTTP ERROR: "+str(e.code)+" "+e.reason, 'loggedInAuthor': author},status=404)
+            elif request.method == "POST":
+                try:
+                    #TODO
+                    pass
+                except urllib2.HTTPError, e:
+                    return render(request, "404_page.html", {'message': "HTTP ERROR: "+str(e.code)+" "+e.reason, 'loggedInAuthor': author},status=404)
+    else:
+        return HttpResponseRedirect(reverse('accounts_login'))
+
+'''
 Renders the My Stream page
 '''
-
-
 def my_stream(request):
     if (request.user.is_authenticated()):
         if request.method == "POST":
