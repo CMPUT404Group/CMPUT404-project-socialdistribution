@@ -141,8 +141,8 @@ def getRemoteAuthorProfile(node_url, request):
     opener = urllib2.build_opener(urllib2.HTTPHandler)
     req = urllib2.Request(url)
 
-    credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",
-                    "http://disporia-cmput404.rhcloud.com/", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"}
+    credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
+                    "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"}
 
     # set credentials on request
     if node_url == "http://project-c404.rhcloud.com/":
