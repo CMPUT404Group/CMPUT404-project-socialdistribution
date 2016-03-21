@@ -116,10 +116,10 @@ def my_stream(request):
         # posts.order_by('-published')
 
         #bring in posts from node4A
-        url = "http://cmput404team4a.herokuapp.com/api/posts"
+        url = "http://cmput404team4b.herokuapp.com/api/posts"
         opener = urllib2.build_opener(urllib2.HTTPHandler)
         req = urllib2.Request(url)
-        encodedValue = base64.b64encode("ba7e0730-984b-4926-9f9f-20ecb4136d51@nodeHost4B:host4b")
+        encodedValue = base64.b64encode("ab432861-f7bc-4b5b-9261-86c167615d6@nodeTeam4A:nodeTeam4A")
         req.add_header("Authorization", "Basic " + encodedValue)
         x = opener.open(req)
         y = x.read()
