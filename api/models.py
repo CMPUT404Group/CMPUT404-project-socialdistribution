@@ -21,6 +21,8 @@ class Author(models.Model):
     picture = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     host = models.CharField(max_length=40, default="http://127.0.0.1:8000/")
     displayname = models.CharField(max_length=40, default="defaultUsername")
+    previous_follower_num = models.PositiveIntegerField(default=0)
+    noti = models.BooleanField(default=False)
 
     def __unicode__(self):
         # return self.user.username

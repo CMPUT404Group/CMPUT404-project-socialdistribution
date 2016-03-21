@@ -45,7 +45,9 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bell">
                         <!-- <span class="badge">10</span> -->
+                        {% if loggedInAuthor.noti %}
                         <span class="label label-default">New</span>
+                        {% endif %}
                         </i> <b class="caret"></b></a>
                         <ul class="dropdown-menu message-dropdown">
                             <li class="message-preview">
@@ -69,8 +71,10 @@
                                 </a>
                             </li>
                             <li class="message-footer">
-                                <a href="{% url 'friendRequest' user.get_username%}">See All New Friend Requests
-                                <span class="label label-default">New</span>
+                                <a href="{% url 'friendRequest' user.get_username%}">See All Friend Requests
+                                    {% if loggedInAuthor.noti %}
+                                    <span class="label label-default">New</span>
+                                    {% endif %}
                                 </a>
                             </li>
                         </ul>
