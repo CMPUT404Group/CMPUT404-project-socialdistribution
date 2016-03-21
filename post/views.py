@@ -14,6 +14,7 @@ from api.serializers import *
 import urllib2
 import json
 import base64
+
 # Create your views here.
 '''
 Handles submitting the Post form - used when creating a new Post
@@ -53,19 +54,7 @@ def public_stream(request):
                     # alert user of the error
                     pass
 
-        # posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
-        #bring in posts from node4A
-        url = "http://cmput404team4a.herokuapp.com/api/posts"
-        opener = urllib2.build_opener(urllib2.HTTPHandler)
-        req = urllib2.Request(url)
-        encodedValue = base64.b64encode("5c3edd09-886b-4c46-97ee-d53e6518630a@nodeHost4B:host4b")
-        req.add_header("Authorization", "Basic " + encodedValue)
-        x = opener.open(req)
-        y = x.read()
-        jsonResponse = json.loads(y)
-        postSerializer = PostSerializer(jsonResponse["posts"], many=True)
-        posts = postSerializer.data
-
+        posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
         form = PostForm()
 
         # If an super user who is not admin tries to login
@@ -78,9 +67,9 @@ def public_stream(request):
 
         # author = Author.objects.get(user=request.user)
         followList = []
-        # followRelationships = Friending.objects.filter(author=author)
-        # for relationship in followRelationships:
-        #     followList.append(relationship.friend)
+        followRelationships = Friending.objects.filter(author=author)
+        for relationship in followRelationships:
+            followList.append(relationship.friend)
         return render(request, 'post/mainStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList })
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
@@ -109,25 +98,38 @@ def my_stream(request):
                     pass
 
         author = Author.objects.get(user=request.user)
-        posts1 = Post.objects.filter(author=author).order_by('-published')
+        # posts1 = Post.objects.filter(author=author).order_by('-published')
 
-        pks = []
+        # pks = []
 
-        #add the posts by the people we are friends with into our myStream
-        friend_pairs = Friending.objects.filter(author=author)
-        for i in range(len(friend_pairs)):
-            friend_posts = Post.objects.filter(author=friend_pairs[i].friend)
-            for j in range(len(friend_posts)):
-                if isAllowed(request.user, friend_posts[j].id):
-                    pks.append(friend_posts[j].id)
+        # #add the posts by the people we are friends with into our myStream
+        # friend_pairs = Friending.objects.filter(author=author)
+        # for i in range(len(friend_pairs)):
+        #     friend_posts = Post.objects.filter(author=friend_pairs[i].friend)
+        #     for j in range(len(friend_posts)):
+        #         if isAllowed(request.user, friend_posts[j].id):
+        #             pks.append(friend_posts[j].id)
 
-        #sort the posts so that the most recent is at the top
-        posts2 = Post.objects.filter(id__in=pks)
-        posts = posts1 | posts2
-        posts.order_by('-published')
+        # #sort the posts so that the most recent is at the top
+        # posts2 = Post.objects.filter(id__in=pks)
+        # posts = posts1 | posts2
+        # posts.order_by('-published')
 
+        #bring in posts from node4B
+        url = "http://cmput404team4b.herokuapp.com/api/posts"
+        opener = urllib2.build_opener(urllib2.HTTPHandler)
+        req = urllib2.Request(url)
+        encodedValue = base64.b64encode("34b149e1-bc35-48e1-a13f-406485190e63@nodeHost4A:host4a")
+        req.add_header("Authorization", "Basic " + encodedValue)
+        x = opener.open(req)
+        y = x.read()
+        jsonResponse = json.loads(y)
+        postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+        posts = postSerializer.data
+
+        followList = []
         form = PostForm()
-        return render(request, 'post/myStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author})
+        return render(request, 'post/myStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList})
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
