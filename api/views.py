@@ -188,10 +188,6 @@ class PostList(generics.GenericAPIView):
     queryset = Post.objects.all()
 
     def get(self, request, format=None):
-        # ensure user is authenticated
-        if (not request.user.is_authenticated()):
-            return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
-
         posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
         page = self.paginate_queryset(posts)
         serializer = PostSerializer(page, many=True)
@@ -205,39 +201,35 @@ class PostList(generics.GenericAPIView):
 
         data = request.data
 
-        # check if request is from remote node, if so handle it
-        remoteNode = getRemoteNode(request.user)
-        if remoteNode != None:
-            author_serializer = getRemoteAuthorProfile(remoteNode.url, request, "") # put credentials in ""
-            # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
-            # else, create a new author object w/o user
-            # author = remoteAuthor here
+        try:
+            author = Author.objects.get(user=request.user)
+        except Author.DoesNotExist as e:
+            return Response({"message":"Author does not exist / is not a local author"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # If its a remote node - not allowed to make posts
+        if request.get_host() not in author.host:
+            return Response({"message":"Only local authors can make posts"}, status=status.HTTP_403_FORBIDDEN)
+
+
+        statusCode = status.HTTP_201_CREATED
+
+        '''
+        Handles : EDIT Posts via POST method
+        '''
+        if post_pk != None:
             try:
-                author = Author.objects.get(id=author_serializer.data["id"])
-            except Author.DoesNotExist as e:
-                author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
-                author.save()
+                post = Post.objects.get(id=post_pk)
+            except Post.DoesNotExist as e:
+                return Response({"message": "Post does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
-        # local author - get from db
-        else:
-            author  = Author.objects.get(user=request.user)
 
-        '''
-        TODO : EDIT Posts via POST method
-        '''
-        # responseStatus = status.HTTP_201_CREATED
-        # if post_pk != None:
-        #     post = get_object_or_404(Post, pk=post_pk)
-        #     # only allow author of the post to modify it
-        #     author = Author.objects.get(user=request.user)
-        #     if author == post.author:
-        #         serializer = PostSerializer(post, data=request.data)
-        #         responseStatus=status.HTTP_200_OK
-        #     # if logged in user is not author of the post
-        #     else:
-        #         return Response(status=status.HTTP_403_FORBIDDEN)
-        # else:
-        #     serializer = PostSerializer(data=data)
+            # only allow author of the post to modify it
+            if author != post.author:
+                return Response({"message":"Only the author of this post can make changes to it"}, status=status.HTTP_403_FORBIDDEN)
+
+            statusCode = status.HTTP_200_OK
+
+
 
         serializer = PostSerializer(data=data)
 
@@ -246,7 +238,7 @@ class PostList(generics.GenericAPIView):
             serializer.validated_data["author"] = author
             serializer.validated_data["published"] = timezone.now()
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=statusCode)
 
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
