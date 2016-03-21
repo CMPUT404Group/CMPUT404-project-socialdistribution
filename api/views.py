@@ -48,6 +48,9 @@ def isAllowed(post_pk, author_id):
     except:
         raise Post.DoesNotExist
 
+    if post.visibility == Post.PUBLIC:
+        return True
+    
     privacy = post.visibility
     viewer = Author.objects.get(id=author_id)
 
