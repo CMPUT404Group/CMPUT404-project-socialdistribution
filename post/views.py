@@ -10,7 +10,10 @@ from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from itertools import chain
-
+from api.serializers import *
+import urllib2
+import json
+import base64
 # Create your views here.
 '''
 Handles submitting the Post form - used when creating a new Post
@@ -50,7 +53,19 @@ def public_stream(request):
                     # alert user of the error
                     pass
 
-        posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
+        # posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
+        #bring in posts from node4A
+        url = "http://cmput404team4a.herokuapp.com/api/posts"
+        opener = urllib2.build_opener(urllib2.HTTPHandler)
+        req = urllib2.Request(url)
+        encodedValue = base64.b64encode("5c3edd09-886b-4c46-97ee-d53e6518630a@nodeHost4B:host4b")
+        req.add_header("Authorization", "Basic " + encodedValue)
+        x = opener.open(req)
+        y = x.read()
+        jsonResponse = json.loads(y)
+        postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+        posts = postSerializer.data
+
         form = PostForm()
 
         # If an super user who is not admin tries to login
@@ -63,9 +78,9 @@ def public_stream(request):
 
         # author = Author.objects.get(user=request.user)
         followList = []
-        followRelationships = Friending.objects.filter(author=author)
-        for relationship in followRelationships:
-            followList.append(relationship.friend)
+        # followRelationships = Friending.objects.filter(author=author)
+        # for relationship in followRelationships:
+        #     followList.append(relationship.friend)
         return render(request, 'post/mainStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList })
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
