@@ -473,7 +473,8 @@ window.onload = function() {
     if (username === "") {
       $("button#closeChooseAuthorModal").click();
     } else {
-      checkUserName(username);
+      authorCallback(true, username);
+      //checkUserName(username); -- problems
     }
   });
 
@@ -487,19 +488,19 @@ window.onload = function() {
       }
   });
 
-  //send an ajax request to see if that userpae exists
-  function checkUserName(username){
-    $.ajax({
-      url: "/author/"+username+"/",
-      complete: function(e,xhr,settings){
-        if(e.status === 200) {
-          authorCallback(true, username);
-        } else if (e.status === 404) {
-          authorCallback(false, username);
-        }
-      }
-    });
-  }
+  //send an ajax request to see if that userpae exists - now we are using the user ids so this wont work
+  // function checkUserName(username){
+  //   $.ajax({
+  //     url: "/author/"+username+"/",
+  //     complete: function(e,xhr,settings){
+  //       if(e.status === 200) {
+  //         authorCallback(true, username);
+  //       } else if (e.status === 404) {
+  //         authorCallback(false, username);
+  //       }
+  //     }
+  //   });
+  // }
 
   //respond correctly if it is an actual user or not
   function authorCallback(result,username){
