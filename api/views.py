@@ -147,10 +147,10 @@ def getRemoteAuthorProfile(node_url, request):
     print url
     # set credentials on request
     if node_url == "http://project-c404.rhcloud.com/":
-        creds = base64.b64encode(credentials["node_url"])
+        creds = base64.b64encode(credentials[node_url])
         req.add_header("Authorization", "Basic " + creds)
     elif node_url == "http://disporia-cmput404.rhcloud.com/":
-        creds = credentials["node_url"]
+        creds = credentials[node_url]
         req.add_header("Authorization", "JWT " + creds)
 
     # # fill this with OUR authentication credentials provided by OTHER TEAMS
