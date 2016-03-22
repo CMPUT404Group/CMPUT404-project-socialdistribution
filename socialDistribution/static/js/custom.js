@@ -517,7 +517,7 @@ window.onload = function() {
     console.log(unfollower_id)
 
     $.ajax({
-      url: 'http://' + window.location.host + 'api/author/' + author_id,
+      url: 'http://' + window.location.host + '/api/author/' + author_id,
       type: "GET",
       contentType: "application/json",
       beforeSend: function(xhr, settings){
