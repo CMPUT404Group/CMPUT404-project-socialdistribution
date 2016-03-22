@@ -5,7 +5,7 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="myModalLabel">Edit Your Github </h4>
             </div>
-		    <form id="editGithubForm" method="POST" enctype="text/plain" data-author-id='{{ author.id}}' > {% csrf_token %}
+		    <form id="editGithubForm" method="POST" enctype="text/plain" data-author-id='{{ loggedInAuthor.id}}' > {% csrf_token %}
 			    <div class="modal-body">
 				    github: <input id="id_github" name="github" type="text" > 
 			    </div>
