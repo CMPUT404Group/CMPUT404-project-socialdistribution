@@ -210,7 +210,7 @@ window.onload = function() {
     event.preventDefault();
     var formData = document.getElementById('id_github').value;
     var authorID = $("#editGithubForm").data("author-id");
-    var Data = JSON.stringify({ "id": authorID ,"github_name": "http://github.com/"+formData});
+    var Data = JSON.stringify({ "id": authorID ,"github": "http://github.com/"+formData});
     $.ajax({
       url: 'http://' + window.location.host + '/api/author/' + authorID + '/',
       type: "POST",
@@ -227,7 +227,7 @@ window.onload = function() {
         $("form#editGithubForm").trigger("reset");
         // change wuthor github
         $("#id-github").empty();
-        $("#id-github").html("github: " + response.github_name);
+        $("#id-github").html("github: " + response.github);
         toastr.info("Github Updated!");
       },
       error: function(xhr, ajaxOptions, error) {
@@ -535,7 +535,7 @@ window.onload = function() {
       $.getJSON(path, function (data) {
           //$("#github_body").html("Under Construction -> Data received still need to make it more reader friendly.");
           $.each(data, function (i, field) {
-              $("#github_body").append("<p>"+"<b>"+field["type"]+"</b>"+" to "+field["repo"]["name"]+"</p>")
+              $("#github_body").append("<p>"+"<b>"+field["type"]+"</b>"+" to "+field["repo"]["name"]+"</p>"+"<p>"+"<b>Message:</b>"+field["payload"]["commits"][0]["message"]+"</p><br/>")
               //var textNode = document.createTextNode(i+ " " +JSON.stringify(field));
               //var textNode = document.createTextNode(JSON.stringify(JSON.stringify(field)));
               //var $newdiv = $( "<div id='github_event_"+i+"'/>" );

@@ -34,7 +34,7 @@
             <p style="color: grey;">displayname: {{ profile_owner.displayname }} </p>
             <p style="color: grey;">url: {{ profile_owner.host }}author/{{ profile_owner.id }} </p>
             <p id="id-email" style="color: grey;">email: {{profile_owner.user.email}} </p>
-            <p id="id-github" style="color: grey;">github: {{ profile_owner.github_name }}</p>
+            <p id="id-github" style="color: grey;">github: {{ profile_owner.github }}</p>
             <!-- Triggers editGithubModal -->
             {% if profile_owner == loggedInAuthor %}
             <button id='editGithubTrigger' type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#editGithubModal"><i class="fa fa-edit"></i></button> 
@@ -51,11 +51,11 @@
 
 
 </div>
-{% if profile_owner.github_name != "" %}
-<div class="main-body" style="position: relative; float: left; width: 70%;">
+{% if profile_owner.github != "" %}
+<div class="main-body" style="position: relative; float: left; width: 70%;"/>
 <!-- display profile owner's github activity -->
-<span id="github_name" data="{{ profile_owner.github_name }}"></span>
-<div id="github_events" class="panel panel-primary">
+<span id="github_name" data="{{ profile_owner.github }}"></span>
+<div id="github_events" class="panel panel-primary"/>
   <div class="panel-heading" style="font-size:2em">Github Activity                            
     <button id='get_github_events' type="button" class="btn btn-primary" style="color:black; background-color:white; position: absolute; right:1em;" >Get Github Activity</button></div>
   <div id="github_body" class="panel-body"></div>
