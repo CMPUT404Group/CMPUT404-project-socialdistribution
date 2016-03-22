@@ -179,6 +179,25 @@ def getRemoteNode(user):
     except Node.DoesNotExist as e:
         return None
 
+# ref: http://stackoverflow.com/questions/16700968/check-existing-password-and-reset-password
+# HASN'T BEEN QUITE TESTED OR IMPLEMENTED COMPLETELY YET
+def postChangeUserPassword(request):
+    if (not request.user.is_authenticated()):
+            return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+    if 'reset_password' in request.POST:
+        old_password = request.POST['old_password'].strip()
+        reset_password = request.POST['reset_password'].strip()
+        new_password = request.POST['new_password'].strip()
+       
+        if (old_password & reset_password & reset_password == new_password):
+            saveuser = User.objects.get(id=request.user.id)
+            if user.check_password(old_password):
+                saveuser.set_password(request.POST['reset_password']);
+                saveuser.save()
+
+        return Response(status=status.HTTP_200_OK)
+
+
 class PostList(generics.GenericAPIView):
     '''
     Lists all Posts  |  Create a new Post / Update an existing post
@@ -1125,15 +1144,6 @@ class FriendRequest(generics.GenericAPIView):
             return Response({"message":"Friend request does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
         # to unfriend simply do it locally
+
         friendship.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-        serializer = FriendingSerializer(data=data)
-        if serializer.is_valid():
-            serializer.validated_data["author"] = author
-            serializer.validated_data["friend"] = friend
-            serializer.save()
-            noti = Notification.objects.create(notificatee=Author.objects.get(id=friend_req["id"]), follower=Author.objects.get(id=author_req["id"]))
-            noti.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
