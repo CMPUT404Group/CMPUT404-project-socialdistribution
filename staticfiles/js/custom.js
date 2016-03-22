@@ -145,6 +145,11 @@ window.onload = function() {
     event.preventDefault();
     var formData = new FormData($("#uploadImageForm")[0]);
     $.ajax({
+      url: 'http://' + window.location.host + '/api/images/',
+      type: "POST",
+      data: formData,
+      contentType: false,
+      processData: false,
       beforeSend: function(xhr, settings) {
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
       },
