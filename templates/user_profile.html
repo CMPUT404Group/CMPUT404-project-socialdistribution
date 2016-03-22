@@ -51,9 +51,8 @@
 
 
 </div>
-
+{% if profile_owner.github_name != "" %}
 <div class="main-body" style="position: relative; float: left; width: 70%;">
-
 <!-- display profile owner's github activity -->
 <span id="github_name" data="{{ profile_owner.github_name }}"></span>
 <div id="github_events" class="panel panel-primary">
@@ -63,6 +62,9 @@
 </div>
 
 </div>
+{% endif %}
+
+<!-- display the profile owners friends and followers -->
 <div style="position: relative; float:right; width: 30%; padding-left: 1.5em;">
     <div class="list-group sidebar" >
         <h4 class="list-group-item list-group-item-info">Friends</h4>

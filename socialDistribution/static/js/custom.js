@@ -517,11 +517,15 @@ window.onload = function() {
 
   $("#get_github_events").click(function(){
     $("#github_body").empty();
-    var github_box = $('#id-github').html();
-    var github_name = github_box.split(" ")[1].split("/")[3]
-    //need to check that its a valid github name
-    var u_url = "https://api.github.com/users/"+github_name;
-    checkGHUserName(u_url, github_name);
+    var github_html = $('#id-github').html();
+    if (github_html != "github: ") {
+      var github_name = github_html.split(" ")[1].split("/")[3]
+      //need to check that its a valid github name
+      var u_url = "https://api.github.com/users/"+github_name;
+      checkGHUserName(u_url, github_name);
+    } else {
+      alert("no github name provided");
+    }
   });
 
   function githubCallback(result, url, username){
