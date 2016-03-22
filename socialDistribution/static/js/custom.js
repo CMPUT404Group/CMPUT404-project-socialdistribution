@@ -279,14 +279,15 @@ window.onload = function() {
               toastr.info("Unfollowed!");
               $("button#unfollow-btn-"+unfollowee_id).text("Unfollowed");
               $("button#unfollow-btn-"+unfollowee_id).removeClass("unfollow-btn");
-              $("button#unfollow-btn-"+unfollowee_id).removeClass("btn-success");
+              $("button#unfollow-btn-"+unfollowee_id).removeClass("btn-warning");
               $("button#unfollow-btn-"+unfollowee_id).addClass("btn-info");
             },
             error: function(xhr, ajaxOptions, error) {
               console.log(xhr.status);
               console.log(xhr.responseText);
               console.log(error);
-              toastr.error("Error. Could not send unfollow request");
+              //toastr.error("Error. Could not send unfollow request");
+              toastr("111");
             }
           });
         }
@@ -510,7 +511,7 @@ window.onload = function() {
 
   // button about unfollow someone
   $("button.unfollow-btn").one("click", function(event){
-    var author_id = this.id.slice(11);
+    var author_id = this.id.slice(13);
     var unfollower_id = document.getElementById('logged-in-author').getAttribute("data");
     console.log(author_id)
     console.log(unfollower_id)
