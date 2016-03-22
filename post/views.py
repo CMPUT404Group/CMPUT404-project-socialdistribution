@@ -17,6 +17,7 @@ import json
 import base64
 import urllib
 import uuid
+import requests
 from django.http import HttpResponse
 
 # Create your views here.
@@ -144,27 +145,30 @@ def explore_post(request, node_id, post_id):
             #checks what node it is on and returns the public posts from that node
             try:
                 node = Node.objects.get(id=node_id)
-                url = node.url + "api/posts/" + post_id +"/comments/"
-                # opener = urllib2.build_opener(urllib2.HTTPHandler)
-                # req = urllib2.Request(url)
+                #get the post info
+
                 credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
-                        "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"}
-                if node.url == "http://project-c404.rhcloud.com/":
-                        creds = base64.b64encode(credentials[node.url])
-                        headers = {"Authorization" : "Basic " + creds}
-                elif node.url == "http://disporia-cmput404.rhcloud.com/":
-                        creds = credentials[node.url]
-                        headers = {"Authorization": "JWT " + creds}
+                     "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"}
 
                 #create the comment to be sent
                 if request.method == "POST":
                     # set credentials on request
+                    url = node.url + "api/posts/" + post_id +"/comments/"
+                    # opener = urllib2.build_opener(urllib2.HTTPHandler)
+                    # req = urllib2.Request(url)
                     if node.url == "http://project-c404.rhcloud.com/":
+                            creds = base64.b64encode(credentials[node.url])
+                            headers = {"Authorization" : "Basic " + creds}
+                    elif node.url == "http://disporia-cmput404.rhcloud.com/":
+                            creds = credentials[node.url]
+                            headers = {"Authorization": "JWT " + creds}
+                    if node.url == "http://project-c404.rhcloud.com/":
+                            cid = uuid.uuid4()
                             values = {
-                                       "comment":"hello11",
+                                       "comment":"hello12",
                                        "contentType": "text/plain",
                                        "author":   {
-                                           "id": uuid.uuid4(),
+                                           "id": "376b65c5-948d-4263-9116-4d58d6e33b3c",
                                            "host": "project-c404.rhcloud.com/api",
                                            "displayName": "team4",
                                            "url": "project-c404.rhcloud.com/api/author/a9661f41-827a-4588-bfcb-61bcfcf316ba",
@@ -176,15 +180,28 @@ def explore_post(request, node_id, post_id):
                             values = {}
 
                     r = requests.post(url, json=values, headers=headers)
-                     #send the request
+                    #send the request
                     print r.json()
                     print r.status_code
-                    
+
+                url = node.url + "api/posts/" + post_id +"/"
+                opener = urllib2.build_opener(urllib2.HTTPHandler)
+                req = urllib2.Request(url)
+                if node.url == "http://project-c404.rhcloud.com/":
+                    creds = base64.b64encode(credentials[node.url])
+                    req.add_header("Authorization", "Basic " + creds)
+                elif node.url == "http://disporia-cmput404.rhcloud.com/":
+                     creds = credentials[node.url]
+                     req.add_header("Authorization", "JWT " + creds)
+                
+                x = opener.open(req)
+                y = x.read()
+                jsonResponse = json.loads(y)
                 postSerializer = PostSerializer(jsonResponse)
                 post = postSerializer.data
-                post = {}
                 commentForm = CommentForm()
                 return render(request, 'post/postDetail.html', {'post': post, 'commentForm': commentForm, 'loggedInAuthor': author, 'node': node})
+
             except urllib2.HTTPError, e:
                 return render(request, "404_page.html", {'message': "HTTP ERROR: "+str(e.code)+" "+e.reason, 'loggedInAuthor': author},status=e.code)
     else:
