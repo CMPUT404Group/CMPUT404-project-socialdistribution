@@ -30,8 +30,11 @@
             <p style="color: grey;">username: {{ profile_owner.user.username }} </p>
             <p style="color: grey;">displayname: {{ profile_owner.displayname }} </p>
             <p style="color: grey;">url: {{ profile_owner.host }}author/{{ profile_owner.id }} </p>
-            <p id="id-email" style="color: grey;">email: {{profile_owner.user.email}} </p>
-            <p id="id-github" style="color: grey;">github: {{ profile_owner.github_name }}
+            <p id="email" style="color: grey;">email: {{profile_owner.user.email}} </p>
+            <p style="color: grey;">github: 
+            <span id="github_name" data="{{ profile_owner.github_name }}">
+            {{ profile_owner.github_name }}
+            </span>
             <!-- Triggers editGithubModal -->
             {% if profile_owner == loggedInAuthor %}
             <button id='editGithubTrigger' type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#editGithubModal"><i class="fa fa-edit"></i></button> 
@@ -51,6 +54,13 @@
 </div>
 
 <div class="main-body" style="position: relative; float: left; width: 70%;">
+
+<!-- display profile owner's github activity -->
+<button id='get_github_events' type="button" class=class="btn btn-primary" color="blue">Get Github Activity</button>
+<div id="github_events" class="panel panel-primary">
+  <div class="panel-heading">Github Activity</div>
+  <div class="panel-body"></div>
+</div>
 
 <!-- If this is the logged in user's profile page, show a create post component -->
 {% if profile_owner.user == user %}
