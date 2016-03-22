@@ -24,6 +24,10 @@ node_modules
 
 # Ignore all image file in this project
 media
+.jpg
+.jpeg
+.png
+.git
 
 # Cached files
 .py~
