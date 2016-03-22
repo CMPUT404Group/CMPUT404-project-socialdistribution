@@ -73,7 +73,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
             ],
         },
-    },sadf
+    },
 ]
 
 WSGI_APPLICATION = 'socialDistribution.wsgi.application'
