@@ -210,7 +210,7 @@ window.onload = function() {
     event.preventDefault();
     var formData = document.getElementById('id_github').value;
     var authorID = $("#editGithubForm").data("author-id");
-    var Data = JSON.stringify({ "id": authorID ,"github_name": "http://github.com/"+formData});
+    var Data = JSON.stringify({ "id": authorID ,"github": "http://github.com/"+formData});
     $.ajax({
       url: 'http://' + window.location.host + '/api/author/' + authorID + '/',
       type: "POST",
@@ -227,7 +227,7 @@ window.onload = function() {
         $("form#editGithubForm").trigger("reset");
         // change wuthor github
         $("#id-github").empty();
-        $("#id-github").html("github: " + response.github_name);
+        $("#id-github").html("github: " + response.github);
         toastr.info("Github Updated!");
       },
       error: function(xhr, ajaxOptions, error) {
