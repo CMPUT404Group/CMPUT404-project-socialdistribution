@@ -110,18 +110,22 @@ def explore(request, node_id=None):
             req = urllib2.Request(url)
             credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
                         "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"}
-            # set credentials on request
-            if node.url == "http://project-c404.rhcloud.com/":
+            try:
+                # set credentials on request
+                if node.url == "http://project-c404.rhcloud.com/":
                     creds = base64.b64encode(credentials[node.url])
                     req.add_header("Authorization", "Basic " + creds)
-            elif node.url == "http://disporia-cmput404.rhcloud.com/":
+                    x = opener.open(req)
+                    y = x.read()
+                    jsonResponse = json.loads(y)
+                    postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+                elif node.url == "http://disporia-cmput404.rhcloud.com/":
                     creds = credentials[node.url]
-                    req.add_header("Authorization", "JWT " + creds)
-            try:
-                x = opener.open(req)
-                y = x.read()
-                jsonResponse = json.loads(y)
-                postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+                    req.add_header("Authorization", "JWT " + creds) 
+                    x = opener.open(req)
+                    y = x.read()
+                    jsonResponse = json.loads(y)
+                    postSerializer = PostSerializer(jsonResponse["results"], many=True)
                 posts = postSerializer.data
 
                 form = PostForm()
@@ -147,33 +151,33 @@ def explore_post(request, node_id, post_id):
                 #get the post info
 
                 credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
-                     "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"}
+                     "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg2MDQ5OTV9.yiiY5evZBCFhjUgCI0U5C76LrluI9eepyOqKUmLdcPE"}
 
                 #create the comment to be sent
                 if request.method == "POST":
                     # set credentials on request                    
-                    url = node.url + "api/posts/" + post_id +"/comments/"
+                    data = request.POST
+                    values = {}
+                    values["comment"] = data["comment"]
+                    values["contentType"] = data["contentType"]
+                    values["author"] = {}
+                    values["author"]["id"] = str(author.id)
+                    values["author"]["host"] = author.host
+                    values["author"]["displayName"] = author.displayname
+                    values["author"]["github"] = author.github_name
+                    values["visibility"] = "PUBLIC"
                     # opener = urllib2.build_opener(urllib2.HTTPHandler)
                     # req = urllib2.Request(url)
                     if node.url == "http://project-c404.rhcloud.com/":
+                        url = node.url + "api/posts/" + post_id +"/comments/"
                         creds = base64.b64encode(credentials[node.url])
                         headers = {"Authorization" : "Basic " + creds}
-                        data = request.POST
-                        values = {}
-                        values["comment"] = data["comment"]
-                        values["contentType"] = data["contentType"]
-                        values["author"] = {}
-                        values["author"]["id"] = str(author.id)
-                        values["author"]["host"] = author.host
-                        values["author"]["displayName"] = author.displayname
-                        #author url?
                         values["author"]["url"] = "project-c404.rhcloud.com/api/author/a9661f41-827a-4588-bfcb-61bcfcf316ba"
-                        values["author"]["github"] = author.github_name
-                        values["visibility"] = "PUBLIC"
                     elif node.url == "http://disporia-cmput404.rhcloud.com/":
+                        url = node.url + "api/posts/" + post_id +"/comments"
                         creds = credentials[node.url]
                         headers = {"Authorization": "JWT " + creds}
-                        values = {}
+                        values["author"]["url"] = "team4_url"
 
                     r = requests.post(url, json=values, headers=headers)
                     #send the request
