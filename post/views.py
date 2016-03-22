@@ -16,7 +16,7 @@ import urllib2
 import json
 import base64
 import urllib
-import uuid
+import requests
 from django.http import HttpResponse
 
 # Create your views here.
@@ -110,18 +110,22 @@ def explore(request, node_id=None):
             req = urllib2.Request(url)
             credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
                         "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"}
-            # set credentials on request
-            if node.url == "http://project-c404.rhcloud.com/":
+            try:
+                # set credentials on request
+                if node.url == "http://project-c404.rhcloud.com/":
                     creds = base64.b64encode(credentials[node.url])
                     req.add_header("Authorization", "Basic " + creds)
-            elif node.url == "http://disporia-cmput404.rhcloud.com/":
+                    x = opener.open(req)
+                    y = x.read()
+                    jsonResponse = json.loads(y)
+                    postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+                elif node.url == "http://disporia-cmput404.rhcloud.com/":
                     creds = credentials[node.url]
-                    req.add_header("Authorization", "JWT " + creds)
-            try:
-                x = opener.open(req)
-                y = x.read()
-                jsonResponse = json.loads(y)
-                postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+                    req.add_header("Authorization", "JWT " + creds) 
+                    x = opener.open(req)
+                    y = x.read()
+                    jsonResponse = json.loads(y)
+                    postSerializer = PostSerializer(jsonResponse["results"], many=True)
                 posts = postSerializer.data
 
                 form = PostForm()
@@ -144,47 +148,60 @@ def explore_post(request, node_id, post_id):
             #checks what node it is on and returns the public posts from that node
             try:
                 node = Node.objects.get(id=node_id)
-                url = node.url + "api/posts/" + post_id +"/comments/"
-                # opener = urllib2.build_opener(urllib2.HTTPHandler)
-                # req = urllib2.Request(url)
+                #get the post info
+
                 credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
-                        "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"}
-                if node.url == "http://project-c404.rhcloud.com/":
-                        creds = base64.b64encode(credentials[node.url])
-                        headers = {"Authorization" : "Basic " + creds}
-                elif node.url == "http://disporia-cmput404.rhcloud.com/":
-                        creds = credentials[node.url]
-                        headers = {"Authorization": "JWT " + creds}
+                     "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg2MDQ5OTV9.yiiY5evZBCFhjUgCI0U5C76LrluI9eepyOqKUmLdcPE"}
 
                 #create the comment to be sent
                 if request.method == "POST":
-                    # set credentials on request
+                    # set credentials on request                    
+                    data = request.POST
+                    values = {}
+                    values["comment"] = data["comment"]
+                    values["contentType"] = data["contentType"]
+                    values["author"] = {}
+                    values["author"]["id"] = str(author.id)
+                    values["author"]["host"] = author.host
+                    values["author"]["displayName"] = author.displayname
+                    values["author"]["github"] = author.github_name
+                    values["visibility"] = "PUBLIC"
+                    # opener = urllib2.build_opener(urllib2.HTTPHandler)
+                    # req = urllib2.Request(url)
                     if node.url == "http://project-c404.rhcloud.com/":
-                            values = {
-                                       "comment":"hello11",
-                                       "contentType": "text/plain",
-                                       "author":   {
-                                           "id": uuid.uuid4(),
-                                           "host": "project-c404.rhcloud.com/api",
-                                           "displayName": "team4",
-                                           "url": "project-c404.rhcloud.com/api/author/a9661f41-827a-4588-bfcb-61bcfcf316ba",
-                                           "github": ""
-                                        },
-                                       "visibility":"PUBLIC"
-                                    }
+                        url = node.url + "api/posts/" + post_id +"/comments/"
+                        creds = base64.b64encode(credentials[node.url])
+                        headers = {"Authorization" : "Basic " + creds}
+                        values["author"]["url"] = "project-c404.rhcloud.com/api/author/a9661f41-827a-4588-bfcb-61bcfcf316ba"
                     elif node.url == "http://disporia-cmput404.rhcloud.com/":
-                            values = {}
+                        url = node.url + "api/posts/" + post_id +"/comments"
+                        creds = credentials[node.url]
+                        headers = {"Authorization": "JWT " + creds}
+                        values["author"]["url"] = "team4_url"
 
                     r = requests.post(url, json=values, headers=headers)
-                     #send the request
+                    #send the request
                     print r.json()
                     print r.status_code
-                    
+
+                url = node.url + "api/posts/" + post_id +"/"
+                opener = urllib2.build_opener(urllib2.HTTPHandler)
+                req = urllib2.Request(url)
+                if node.url == "http://project-c404.rhcloud.com/":
+                    creds = base64.b64encode(credentials[node.url])
+                    req.add_header("Authorization", "Basic " + creds)
+                elif node.url == "http://disporia-cmput404.rhcloud.com/":
+                     creds = credentials[node.url]
+                     req.add_header("Authorization", "JWT " + creds)
+                
+                x = opener.open(req)
+                y = x.read()
+                jsonResponse = json.loads(y)
                 postSerializer = PostSerializer(jsonResponse)
                 post = postSerializer.data
-                post = {}
                 commentForm = CommentForm()
-                return render(request, 'post/postDetail.html', {'post': post, 'commentForm': commentForm, 'loggedInAuthor': author, 'node': node})
+                return render(request, 'post/postDetail.html', {'remote':True, 'post': post, 'commentForm': commentForm, 'loggedInAuthor': author, 'node': node})
+
             except urllib2.HTTPError, e:
                 return render(request, "404_page.html", {'message': "HTTP ERROR: "+str(e.code)+" "+e.reason, 'loggedInAuthor': author},status=e.code)
     else:
@@ -212,77 +229,77 @@ def my_stream(request):
 
         author = Author.objects.get(user=request.user)
 
-        # posts1 = Post.objects.filter(author=author).order_by('-published')
+        posts1 = Post.objects.filter(author=author).order_by('-published')
 
-        # pks = []
+        pks = []
 
-        # #add the posts by the people we are friends with into our myStream
-        # friend_pairs = Friending.objects.filter(author=author)
-        # for i in range(len(friend_pairs)):
-        #     friend_posts = Post.objects.filter(author=friend_pairs[i].friend)
-        #     for j in range(len(friend_posts)):
-        #         if isAllowed(request.user, friend_posts[j].id):
-        #             pks.append(friend_posts[j].id)
+        #add the posts by the people we are friends with into our myStream
+        friend_pairs = Friending.objects.filter(author=author)
+        for i in range(len(friend_pairs)):
+            friend_posts = Post.objects.filter(author=friend_pairs[i].friend)
+            for j in range(len(friend_posts)):
+                if isAllowed(request.user, friend_posts[j].id):
+                    pks.append(friend_posts[j].id)
 
-        # #sort the posts so that the most recent is at the top
-        # posts2 = Post.objects.filter(id__in=pks)
-        # posts = posts1 | posts2
-        # posts.order_by('-published')
+        #sort the posts so that the most recent is at the top
+        posts2 = Post.objects.filter(id__in=pks)
+        posts = posts1 | posts2
+        posts.order_by('-published')
 
         #bring in posts from node4A
-        url = "http://cmput404team4b.herokuapp.com/api/posts"
-        opener = urllib2.build_opener(urllib2.HTTPHandler)
-        req = urllib2.Request(url)
-        encodedValue = base64.b64encode("ab432861-f7bc-4b5b-9261-86c167615d6@nodeTeam4A:nodeTeam4A")
-        req.add_header("Authorization", "Basic " + encodedValue)
-        x = opener.open(req)
-        y = x.read()
-        jsonResponse = json.loads(y)
-        postSerializer = PostSerializer(jsonResponse["posts"], many=True)
-        posts = postSerializer.data
+        # url = "http://cmput404team4A.herokuapp.com/api/posts/"
+        # opener = urllib2.build_opener(urllib2.HTTPHandler)
+        # req = urllib2.Request(url)
+        # encodedValue = base64.b64encode("ab432861-f7bc-4b5b-9261-86c167615d6@nodeTeam4A:nodeTeam4A")
+        # req.add_header("Authorization", "Basic " + encodedValue)
+        # x = opener.open(req)
+        # y = x.read()
+        # jsonResponse = json.loads(y)
+        # postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+        # posts = postSerializer.data
 
         followList = []
-        # # notification on if logged in author has new follower
-        # followList = []
-        # followRelationships = Friending.objects.filter(friend=author)
-        # for relationship in followRelationships:
-        #     followList.append(relationship.friend)
+        # notification on if logged in author has new follower
+        followList = []
+        followRelationships = Friending.objects.filter(friend=author)
+        for relationship in followRelationships:
+            followList.append(relationship.friend)
 
-        # if len(followList) > author.previous_follower_num:
-        #     author.noti = True
-        #     author.previous_follower_num = len(followList)
-        # else:
-        #     author.noti = False
-        # author.save()
-        # posts1 = Post.objects.filter(author=author).order_by('-published')
+        if len(followList) > author.previous_follower_num:
+            author.noti = True
+            author.previous_follower_num = len(followList)
+        else:
+            author.noti = False
+        author.save()
+        posts1 = Post.objects.filter(author=author).order_by('-published')
 
-        # pks = []
+        pks = []
 
-        # #add the posts by the people we are friends with into our myStream
-        # friend_pairs = Friending.objects.filter(author=author)
-        # for i in range(len(friend_pairs)):
-        #     friend_posts = Post.objects.filter(author=friend_pairs[i].friend)
-        #     for j in range(len(friend_posts)):
-        #         if isAllowed(request.user, friend_posts[j].id):
-        #             pks.append(friend_posts[j].id)
+        #add the posts by the people we are friends with into our myStream
+        friend_pairs = Friending.objects.filter(author=author)
+        for i in range(len(friend_pairs)):
+            friend_posts = Post.objects.filter(author=friend_pairs[i].friend)
+            for j in range(len(friend_posts)):
+                if isAllowed(request.user, friend_posts[j].id):
+                    pks.append(friend_posts[j].id)
 
-        # #sort the posts so that the most recent is at the top
-        # posts2 = Post.objects.filter(id__in=pks)
-        # posts = posts1 | posts2
-        # posts.order_by('-published')
+        #sort the posts so that the most recent is at the top
+        posts2 = Post.objects.filter(id__in=pks)
+        posts = posts1 | posts2
+        posts.order_by('-published')
 
-        # # notification on if logged in author has new follower
-        # followList = []
-        # followRelationships = Friending.objects.filter(friend=author)
-        # for relationship in followRelationships:
-        #     followList.append(relationship.friend)
+        # notification on if logged in author has new follower
+        followList = []
+        followRelationships = Friending.objects.filter(friend=author)
+        for relationship in followRelationships:
+            followList.append(relationship.friend)
 
-        # if len(followList) > author.previous_follower_num:
-        #     author.noti = True
-        #     author.previous_follower_num = len(followList)
-        # else:
-        #     author.noti = False
-        # author.save()
+        if len(followList) > author.previous_follower_num:
+            author.noti = True
+            author.previous_follower_num = len(followList)
+        else:
+            author.noti = False
+        author.save()
 
         form = PostForm()
         return render(request, 'post/myStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList})
@@ -329,7 +346,7 @@ def post_detail(request, post_pk):
             post = Post.objects.get(pk=post_pk)
             form = CommentForm()
             author = Author.objects.get(user=request.user)
-            return render(request, 'post/postDetail.html', {'post': post, 'commentForm': form, 'loggedInAuthor': author})
+            return render(request, 'post/postDetail.html', {'remote':False,'post': post, 'commentForm': form, 'loggedInAuthor': author})
         else:
             return HttpResponseForbidden("You are not allowed to access this page")
     else:
@@ -371,19 +388,22 @@ def user_profile(request, user_id):
 
         # Delegates create post form submission
         if request.method == "POST":
-            response = _submitPostForm(request)
-
-            # Empty Form Submitted
-            if response == None:
-                # alert user form was empty
-                pass
+            if 'reset_password' in request.POST:
+                postChangeUserPassword(request, profile_owner)
             else:
-                # -- TODO : display post success or failure on mainStream.html -- #
-                if response.status_code == 201:
-                    return HttpResponseRedirect(reverse('user_profile_success', kwargs={'user_id': user_id}))
-                else:  # 400 error
-                    # alert user of the error
+                response = _submitPostForm(request)
+
+                # Empty Form Submitted
+                if response == None:
+                    # alert user form was empty
                     pass
+                else:
+                    # -- TODO : display post success or failure on mainStream.html -- #
+                    if response.status_code == 201:
+                        return HttpResponseRedirect(reverse('user_profile_success', kwargs={'user_id': user_id}))
+                    else:  # 400 error
+                        # alert user of the error
+                        pass
 
         # FILTER POSTS BY VISIBILITY TO LOGGED IN USER --- #
         logged_author = Author.objects.get(user=request.user)
@@ -479,3 +499,22 @@ def isAllowed(user,pk):
             return False
     else:
         return False
+
+
+# ref: http://stackoverflow.com/questions/16700968/check-existing-password-and-reset-password
+# HASN'T BEEN QUITE TESTED OR IMPLEMENTED COMPLETELY YET
+def postChangeUserPassword(request, profile_owner):
+    old_password = str(request.POST['old_password'].strip())
+    print(old_password)
+    reset_password = str(request.POST['reset_password'].strip())
+    new_password = str(request.POST['new_password'].strip())
+       
+    if (old_password and reset_password and reset_password == new_password):
+        saveuser = User.objects.get(id=profile_owner.user.id)
+        if saveuser.check_password(old_password):
+            saveuser.set_password(request.POST['reset_password']);
+            saveuser.save()
+            #I DONT THINK WE NEED TO USE SERIALIZER or anything HERE???
+            return True
+    return False
+    

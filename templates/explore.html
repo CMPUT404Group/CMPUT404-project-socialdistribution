@@ -70,9 +70,13 @@ document.getElementById("explore").setAttribute("class", "active");
     </a>
     </div>
 
-    {% if  loggedInAuthor.id != post.author.id %}    
-    <button  id='unfollow-btn-{{post.author.id}}' class="unfollow-btn btn-sm btn-warning pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;">Unfollow</button>
-    {% endif %}   
+    {% if  loggedInAuthor.id != post.author.id %}
+        {% if post.author not in followList %}
+            <button  id='follow-btn-{{post.author.id}}' class="follow-btn btn-sm btn-success pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;"> Follow </button>
+        {% else %}
+            <button  id='unfollow-btn-{{post.author.id}}' class="unfollow-btn btn-sm btn-warning pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;"> Unfollow </button>
+        {% endif %}
+    {% endif %}
 
     <div class="panel panel-primary media-body">
         <div class='panel-heading'> <a class='title' href='{% url "explore_post" node.id post.id %}'> {{ post.title }} </a> <span class='date'> {{ post.published }} </span> </div>

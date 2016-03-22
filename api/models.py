@@ -17,7 +17,7 @@ CONTENT_TYPE_CHOICES = (
 class Author(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
-    github_name = models.CharField(max_length=40, blank=True)
+    github_name = models.CharField(max_length=40, blank=True, default="defunkt")
     picture = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     host = models.CharField(max_length=40, default="http://127.0.0.1:8000/")
     displayname = models.CharField(max_length=40, default="defaultUsername")

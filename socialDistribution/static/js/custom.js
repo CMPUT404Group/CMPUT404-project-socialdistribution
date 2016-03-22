@@ -226,7 +226,7 @@ window.onload = function() {
         $("button#closeeditGithubModal").click();
         // clear editgithub form
         $("form#editGithubForm").trigger("reset");
-        // change wuthor github
+        // change author github
         $("#id-github").empty();
         $("#id-github").html("github: " + response.github_name);
         toastr.info("Github Updated!");
@@ -245,6 +245,62 @@ window.onload = function() {
   function parseProfileResponse(author_profile_obj) {
     delete author_profile_obj["friends"];
     return author_profile_obj;
+  }
+
+  // for unfollow we only consider locally
+  function sendLocalUnFriendRequest(unfollower_id, unfollowee_obj){
+    var unfollowee_id = unfollowee_obj["id"]
+
+    $.ajax({
+      url: '/api/author/' + unfollower_id + '/',
+      type: "GET",
+      contentType: "application/json",
+      beforeSend: function(xhr, settings){
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function(response, statusText, xhr){
+        console.log(xhr.status);
+        if (xhr.status == 200) {
+          var unfollower_author_obj = parseProfileResponse(response);
+          var JSONobject = { "query": "friendrequest", "author": unfollower_author_obj, "friend": unfollowee_obj};
+          var jsonData = JSON.stringify(JSONobject);
+          console.log(jsonData);
+          $.ajax({
+            url: 'http://' + window.location.host + '/api/friendrequest/' + unfollowee_obj["id"],
+            type: "DELETE",
+            data: jsonData,
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            beforeSend: function(xhr, settings){
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function(response2) {
+              console.log(response2);
+              toastr.info("Unfollowed!");
+              $("button#unfollow-btn-"+unfollowee_id).text("Unfollowed");
+              $("button#unfollow-btn-"+unfollowee_id).removeClass("unfollow-btn");
+              $("button#unfollow-btn-"+unfollowee_id).removeClass("btn-warning");
+              $("button#unfollow-btn-"+unfollowee_id).addClass("btn-info");
+            },
+            error: function(xhr, ajaxOptions, error) {
+              console.log(xhr.status);
+              console.log(xhr.responseText);
+              console.log(error);
+              toastr.error("Error. Could not send unfollow request");
+            }
+          });
+        }
+        else {
+          toastr.error("Author not found.");
+        }
+      },
+      error: function(xhr, ajaxOptions, error) {
+        console.log(xhr.status);
+        console.log(xhr.responseText);
+        console.log(error);
+        toastr.error("Error. Could not send request");
+      }
+    });
   }
 
   function sendLocalFriendRequest(follower_id, followee_author_obj) {
@@ -452,14 +508,15 @@ window.onload = function() {
     })
   });
 
-    $("button.unfollow-btn").one("click", function(event){
-    var author_id = this.id.slice(11);
+  // button about unfollow someone
+  $("button.unfollow-btn").one("click", function(event){
+    var author_id = this.id.slice(13);
     var unfollower_id = document.getElementById('logged-in-author').getAttribute("data");
     console.log(author_id)
     console.log(unfollower_id)
 
     $.ajax({
-      url: 'http://' + window.location.host + 'api/author/' + author_id,
+      url: 'http://' + window.location.host + '/api/author/' + author_id,
       type: "GET",
       contentType: "application/json",
       beforeSend: function(xhr, settings){
@@ -549,6 +606,25 @@ window.onload = function() {
       alert("That is not a valid username. Try again");
     }
   }
+
+  $("#get_github_events").click(function(){
+    $("#github_events").empty();
+    $("#github_events").append("  <div class='panel-heading'>Github Activity</div>");
+    var github_name = document.getElementById('github_name').getAttribute("data");
+    var path = "https://api.github.com/users/"+github_name+"/events";
+    console.log(path);
+    $.getJSON(path, function (data) {
+        $.each(data, function (i, field) {
+            var textNode = document.createTextNode(i+ " " +JSON.stringify(field));
+            // var textNode = document.createTextNode(JSON.stringify(JSON.stringify(field)));
+            var $newdiv = $( "<div class='panel-body' id='github_event_"+i+"'/>" );
+            $("#github_events").append($newdiv);
+            $("#github_event_"+i).append(textNode);
+            // only get most recent 5 events
+            if (i >= 5) return false;
+        });
+    });
+});
 
 // use bootstrap tooltip to display the small pop-up box
   $(document).ready(function(){

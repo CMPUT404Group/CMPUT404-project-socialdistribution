@@ -22,6 +22,9 @@
             {% else %}
             <button id='unfollow-btn-{{profile_owner.id}}'  class="unfollow-btn btn btn-warning pull-right" style="position: relative; top: 1.5em; right: 1.5em;">Unfollow</button>
             {% endif %}
+        {% else %}
+            <!-- Display button to change password- -->
+            <button id='changePassword' type="button" class="password-btn btn btn-default pull-right" style="position: relative; top: 1.5em; right: 1.5em;" data-toggle="modal" data-target="#changePasswordModal">Change Password</button> 
         {% endif %}
         <!-- Display required user info on profile page -->
         <h1> {{ profile_owner.user.username }} </h1>
@@ -31,19 +34,18 @@
             <p style="color: grey;">displayname: {{ profile_owner.displayname }} </p>
             <p style="color: grey;">url: {{ profile_owner.host }}author/{{ profile_owner.id }} </p>
             <p id="id-email" style="color: grey;">email: {{profile_owner.user.email}} </p>
-            <p id="id-github" style="color: grey;">github: {{ profile_owner.github_name }}
+            <p id="id-github" style="color: grey;">github: {{ profile_owner.github_name }}</p>
             <!-- Triggers editGithubModal -->
             {% if profile_owner == loggedInAuthor %}
-            <button id='editGithubTrigger' type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#editGithubModal"><i class="fa fa-edit"></i></button> 
+            <button id='editGithubForm' type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#editGithubModal"><i class="fa fa-edit"></i></button> 
             {% endif %}
-            </p>
         </div>
     </div>
 
     {% if profile_owner.user == user %}
     <!-- Triggers uploadImageModal -->
     <span>
-        <button id='uploadProfileImageTrigger' type="button" class="btn btn-default" data-toggle="modal" data-target="#uploadProfileImageModal"><i class="fa fa-picture-o"></i></button>
+        <button id='uploadProfileImageForm' type="button" class="btn btn-default" data-toggle="modal" data-target="#uploadProfileImageModal"><i class="fa fa-picture-o"></i></button>
     </span>
     {% endif %}
 
@@ -51,6 +53,14 @@
 </div>
 
 <div class="main-body" style="position: relative; float: left; width: 70%;">
+
+<!-- display profile owner's github activity -->
+<span id="github_name" data="{{ profile_owner.github_name }}"></span>
+<button id='get_github_events' type="button" class=class="btn btn-primary" color="blue">Get Github Activity</button>
+<div id="github_events" class="panel panel-primary">
+  <div class="panel-heading">Github Activity</div>
+  <div class="panel-body"></div>
+</div>
 
 <!-- If this is the logged in user's profile page, show a create post component -->
 {% if profile_owner.user == user %}
@@ -104,6 +114,7 @@
 </div>
 {% endfor %}
 
+{% include "reset_password_box.html" %}
 {% include "post/editProfileFieldModal.html" %}
 {% include "post/uploadProfileImageModal.html" %}
 
