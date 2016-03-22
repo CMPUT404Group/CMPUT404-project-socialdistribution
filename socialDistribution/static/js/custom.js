@@ -286,8 +286,7 @@ window.onload = function() {
               console.log(xhr.status);
               console.log(xhr.responseText);
               console.log(error);
-              //toastr.error("Error. Could not send unfollow request");
-              toastr("111");
+              toastr.error("Error. Could not send unfollow request");
             }
           });
         }
