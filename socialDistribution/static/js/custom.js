@@ -226,7 +226,7 @@ window.onload = function() {
         $("button#closeeditGithubModal").click();
         // clear editgithub form
         $("form#editGithubForm").trigger("reset");
-        // change wuthor github
+        // change author github
         $("#id-github").empty();
         $("#id-github").html("github: " + response.github_name);
         toastr.info("Github Updated!");
@@ -606,6 +606,25 @@ window.onload = function() {
       alert("That is not a valid username. Try again");
     }
   }
+
+  $("#get_github_events").click(function(){
+    $("#github_events").empty();
+    $("#github_events").append("  <div class='panel-heading'>Github Activity</div>");
+    var github_name = document.getElementById('github_name').getAttribute("data");
+    var path = "https://api.github.com/users/"+github_name+"/events";
+    console.log(path);
+    $.getJSON(path, function (data) {
+        $.each(data, function (i, field) {
+            var textNode = document.createTextNode(i+ " " +JSON.stringify(field));
+            // var textNode = document.createTextNode(JSON.stringify(JSON.stringify(field)));
+            var $newdiv = $( "<div class='panel-body' id='github_event_"+i+"'/>" );
+            $("#github_events").append($newdiv);
+            $("#github_event_"+i).append(textNode);
+            // only get most recent 5 events
+            if (i >= 5) return false;
+        });
+    });
+});
 
 // use bootstrap tooltip to display the small pop-up box
   $(document).ready(function(){

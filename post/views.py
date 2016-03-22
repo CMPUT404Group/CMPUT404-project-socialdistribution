@@ -200,7 +200,7 @@ def explore_post(request, node_id, post_id):
                 postSerializer = PostSerializer(jsonResponse)
                 post = postSerializer.data
                 commentForm = CommentForm()
-                return render(request, 'post/postDetail.html', {'post': post, 'commentForm': commentForm, 'loggedInAuthor': author, 'node': node})
+                return render(request, 'post/postDetail.html', {'remote':True, 'post': post, 'commentForm': commentForm, 'loggedInAuthor': author, 'node': node})
 
             except urllib2.HTTPError, e:
                 return render(request, "404_page.html", {'message': "HTTP ERROR: "+str(e.code)+" "+e.reason, 'loggedInAuthor': author},status=e.code)
@@ -346,7 +346,7 @@ def post_detail(request, post_pk):
             post = Post.objects.get(pk=post_pk)
             form = CommentForm()
             author = Author.objects.get(user=request.user)
-            return render(request, 'post/postDetail.html', {'post': post, 'commentForm': form, 'loggedInAuthor': author})
+            return render(request, 'post/postDetail.html', {'remote':False,'post': post, 'commentForm': form, 'loggedInAuthor': author})
         else:
             return HttpResponseForbidden("You are not allowed to access this page")
     else:
