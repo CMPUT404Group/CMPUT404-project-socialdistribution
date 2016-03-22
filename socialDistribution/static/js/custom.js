@@ -264,6 +264,7 @@ window.onload = function() {
           var JSONobject = { "query": "friendrequest", "author": unfollower_author_obj, "friend": unfollowee_obj};
           var jsonData = JSON.stringify(JSONobject);
           console.log(jsonData);
+          toastr(jsonData);
           $.ajax({
             url: 'http://' + window.location.host + '/api/friendrequest/' + unfollowee_obj["id"],
             type: "DELETE",

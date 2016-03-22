@@ -1116,7 +1116,8 @@ class FriendRequest(generics.GenericAPIView):
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, format=None):
+
+    def delete(self, request, request_pk, format=None):
         # ensure user is authenticated
         if (not request.user.is_authenticated()):
             return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -1140,10 +1141,9 @@ class FriendRequest(generics.GenericAPIView):
         # check if the friendship exist
         try:
             friendship = Friending.objects.get(author=loggedInAuthor, friend=unfriend)
-        except Friending.DoesNotExist as e:
-            return Response({"message":"Friend request does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print '%s (%s)' % (e.message, type(e))
 
         # to unfriend simply do it locally
-
         friendship.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
