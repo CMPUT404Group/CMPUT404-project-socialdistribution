@@ -56,7 +56,7 @@
 	    <div class="media-body">
 	    	<div class='panel-body'> 
 	    		{% if comment.contentType == "text/x-markdown" %}
-	    			{{ comment.comment|markdown|urlize }} 
+	    			{{ comment.comment|markdown }} 
 				{% else %}
 					{{ comment.comment|urlize }}
 	    		{% endif %}
