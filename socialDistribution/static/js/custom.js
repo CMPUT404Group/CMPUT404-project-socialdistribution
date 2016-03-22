@@ -252,19 +252,19 @@ window.onload = function() {
     var unfollowee_id = unfollowee_obj["id"]
 
     $.ajax({
-      url: 'http//' + window.location.host + '/api/author/' + unfollower_id,
+      url: '/api/author/' + unfollower_id + '/',
       type: "GET",
       contentType: "application/json",
       beforeSend: function(xhr, settings){
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
       },
-      success: function(xhr, settings){
+      success: function(response, statusText, xhr){
+        console.log(xhr.status);
         if (xhr.status == 200) {
           var unfollower_author_obj = parseProfileResponse(response);
           var JSONobject = { "query": "friendrequest", "author": unfollower_author_obj, "friend": unfollowee_obj};
           var jsonData = JSON.stringify(JSONobject);
           console.log(jsonData);
-          toastr(jsonData);
           $.ajax({
             url: 'http://' + window.location.host + '/api/friendrequest/' + unfollowee_obj["id"],
             type: "DELETE",
