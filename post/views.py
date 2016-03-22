@@ -388,19 +388,22 @@ def user_profile(request, user_id):
 
         # Delegates create post form submission
         if request.method == "POST":
-            response = _submitPostForm(request)
-
-            # Empty Form Submitted
-            if response == None:
-                # alert user form was empty
-                pass
+            if 'reset_password' in request.POST:
+                postChangeUserPassword(request, profile_owner)
             else:
-                # -- TODO : display post success or failure on mainStream.html -- #
-                if response.status_code == 201:
-                    return HttpResponseRedirect(reverse('user_profile_success', kwargs={'user_id': user_id}))
-                else:  # 400 error
-                    # alert user of the error
+                response = _submitPostForm(request)
+
+                # Empty Form Submitted
+                if response == None:
+                    # alert user form was empty
                     pass
+                else:
+                    # -- TODO : display post success or failure on mainStream.html -- #
+                    if response.status_code == 201:
+                        return HttpResponseRedirect(reverse('user_profile_success', kwargs={'user_id': user_id}))
+                    else:  # 400 error
+                        # alert user of the error
+                        pass
 
         # FILTER POSTS BY VISIBILITY TO LOGGED IN USER --- #
         logged_author = Author.objects.get(user=request.user)
@@ -496,3 +499,22 @@ def isAllowed(user,pk):
             return False
     else:
         return False
+
+
+# ref: http://stackoverflow.com/questions/16700968/check-existing-password-and-reset-password
+# HASN'T BEEN QUITE TESTED OR IMPLEMENTED COMPLETELY YET
+def postChangeUserPassword(request, profile_owner):
+    old_password = str(request.POST['old_password'].strip())
+    print(old_password)
+    reset_password = str(request.POST['reset_password'].strip())
+    new_password = str(request.POST['new_password'].strip())
+       
+    if (old_password and reset_password and reset_password == new_password):
+        saveuser = User.objects.get(id=profile_owner.user.id)
+        if saveuser.check_password(old_password):
+            saveuser.set_password(request.POST['reset_password']);
+            saveuser.save()
+            #I DONT THINK WE NEED TO USE SERIALIZER or anything HERE???
+            return True
+    return False
+    

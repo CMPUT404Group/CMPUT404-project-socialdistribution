@@ -22,6 +22,9 @@
             {% else %}
             <button id='unfollow-btn-{{profile_owner.id}}'  class="unfollow-btn btn btn-warning pull-right" style="position: relative; top: 1.5em; right: 1.5em;">Unfollow</button>
             {% endif %}
+        {% else %}
+            <!-- Display button to change password- -->
+            <button id='changePassword' type="button" class="password-btn btn btn-default pull-right" style="position: relative; top: 1.5em; right: 1.5em;" data-toggle="modal" data-target="#changePasswordModal">Change Password</button> 
         {% endif %}
         <!-- Display required user info on profile page -->
         <h1> {{ profile_owner.user.username }} </h1>
@@ -104,6 +107,7 @@
 </div>
 {% endfor %}
 
+{% include "reset_password_box.html" %}
 {% include "post/editProfileFieldModal.html" %}
 {% include "post/uploadProfileImageModal.html" %}
 
