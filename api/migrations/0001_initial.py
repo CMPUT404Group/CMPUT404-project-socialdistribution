@@ -19,9 +19,11 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, serialize=False, editable=False, primary_key=True)),
                 ('github_name', models.CharField(max_length=40, blank=True)),
-                ('picture', models.ImageField(upload_to=b'profile_images/', blank=True)),
-                ('host', models.CharField(default=b'http://127.0.0.1:8080/', max_length=40)),
-                ('username', models.CharField(default=b'defaultUsername', max_length=40)),
+                ('picture', models.ImageField(null=True, upload_to=b'profile_images/', blank=True)),
+                ('host', models.CharField(default=b'http://127.0.0.1:8000/', max_length=40)),
+                ('displayname', models.CharField(default=b'defaultUsername', max_length=40)),
+                ('previous_follower_num', models.PositiveIntegerField(default=0)),
+                ('noti', models.BooleanField(default=False)),
                 ('user', models.OneToOneField(null=True, blank=True, to=settings.AUTH_USER_MODEL)),
             ],
         ),
@@ -53,6 +55,15 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
+            name='Node',
+            fields=[
+                ('id', models.UUIDField(default=uuid.uuid4, serialize=False, editable=False, primary_key=True)),
+                ('hostname', models.CharField(max_length=40)),
+                ('url', models.CharField(max_length=200)),
+                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
+            ],
+        ),
+        migrations.CreateModel(
             name='Post',
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, serialize=False, editable=False, primary_key=True)),
@@ -64,14 +75,6 @@ class Migration(migrations.Migration):
                 ('image_url', models.CharField(max_length=200, null=True, blank=True)),
                 ('other_author', models.CharField(max_length=30, null=True, blank=True)),
                 ('author', models.ForeignKey(to='api.Author')),
-            ],
-        ),
-        migrations.CreateModel(
-            name='Upload',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('pic', models.ImageField(upload_to=b'images/', verbose_name=b'Image')),
-                ('upload_date', models.DateTimeField(auto_now_add=True)),
             ],
         ),
         migrations.AddField(

@@ -1,0 +1,56 @@
+(venv)geneva@uc06:~/404proj>heroku run python manage.py migrate auth
+Running python manage.py migrate auth on cmput404team4b... up, run.1722
+Operations to perform:
+  Apply all migrations: auth
+Running migrations:
+  Rendering model states... DONE
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+(venv)geneva@uc06:~/404proj>heroku run python manage.py createsuperuser
+Running python manage.py createsuperuser on cmput404team4b... up, run.6068
+Username (leave blank to use 'u4099'): geneva
+Email address: geneva@ualberta.ca
+Password: 
+Password (again): 
+Superuser created successfully.
+(venv)geneva@uc06:~/404proj>heroku pg:psql
+---> Connecting to DATABASE_URL
+psql (9.3.11, server 9.4.6)
+WARNING: psql major version 9.3, server major version 9.4.
+         Some psql features might not work.
+SSL connection (cipher: ECDHE-RSA-AES256-GCM-SHA384, bits: 256)
+Type "help" for help.
+
+cmput404team4b::DATABASE=> \d
+cmput404team4b::DATABASE=> \q
+(venv)geneva@uc06:~/404proj>heroku run python manage.py syncdb
+Running python manage.py syncdb on cmput404team4b... up, run.5892
+/app/.heroku/python/lib/python2.7/site-packages/django/core/management/commands/syncdb.py:24: RemovedInDjango19Warning: The syncdb command will be removed in Django 1.9
+  warnings.warn("The syncdb command will be removed in Django 1.9", RemovedInDjango19Warning)
+
+Operations to perform:
+  Synchronize unmigrated apps: corsheaders, widget_tweaks, api, messages, manager, rest_framework, post, markdown_deux, staticfiles
+  Apply all migrations: auth, sessions, contenttypes, admin
+Synchronizing apps without migrations:
+  Creating tables...
+    Creating table api_author
+    Creating table api_node
+    Creating table api_post
+    Creating table api_comment
+    Creating table api_image
+    Creating table api_friending
+    Creating table post_notification
+    Creating table corsheaders_corsmodel
+    Running deferred SQL...
+  Installing custom SQL...
+Running migrations:
+  Rendering model states... DONE
+  Applying admin.0001_initial... OK
+  Applying sessions.0001_initial... OK
+

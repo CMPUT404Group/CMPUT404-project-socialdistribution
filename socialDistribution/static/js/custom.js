@@ -387,7 +387,7 @@ window.onload = function() {
             dataType: 'json',
             beforeSend: function(xhr, settings) {
               // put authentication credentials to REMOTE SITES here - may be different for each group
-              xhr.setRequestHeader("Authorization", "Basic " + btoa( follower_id + "@nodeCity:city"));
+              xhr.setRequestHeader("Authorization", "Basic " + btoa( follower_id + "@nodeHost4B:host4b"));
             },
             success: function(response2, statusText, xhr) {
               console.log(response2);

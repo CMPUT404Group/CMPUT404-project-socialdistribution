@@ -57,38 +57,12 @@ class HostBasicAuthentication(BasicAuthentication):
             raise exceptions.AuthenticationFailed(msg)
 
         user_id, host = auth_parts[0].split("@")
-        custom_auth_parts = [ user_id, host, auth_parts[2]]
-        # my_auth_parts => [ host , ":", password ]
-        # my_auth_parts = auth_parts[2].partition(":")
         # custom_auth_parts => [ userid, host, password ]
-        # custom_auth_parts = [ auth_parts[0], my_auth_parts[0], my_auth_parts[2] ]
-        # print "BasicAuthentication: custom_auth_parts : ",
-        # print custom_auth_parts
+        custom_auth_parts = [ user_id, host, auth_parts[2]]
         request.META["HTTP_REMOTE_USER"] = user_id
-        # userid, password = auth_parts[0], auth_parts[2] # ORIGINAL
-        # userid, password = custom_auth_parts[1] + "a", custom_auth_parts[2] + "a"
         userid, password = custom_auth_parts[1], custom_auth_parts[2]
 
         userObj = self.authenticate_credentials(userid, password)
-
-        # print "CUSTOM BasicAuthentication :"
-        # print userObj
-        
-        # print "\tREQUEST.USER : ",
-        # print request.user
-        # request.user = SimpleLazyObject(lambda: get_user(request))
-
-        # return self.authenticate_credentials(userid, password) # ORIGINAL
-
-        # author = Author.objects.get(user=userObj[0])
-        # print repr(author)
-        # request.user = author
-        # request.user = userObj[0]
-        # print request.user
-        # request.author = author
-        # print request.author
-        # print request.auth
-
         return userObj
 
 
