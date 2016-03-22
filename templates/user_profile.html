@@ -30,23 +30,19 @@
             <p style="color: grey;">username: {{ profile_owner.user.username }} </p>
             <p style="color: grey;">displayname: {{ profile_owner.displayname }} </p>
             <p style="color: grey;">url: {{ profile_owner.host }}author/{{ profile_owner.id }} </p>
-            <p id="email" style="color: grey;">email: {{profile_owner.user.email}} </p>
-            <p style="color: grey;">github: 
-            <span id="github_name" data="{{ profile_owner.github_name }}">
-            {{ profile_owner.github_name }}
-            </span>
+            <p id="id-email" style="color: grey;">email: {{profile_owner.user.email}} </p>
+            <p id="id-github" style="color: grey;">github: {{ profile_owner.github_name }}</p>
             <!-- Triggers editGithubModal -->
             {% if profile_owner == loggedInAuthor %}
-            <button id='editGithubTrigger' type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#editGithubModal"><i class="fa fa-edit"></i></button> 
+            <button id='editGithubForm' type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#editGithubModal"><i class="fa fa-edit"></i></button> 
             {% endif %}
-            </p>
         </div>
     </div>
 
     {% if profile_owner.user == user %}
     <!-- Triggers uploadImageModal -->
     <span>
-        <button id='uploadProfileImageTrigger' type="button" class="btn btn-default" data-toggle="modal" data-target="#uploadProfileImageModal"><i class="fa fa-picture-o"></i></button>
+        <button id='uploadProfileImageForm' type="button" class="btn btn-default" data-toggle="modal" data-target="#uploadProfileImageModal"><i class="fa fa-picture-o"></i></button>
     </span>
     {% endif %}
 
@@ -56,6 +52,7 @@
 <div class="main-body" style="position: relative; float: left; width: 70%;">
 
 <!-- display profile owner's github activity -->
+<span id="github_name" data="{{ profile_owner.github_name }}"></span>
 <button id='get_github_events' type="button" class=class="btn btn-primary" color="blue">Get Github Activity</button>
 <div id="github_events" class="panel panel-primary">
   <div class="panel-heading">Github Activity</div>

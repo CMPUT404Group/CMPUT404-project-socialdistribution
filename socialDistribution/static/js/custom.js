@@ -226,7 +226,7 @@ window.onload = function() {
         $("button#closeeditGithubModal").click();
         // clear editgithub form
         $("form#editGithubForm").trigger("reset");
-        // change wuthor github
+        // change author github
         $("#id-github").empty();
         $("#id-github").html("github: " + response.github_name);
         toastr.info("Github Updated!");
