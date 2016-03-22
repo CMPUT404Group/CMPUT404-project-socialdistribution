@@ -155,7 +155,7 @@ def getRemoteAuthorProfile(node_url, request):
         req.add_header("Authorization", "JWT " + creds)
     elif node_url == "http://cmput404-team-4b.herokuapp.com/":
         encodedValue = base64.b64encode(credentials[node_url])
-        request.add_header("Authorization", "Basic " + encodedValue ) #Header, Value 
+        req.add_header("Authorization", "Basic " + encodedValue ) #Header, Value 
 
     x = opener.open(req)
     y = x.read()
