@@ -455,7 +455,7 @@ class CommentList(generics.GenericAPIView):
             else:
                 author_serializer = AuthorSerializer(data["author"])
                 # author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
-                author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=author_serializer.data["host"])
+                author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=author_serializer.data["host"], github=author_serializer.data["github"])
                 # TODO :ADD GITHUB AFTER CHANGING OUR GITHUB MODEL FROM GITHUB_NAME TO GITHUB
                 author.save()
 
@@ -593,7 +593,7 @@ class CommentDetail(generics.GenericAPIView):
                 author = Author.objects.get(id=data["author"]["id"])
             except Author.DoesNotExist as e:
                 # author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
-                author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=author_serializer.data["host"])
+                author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=author_serializer.data["host"], github=author_serializer.data["github"])
                 # TODO :ADD GITHUB AFTER CHANGING OUR GITHUB MODEL FROM GITHUB_NAME TO GITHUB
                 author.save()
         else:
@@ -1093,7 +1093,7 @@ class FriendRequest(generics.GenericAPIView):
             # else is remote author sending the request
         except Author.DoesNotExist as e:
             # not local author - create remote author w/o user
-            author = Author.objects.create(id=author_req["id"], displayname=author_req["displayname"], host=author_req["host"])
+            author = Author.objects.create(id=author_req["id"], displayname=author_req["displayname"], host=author_req["host"], github=author_req["github"])
             author.save()
 
         try:
