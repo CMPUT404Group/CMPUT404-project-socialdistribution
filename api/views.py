@@ -61,6 +61,8 @@ def isAllowed(post_pk, author_id):
     elif privacy == Post.PUBLIC:
         return True
     elif privacy == Post.SERVER_ONLY:
+        print viewer.host
+        print post.author.host
         if viewer.host == post.author.host:
             return True
         else:
@@ -285,8 +287,9 @@ class PostDetail(generics.GenericAPIView):
         except Post.DoesNotExist as e:
             return Response({"message":"Post does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
+        serializer = PostSerializer(post)
+
         if post.visibility == Post.PUBLIC:
-            serializer = PostSerializer(post)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -296,58 +299,28 @@ class PostDetail(generics.GenericAPIView):
             return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-        '''
-        Gets the author from the request
-        '''
-        try:
-            author = Author.objects.get(user=request.user)
-
-        except Author.DoesNotExist as e:
-            # check if it is a remote node
-            remoteNode = getRemoteNode(request.user)
-
-            # not a remote author & not a local author
-            if remoteNode == None:
-                return Response({"message":"Node not allowed"},status=status.HTTP_403_FORBIDDEN)
-
-            # is a remote author - assume remote author is already authenticated by remote node
-            author_id = request.META.get("HTTP_REMOTE_USER")
-            if (isAllowed(pk, author_id)):
-                serializer = PostSerializer(post)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-
-            return Response({"message": "User is not allowed to see this post"}, status=status.HTTP_403_FORBIDDEN)
-       
-       # If its a local author - return the post
-        if request.get_host() in author.host:
-            serializer = PostSerializer(post)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
         # check if it is a remote node
         remoteNode = getRemoteNode(request.user)
 
-        # not a remote author & not a local author
-        if remoteNode == None:
-            return Response({"message":"Node not allowed"},status=status.HTTP_403_FORBIDDEN)
+        if remoteNode != None:
+            # is a remote node / author
+            if ((post.visibility ==  Post.SERVER_ONLY) | (post.visibility == Post.ME_ONLY)):
+                return Response({"message": "This node & authors on this node are not allowed to see this post"}, status=status.HTTP_403_FORBIDDEN)
+            else:
+                return Response(serializer.data, status=status.HTTP_200_OK)
 
-        # is a remote author - assume remote author is already authenticated by remote node
-        author_id = request.META.get("HTTP_REMOTE_USER")
-        author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
-        # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
-        # else, create a new author object w/o user
-        # author = remoteAuthor here
+
         try:
-            author = Author.objects.get(id=author_serializer.data["id"])
+            author = Author.objects.get(user=request.user)
         except Author.DoesNotExist as e:
-            author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
-            author.save()
+            return Response({"message": "Author does not exist"}, status=status.HTTP_403_FORBIDDEN)
+
 
         if (isAllowed(pk, author_id)):
-            serializer = PostSerializer(post)
             return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "User is not allowed to see this post"}, status=status.HTTP_403_FORBIDDEN)
 
-        return Response({"message": "User is not allowed to see this post"}, status=status.HTTP_403_FORBIDDEN)
-       
     def put(self, request, pk, format=None):
         data = request.data
 
@@ -425,12 +398,13 @@ class CommentList(generics.GenericAPIView):
         except Post.DoesNotExist as e:
             return Response({"message":"Post does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
-        if post.visibility == Post.PUBLIC:
-            comments = Comment.objects.filter(post=post_pk).order_by('-published')
-            page = self.paginate_queryset(comments)
-            serializer = CommentSerializer(page, many=True)
-            return self.get_paginated_response({"data": serializer.data, "query": "comments"})
+        comments = Comment.objects.filter(post=post_pk).order_by('-published')
+        page = self.paginate_queryset(comments)
+        serializer = CommentSerializer(page, many=True)
+        paginatedResponse = self.get_paginated_response({"data": serializer.data, "query": "comments"})
 
+        if post.visibility == Post.PUBLIC:
+            return paginatedResponse
 
 
         # if post is not public - ensure user is authenticated
@@ -438,36 +412,27 @@ class CommentList(generics.GenericAPIView):
             return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-        # check if request is from remote node, if so handle it
+        # check if it is a remote node
         remoteNode = getRemoteNode(request.user)
+
         if remoteNode != None:
-            author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
-            # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
-            # else, create a new author object w/o user
-            # author = remoteAuthor here
-            try:
-                author = Author.objects.get(id=author_serializer.data["id"])
-            except Author.DoesNotExist as e:
-                author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
-                author.save()
-
-        # local author - get from db
-        else:
-            author  = Author.objects.get(user=request.user)
-
-
-        author_id = author.id
-        try:
-            if (isAllowed(post_pk, author_id)):
-                comments = Comment.objects.filter(post=post_pk).order_by('-published')
-                page = self.paginate_queryset(comments)
-                serializer = CommentSerializer(page, many=True)
-                return self.get_paginated_response({"data": serializer.data, "query": "comments"})
+            # is a remote node / author
+            if ((post.visibility ==  Post.SERVER_ONLY) | (post.visibility == Post.ME_ONLY)):
+                return Response({"message": "This node & authors on this node are not allowed to see this post"}, status=status.HTTP_403_FORBIDDEN)
             else:
-                return Response({"message": "User is not allowed to see this comment or it's corresponding post"}, status=status.HTTP_403_FORBIDDEN)
+                return paginatedResponse
 
-        except Post.DoesNotExist as e:
-            return Response({"message":"Post does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            author = Author.objects.get(user=request.user)
+        except Author.DoesNotExist as e:
+            return Response({"message": "Author does not exist"}, status=status.HTTP_403_FORBIDDEN)
+
+
+        if (isAllowed(post_pk, author.id)):
+            return paginatedResponse
+        else:
+            return Response({"message": "User is not allowed to see this comment or it's corresponding post"}, status=status.HTTP_403_FORBIDDEN)
+
 
 
     def post(self, request, post_pk, format=None):
@@ -475,29 +440,25 @@ class CommentList(generics.GenericAPIView):
         if (not request.user.is_authenticated()):
             return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
-        data = request.data
+        try:
+            post = Post.objects.get(id=post_pk)
+        except Post.DoesNotExist as e:
+            return Response({"message":"Post does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
-        # check if request is from remote node, if so handle it
+        # check if it is a remote node
         remoteNode = getRemoteNode(request.user)
+
         if remoteNode != None:
-            author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
-            # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
-            # else, create a new author object w/o user
-            # author = remoteAuthor here
-            try:
-                author = Author.objects.get(id=author_serializer.data["id"])
-            except Author.DoesNotExist as e:
-                author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
+            # is a remote node / author
+            if ((post.visibility ==  Post.SERVER_ONLY) | (post.visibility == Post.ME_ONLY)):
+                return Response({"message": "This node & authors on this node are not allowed to see this post & thus cannot comment"}, status=status.HTTP_403_FORBIDDEN)
+            else:
+                author_serializer = AuthorSerializer(data["author"])
+                # author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
+                author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=author_serializer.data["host"], github=author_serializer.data["github"])
+                # TODO :ADD GITHUB AFTER CHANGING OUR GITHUB MODEL FROM GITHUB_NAME TO GITHUB
                 author.save()
 
-        # local author - get from db
-        else:
-            author  = Author.objects.get(user=request.user)
-
-
-        author_id = author.id
-        try:
-            if (isAllowed(post_pk, author_id)):
                 serializer = CommentSerializer(data=data)
 
                 if serializer.is_valid():
@@ -509,12 +470,32 @@ class CommentList(generics.GenericAPIView):
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
                 else:
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            
+
+        else:
+            try:
+                author = Author.objects.get(id=data.author.id)
+                # author = Author.objects.get(user=request.user)
+            except Author.DoesNotExist as e:
+                return Response({"message": "Author does not exist"}, status=status.HTTP_403_FORBIDDEN)
+
+
+        if (isAllowed(post_pk, author.id)):
+            serializer = CommentSerializer(data=data)
+
+            if serializer.is_valid():
+                print "DEBUG : API - views.py - CommentList"
+                serializer.validated_data["author"] = author
+                serializer.validated_data["published"] = timezone.now()
+                serializer.validated_data["post"] = Post.objects.get(pk=post_pk)
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
-                return Response({"message": "User is not allowed to see this post/comment"}, status=status.HTTP_403_FORBIDDEN)
-        
-        except Post.DoesNotExist as e:
-            return Response({"message":"Corresponding post does not exist"}, status=status.HTTP_404_NOT_FOUND)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        else:
+            return Response({"message": "User is not allowed to see this post/comment"}, status=status.HTTP_403_FORBIDDEN)
+
+
 
 
 
@@ -537,44 +518,51 @@ class CommentDetail(generics.GenericAPIView):
 
 
     def get(self, request, post_pk, comment_pk, format=None):
-        # ensure user is authenticated
+        try:
+            post = Post.objects.get(id=post_pk)
+        except Post.DoesNotExist as e:
+            return Response({"message":"Post does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            comment = Comment.objects.get(id=comment_pk)
+        except Comment.DoesNotExist as e:
+            return Response({"message":"Comment does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = CommentSerializer(comment)
+
+
+        if post.visibility == Post.PUBLIC:
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+    
+
+        # if post is not public - ensure user is authenticated
         if (not request.user.is_authenticated()):
             return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-        # check if request is from remote node, if so handle it
         remoteNode = getRemoteNode(request.user)
+
         if remoteNode != None:
-            author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
-            # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
-            # else, create a new author object w/o user
-            # author = remoteAuthor here
-            try:
-                author = Author.objects.get(id=author_serializer.data["id"])
-            except Author.DoesNotExist as e:
-                author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
-                author.save()
-
-        # local author - get from db
-        else:
-            author  = Author.objects.get(user=request.user)
-
-
-        author_id = author.id
-        try:
-            if (isAllowed(post_pk, author_id)):
-                comment = Comment.objects.get(id=comment_pk)
-                serializer = CommentSerializer(comment)
+            # is a remote node / author
+            if ((post.visibility ==  Post.SERVER_ONLY) | (post.visibility == Post.ME_ONLY)):
+                return Response({"message": "This node & authors on this node are not allowed to see this post & thus cannnot see comments"}, status=status.HTTP_403_FORBIDDEN)
+            else:
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
-            else:
-                return Response({"message": "User is not allowed to see this comment or it's corresponding post"}, status=status.HTTP_403_FORBIDDEN)
 
-        except Post.DoesNotExist as e:
-            return Response({"message":"Post does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            author = Author.objects.get(user=request.user)
+        except Author.DoesNotExist as e:
+            return Response({"message": "Author does not exist"}, status=status.HTTP_403_FORBIDDEN)
 
-        except Comment.DoesNotExist as e:
-            return Response({"message":"Comment does not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+        if (isAllowed(post_pk, author.id)):
+            return paginatedResponse
+        else:
+            return Response({"message": "User is not allowed to see this comment or it's corresponding post"}, status=status.HTTP_403_FORBIDDEN)
+
+
 
     # need to fix
     def put(self, request, post_pk, comment_pk, format=None):
@@ -589,39 +577,46 @@ class CommentDetail(generics.GenericAPIView):
         except Post.DoesNotExist as e:
             return Response({"message":"Post does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
-
         try:
             comment = Comment.objects.get(id=comment_pk)
         except Comment.DoesNotExist as e:
             return Response({"message":"Comment does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
-        # check if request is from remote node, if so handle it
+
+
+        serializer = CommentSerializer(comment)
+
+
         remoteNode = getRemoteNode(request.user)
         if remoteNode != None:
-            author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
-            # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
-            # else, create a new author object w/o user
-            # author = remoteAuthor here
             try:
-                author = Author.objects.get(id=author_serializer.data["id"])
+                author = Author.objects.get(id=data["author"]["id"])
             except Author.DoesNotExist as e:
-                author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
+                # author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
+                author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=author_serializer.data["host"], github=author_serializer.data["github"])
+                # TODO :ADD GITHUB AFTER CHANGING OUR GITHUB MODEL FROM GITHUB_NAME TO GITHUB
                 author.save()
-
-        # local author - get from db
         else:
-            author  = Author.objects.get(user=request.user)
-
+            try:
+                author = Author.objects.get(user=request.user)
+            except Author.DoesNotExist as e:
+                return Response({"message": "Author does not exist"}, status=status.HTTP_403_FORBIDDEN)
 
         # only allow author of the comment to modify it
         if author.id != comment.author.id:
             return Response({"message": "User is not the author of this comment & is not allowed to update this comment"}, status=status.HTTP_403_FORBIDDEN)
 
+
         serializer = CommentSerializer(comment, data=data)
+
         if serializer.is_valid():
+            print "DEBUG : API - views.py - CommentList"
+            serializer.validated_data["published"] = timezone.now()
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
     def delete(self, request, post_pk, comment_pk, format=None):
         # ensure user is authenticated
@@ -638,14 +633,28 @@ class CommentDetail(generics.GenericAPIView):
         except Comment.DoesNotExist as e:
             return Response({"message":"Comment does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
+
+
+        remoteNode = getRemoteNode(request.user)
+        if remoteNode != None:
+            return Response({"message":"remote authors can't delete comments. no author is provided."}, status=status.HTTP_403_FORBIDDEN)
+        # if remoteNode != None:
+        #     try:
+        #         author = Author.objects.get(id=data["author"]["id"])
+        #     except Author.DoesNotExist as e:
+        #         # author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
+        #         author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=author_serializer.data["host"])
+        #         # TODO :ADD GITHUB AFTER CHANGING OUR GITHUB MODEL FROM GITHUB_NAME TO GITHUB
+        #         author.save()
+
         try:
-            loggedInAuthor = Author.objects.get(user=request.user)
+            author = Author.objects.get(user=request.user)
         except Author.DoesNotExist as e:
             return Response({"message":"Author does not exist"}, status=status.HTTP_401_UNAUTHORIZED)
 
 
         # only allow author of the comment to delete it
-        if loggedInAuthor != comment.author:
+        if author.id != comment.author.id:
             return Response({"message": "User is not the author of this comment & is not allowed to delete this comment"}, status=status.HTTP_403_FORBIDDEN)
 
         # else if logged in user is author of the comment, delete it
@@ -744,6 +753,25 @@ class AuthorTimeline(generics.GenericAPIView):
             except DoesNotExist as e:
                 return Response(status=status.HTTP_404_NOT_FOUND)
 
+            if author_pk != None:
+                try:
+                    author = Author.objects.get(id=author_pk)
+                except Author.DoesNotExist as e:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+            remoteNode = getRemoteNode(request.user)
+            if remoteNode != None:
+                if author_pk == None:
+                    resultPosts = Post.objects.filter(visibility__in=[Post.PUBLIC, Post.FRIENDS, Post.FRIENDS_OF_FRIENDS, Post.OTHER_AUTHOR])
+                else:
+                    resultPosts = Post.objects.filter(visibility__in=[Post.PUBLIC, Post.FRIENDS, Post.FRIENDS_OF_FRIENDS, Post.OTHER_AUTHOR], author__id=author_pk)
+
+                page = self.paginate_queryset(resultPosts)
+                serializer = PostSerializer(page, many=True)
+                return self.get_paginated_response({"data": serializer.data, "query": "posts"})
+
+
             # posts that are visible to the currently authenticated user
             if author_pk == None:
                 # get author's own posts
@@ -767,10 +795,8 @@ class AuthorTimeline(generics.GenericAPIView):
                 resultPosts = Post.objects.filter(id__in=[post.id for post in result]).order_by('-published')
 
                 page = self.paginate_queryset(resultPosts)
-                if page is not None:
-                    serializer = PostSerializer(page, many=True)
-                    return self.get_paginated_response({"data": serializer.data, "query": "posts"})
-                # else : TODO
+                serializer = PostSerializer(page, many=True)
+                return self.get_paginated_response({"data": serializer.data, "query": "posts"})
 
             # author pk is provided - all posts made by {AUTHOR_ID} visible to the currently authenticated user
             else:   # author_pk != None
@@ -801,8 +827,12 @@ class AuthorTimeline(generics.GenericAPIView):
                     # viewee's public posts
                     publicPosts = Post.objects.filter(author=viewee, visibility=Post.PUBLIC)
 
+                    serverPosts = Post.objects.filter(author=viewee, visibility=Post.SERVER_ONLY)
+
+                    otherAuthor = Post.objects.filter(author=viewee, visibility=Post.OTHER_AUTHOR, other_author=viewer)
                     # combine all posts into one list w/o duplicates
-                    result = list(set(publicPosts) | set(friendsPosts) | set(foafPosts))
+
+                    result = list(set(publicPosts) | set(friendsPosts) | set(foafPosts) | set(serverPosts) | set(otherAuthor))
 
                     # put posts in order from most recent to least recent
                     resultPosts = Post.objects.filter(id__in=[post.id for post in result]).order_by('-published')
@@ -889,9 +919,7 @@ class AuthorDetail(generics.GenericAPIView):
             return Response({"message":"Author does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
         if request.user == author.user:
-            print "1"
             serializer = AuthorSerializer(author, data=request.data)
-            print "2"  
             if serializer.is_valid():
                 print "DEBUG : API - views.py - AuthorDetail"
                 serializer.save()
@@ -1065,7 +1093,7 @@ class FriendRequest(generics.GenericAPIView):
             # else is remote author sending the request
         except Author.DoesNotExist as e:
             # not local author - create remote author w/o user
-            author = Author.objects.create(id=author_req["id"], displayname=author_req["displayname"], host=author_req["host"])
+            author = Author.objects.create(id=author_req["id"], displayname=author_req["displayname"], host=author_req["host"], github=author_req["github"])
             author.save()
 
         try:
