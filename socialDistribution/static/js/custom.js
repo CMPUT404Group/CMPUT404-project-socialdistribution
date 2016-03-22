@@ -517,13 +517,14 @@ window.onload = function() {
 
   $("#get_github_events").click(function(){
     $("#github_body").empty();
-    var github_name = document.getElementById('github_name').getAttribute("data");
+    var github_box = $('#id-github').html();
+    var github_name = github_box.split(" ")[1].split("/")[3]
     //need to check that its a valid github name
     var u_url = "https://api.github.com/users/"+github_name;
-    checkGHUserName(u_url);
+    checkGHUserName(u_url, github_name);
   });
 
-  function githubCallback(result, url){
+  function githubCallback(result, url, username){
     var path = url +"/events";
     console.log(path);
     if (result === true) {
@@ -544,19 +545,19 @@ window.onload = function() {
           });
       });
     } else {
-      alert("That is not a valid github username");
+      alert(username+" is not a valid github username");
     }
   }
 
   //send an ajax request to see if that username exists - now we are using the user ids so this wont work
-  function checkGHUserName(url){
+  function checkGHUserName(url, username){
     $.ajax({
       url: url,
       complete: function(e,xhr,settings){
         if(e.status === 200) {
           githubCallback(true, url);
         } else if (e.status === 404) {
-          githubCallback(false, url);
+          githubCallback(false, url, username);
         }
       }
     });
