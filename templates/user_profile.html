@@ -37,7 +37,7 @@
             <p id="id-github" style="color: grey;">github: {{ profile_owner.github_name }}</p>
             <!-- Triggers editGithubModal -->
             {% if profile_owner == loggedInAuthor %}
-            <button id='editGithubForm' type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#editGithubModal"><i class="fa fa-edit"></i></button> 
+            <button id='editGithubTrigger' type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#editGithubModal"><i class="fa fa-edit"></i></button> 
             {% endif %}
         </div>
     </div>
@@ -45,7 +45,7 @@
     {% if profile_owner.user == user %}
     <!-- Triggers uploadImageModal -->
     <span>
-        <button id='uploadProfileImageForm' type="button" class="btn btn-default" data-toggle="modal" data-target="#uploadProfileImageModal"><i class="fa fa-picture-o"></i></button>
+        <button id='uploadProfileImageTrigger' type="button" class="btn btn-default" data-toggle="modal" data-target="#uploadProfileImageModal"><i class="fa fa-picture-o"></i></button>
     </span>
     {% endif %}
 

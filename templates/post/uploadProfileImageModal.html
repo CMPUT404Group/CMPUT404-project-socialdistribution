@@ -5,7 +5,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="myModalLabel">Set Profile Image</h4>
       </div>
-		<form id="uploadProfileImageForm" method="POST" enctype="multipart/form-data" data-author-id='{{ author.id}}' > {% csrf_token %}
+		<form id="uploadProfileImageForm" method="POST" enctype="multipart/form-data" data-author-id='{{ loggedInAuthor.id}}' > {% csrf_token %}
 			<div class="modal-body">
 				<input id="id_photo" name="picture" type="file" accept="image/*"> 
 			</div>

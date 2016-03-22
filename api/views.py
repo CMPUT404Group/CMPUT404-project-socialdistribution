@@ -142,7 +142,8 @@ def getRemoteAuthorProfile(node_url, request):
     req = urllib2.Request(url)
 
     credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
-                    "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"}
+                    "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ",\
+                    "http://cmput404-team-4b.herokuapp.com/" : "teamgeneva@teamgeneva:teamgeneva"}
     print node_url
     print url
     # set credentials on request
@@ -152,9 +153,9 @@ def getRemoteAuthorProfile(node_url, request):
     elif node_url == "http://disporia-cmput404.rhcloud.com/":
         creds = credentials[node_url]
         req.add_header("Authorization", "JWT " + creds)
-    elif node_url == "":
-        encodedValue = base64.b64encode("nodeHost4B@nodeHost4B:host4b")
-        request.add_header("Authorization", "Basic " + encodedValue ) #Header, Value 
+    elif node_url == "http://cmput404-team-4b.herokuapp.com/":
+        encodedValue = base64.b64encode(credentials[node_url])
+        req.add_header("Authorization", "Basic " + encodedValue ) #Header, Value 
 
     x = opener.open(req)
     y = x.read()
@@ -594,14 +595,26 @@ class CommentDetail(generics.GenericAPIView):
         except Comment.DoesNotExist as e:
             return Response({"message":"Comment does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
-        try:
-            loggedInAuthor = Author.objects.get(user=request.user)
-        except Author.DoesNotExist as e:
-            return Response({"message":"Author does not exist"}, status=status.HTTP_401_UNAUTHORIZED)
+        # check if request is from remote node, if so handle it
+        remoteNode = getRemoteNode(request.user)
+        if remoteNode != None:
+            author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
+            # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
+            # else, create a new author object w/o user
+            # author = remoteAuthor here
+            try:
+                author = Author.objects.get(id=author_serializer.data["id"])
+            except Author.DoesNotExist as e:
+                author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
+                author.save()
+
+        # local author - get from db
+        else:
+            author  = Author.objects.get(user=request.user)
 
 
         # only allow author of the comment to modify it
-        if loggedInAuthor != comment.author:
+        if author.id != comment.author.id:
             return Response({"message": "User is not the author of this comment & is not allowed to update this comment"}, status=status.HTTP_403_FORBIDDEN)
 
         serializer = CommentSerializer(comment, data=data)
