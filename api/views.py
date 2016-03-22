@@ -61,6 +61,8 @@ def isAllowed(post_pk, author_id):
     elif privacy == Post.PUBLIC:
         return True
     elif privacy == Post.SERVER_ONLY:
+        print viewer.host
+        print post.author.host
         if viewer.host == post.author.host:
             return True
         else:
@@ -825,8 +827,12 @@ class AuthorTimeline(generics.GenericAPIView):
                     # viewee's public posts
                     publicPosts = Post.objects.filter(author=viewee, visibility=Post.PUBLIC)
 
+                    serverPosts = Post.objects.filter(author=viewee, visibility=Post.SERVER_ONLY)
+
+                    otherAuthor = Post.objects.filter(author=viewee, visibility=Post.OTHER_AUTHOR, other_author=viewer)
                     # combine all posts into one list w/o duplicates
-                    result = list(set(publicPosts) | set(friendsPosts) | set(foafPosts))
+
+                    result = list(set(publicPosts) | set(friendsPosts) | set(foafPosts) | set(serverPosts) | set(otherAuthor))
 
                     # put posts in order from most recent to least recent
                     resultPosts = Post.objects.filter(id__in=[post.id for post in result]).order_by('-published')
