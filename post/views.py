@@ -16,7 +16,6 @@ import urllib2
 import json
 import base64
 import urllib
-import uuid
 import requests
 from django.http import HttpResponse
 
@@ -152,32 +151,29 @@ def explore_post(request, node_id, post_id):
 
                 #create the comment to be sent
                 if request.method == "POST":
-                    # set credentials on request
+                    # set credentials on request                    
                     url = node.url + "api/posts/" + post_id +"/comments/"
                     # opener = urllib2.build_opener(urllib2.HTTPHandler)
                     # req = urllib2.Request(url)
                     if node.url == "http://project-c404.rhcloud.com/":
-                            creds = base64.b64encode(credentials[node.url])
-                            headers = {"Authorization" : "Basic " + creds}
+                        creds = base64.b64encode(credentials[node.url])
+                        headers = {"Authorization" : "Basic " + creds}
+                        data = request.POST
+                        values = {}
+                        values["comment"] = data["comment"]
+                        values["contentType"] = data["contentType"]
+                        values["author"] = {}
+                        values["author"]["id"] = str(author.id)
+                        values["author"]["host"] = author.host
+                        values["author"]["displayName"] = author.displayname
+                        #author url?
+                        values["author"]["url"] = "project-c404.rhcloud.com/api/author/a9661f41-827a-4588-bfcb-61bcfcf316ba"
+                        values["author"]["github"] = author.github_name
+                        values["visibility"] = "PUBLIC"
                     elif node.url == "http://disporia-cmput404.rhcloud.com/":
-                            creds = credentials[node.url]
-                            headers = {"Authorization": "JWT " + creds}
-                    if node.url == "http://project-c404.rhcloud.com/":
-                            cid = uuid.uuid4()
-                            values = {
-                                       "comment":"hello12",
-                                       "contentType": "text/plain",
-                                       "author":   {
-                                           "id": "376b65c5-948d-4263-9116-4d58d6e33b3c",
-                                           "host": "project-c404.rhcloud.com/api",
-                                           "displayName": "team4",
-                                           "url": "project-c404.rhcloud.com/api/author/a9661f41-827a-4588-bfcb-61bcfcf316ba",
-                                           "github": ""
-                                        },
-                                       "visibility":"PUBLIC"
-                                    }
-                    elif node.url == "http://disporia-cmput404.rhcloud.com/":
-                            values = {}
+                        creds = credentials[node.url]
+                        headers = {"Authorization": "JWT " + creds}
+                        values = {}
 
                     r = requests.post(url, json=values, headers=headers)
                     #send the request
