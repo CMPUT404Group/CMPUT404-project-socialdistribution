@@ -17,6 +17,7 @@ import json
 import base64
 import urllib
 import uuid
+from django.http import HttpResponse
 
 # Create your views here.
 '''
@@ -210,6 +211,7 @@ def my_stream(request):
                     pass
 
         author = Author.objects.get(user=request.user)
+
         # posts1 = Post.objects.filter(author=author).order_by('-published')
 
         # pks = []
@@ -240,6 +242,35 @@ def my_stream(request):
         posts = postSerializer.data
 
         followList = []
+        # # notification on if logged in author has new follower
+        # followList = []
+        # followRelationships = Friending.objects.filter(friend=author)
+        # for relationship in followRelationships:
+        #     followList.append(relationship.friend)
+
+        # if len(followList) > author.previous_follower_num:
+        #     author.noti = True
+        #     author.previous_follower_num = len(followList)
+        # else:
+        #     author.noti = False
+        # author.save()
+        # posts1 = Post.objects.filter(author=author).order_by('-published')
+
+        # pks = []
+
+        # #add the posts by the people we are friends with into our myStream
+        # friend_pairs = Friending.objects.filter(author=author)
+        # for i in range(len(friend_pairs)):
+        #     friend_posts = Post.objects.filter(author=friend_pairs[i].friend)
+        #     for j in range(len(friend_posts)):
+        #         if isAllowed(request.user, friend_posts[j].id):
+        #             pks.append(friend_posts[j].id)
+
+        # #sort the posts so that the most recent is at the top
+        # posts2 = Post.objects.filter(id__in=pks)
+        # posts = posts1 | posts2
+        # posts.order_by('-published')
+
         # # notification on if logged in author has new follower
         # followList = []
         # followRelationships = Friending.objects.filter(friend=author)
