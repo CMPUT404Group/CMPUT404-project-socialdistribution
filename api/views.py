@@ -142,7 +142,8 @@ def getRemoteAuthorProfile(node_url, request):
     req = urllib2.Request(url)
 
     credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
-                    "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"}
+                    "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ",\
+                    "http://cmput404-team-4b.herokuapp.com/" : "teamgeneva@teamgeneva:teamgeneva"}
     print node_url
     print url
     # set credentials on request
@@ -152,8 +153,8 @@ def getRemoteAuthorProfile(node_url, request):
     elif node_url == "http://disporia-cmput404.rhcloud.com/":
         creds = credentials[node_url]
         req.add_header("Authorization", "JWT " + creds)
-    elif node_url == "":
-        encodedValue = base64.b64encode("nodeHost4B@nodeHost4B:host4b")
+    elif node_url == "http://cmput404-team-4b.herokuapp.com/":
+        encodedValue = base64.b64encode(credentials[node_url])
         request.add_header("Authorization", "Basic " + encodedValue ) #Header, Value 
 
     x = opener.open(req)
