@@ -580,7 +580,7 @@ window.onload = function() {
       }
   });
 
-  //send an ajax request to see if that userpae exists - now we are using the user ids so this wont work
+  //send an ajax request to see if that username exists - now we are using the user ids so this wont work
   // function checkUserName(username){
   //   $.ajax({
   //     url: "/author/"+username+"/",
@@ -608,23 +608,47 @@ window.onload = function() {
   }
 
   $("#get_github_events").click(function(){
-    $("#github_events").empty();
-    $("#github_events").append("  <div class='panel-heading'>Github Activity</div>");
+    $("#github_body").empty();
     var github_name = document.getElementById('github_name').getAttribute("data");
-    var path = "https://api.github.com/users/"+github_name+"/events";
+    //need to check that its a valid github name
+    var u_url = "https://api.github.com/users/"+github_name;
+    checkUserName(u_url);
+  });
+
+  function githubCallback(result, url){
+    var path = url +"/events";
     console.log(path);
-    $.getJSON(path, function (data) {
-        $.each(data, function (i, field) {
-            var textNode = document.createTextNode(i+ " " +JSON.stringify(field));
-            // var textNode = document.createTextNode(JSON.stringify(JSON.stringify(field)));
-            var $newdiv = $( "<div class='panel-body' id='github_event_"+i+"'/>" );
-            $("#github_events").append($newdiv);
-            $("#github_event_"+i).append(textNode);
-            // only get most recent 5 events
-            if (i >= 5) return false;
-        });
+    if (result === true) {
+      $.getJSON(path, function (data) {
+          $("#github_body").html("Under Construction -> Data received still need to make it more reader friendly.");
+          $.each(data, function (i, field) {
+              //var textNode = document.createTextNode(i+ " " +JSON.stringify(field));
+              //var textNode = document.createTextNode(JSON.stringify(JSON.stringify(field)));
+              //var $newdiv = $( "<div id='github_event_"+i+"'/>" );
+              //$("#github_body").append($newdiv);
+              //$("#github_event_"+i).append(textNode);
+              // only get most recent 5 events
+              if (i >= 5) return false;
+          });
+      });
+    } else {
+      alert("That is not a valid github username");
+    }
+  }
+
+  //send an ajax request to see if that username exists - now we are using the user ids so this wont work
+  function checkUserName(url){
+    $.ajax({
+      url: url,
+      complete: function(e,xhr,settings){
+        if(e.status === 200) {
+          githubCallback(true, url);
+        } else if (e.status === 404) {
+          githubCallback(false, url);
+        }
+      }
     });
-});
+  }
 
 // use bootstrap tooltip to display the small pop-up box
   $(document).ready(function(){

@@ -56,16 +56,51 @@
 
 <!-- display profile owner's github activity -->
 <span id="github_name" data="{{ profile_owner.github_name }}"></span>
-<button id='get_github_events' type="button" class=class="btn btn-primary" color="blue">Get Github Activity</button>
 <div id="github_events" class="panel panel-primary">
-  <div class="panel-heading">Github Activity</div>
-  <div class="panel-body"></div>
+  <div class="panel-heading" style="font-size:2em">Github Activity                            
+    <button id='get_github_events' type="button" class="btn btn-primary" style="color:black; background-color:white; position: absolute; right:1em;" >Get Github Activity</button></div>
+  <div id="github_body" class="panel-body"></div>
 </div>
 
-<!-- If this is the logged in user's profile page, show a create post component -->
-{% if profile_owner.user == user %}
-{% include "post/createPost.html" %}
-{% endif %}
+</div>
+<div style="position: relative; float:right; width: 30%; padding-left: 1.5em;">
+    <div class="list-group sidebar" >
+        <h4 class="list-group-item list-group-item-info">Friends</h4>
+        {% for friend in friends|slice:":8" %}
+         <a class="list-group-item" style="height: 75px;" href="{% url 'user_profile' friend.id %}">
+        <img src={% if friend.picture %} '/media/{{friend.picture}}' {% else %} "http://placehold.it/50x50" {% endif%} class="friend-profile-icon img-circle img-responsive img-center pull-left list-group-item-text" alt="Profile Image"/>
+        <span>
+        <h4 class="list-group-item-heading">{{friend}}</h4>
+        <p class="list-group-item-text" style="font-size: smaller;">{{friend.host}}</p>
+    </span>
+        </a>
+        {% endfor %}
+        {% if friends|length > 8 %}
+        <a class="list-group-item" href='#'>See More Friends ...</a>
+        {% elif friends|length == 0 %}
+        <label class="list-group-item" href='#'>No Friends</label>
+        {% endif %}
+    </div>
+
+    <!-- Display profile owner's follower list --> 
+    <div class="list-group sidebar" >
+        <h4 class="list-group-item list-group-item-info">Followers</h4>
+        {% for follower in followers|slice:":8" %}
+         <a class="list-group-item" style="height: 75px;" href="{% url 'user_profile' follower.id %}">
+        <img src={% if follower.picture %} '/media/{{follower.picture}}' {% else %} "http://placehold.it/50x50" {% endif%} class="friend-profile-icon img-circle img-responsive img-center pull-left list-group-item-text" alt="Profile Image"/>
+        <span>
+        <h4 class="list-group-item-heading">{{follower}}</h4>
+        <p class="list-group-item-text" style="font-size: smaller;">{{follower.host}}</p>
+    </span>
+        </a>
+        {% endfor %}
+        {% if followers|length > 8 %}
+        <a class="list-group-item" href='#'>See More Followers ...</a>
+        {% elif friends|length == 0 %}
+        <label class="list-group-item" href='#'>No Followers</label>
+        {% endif %}
+    </div>
+</div>
 
 
 {% for post in posts %}
@@ -117,45 +152,4 @@
 {% include "reset_password_box.html" %}
 {% include "post/editProfileFieldModal.html" %}
 {% include "post/uploadProfileImageModal.html" %}
-
-</div>
-<div style="position: relative; float:right; width: 30%; padding-left: 1.5em;">
-    <div class="list-group sidebar" >
-        <h4 class="list-group-item list-group-item-info">Friends</h4>
-        {% for friend in friends|slice:":8" %}
-         <a class="list-group-item" style="height: 75px;" href="{% url 'user_profile' friend.id %}">
-        <img src={% if friend.picture %} '/media/{{friend.picture}}' {% else %} "http://placehold.it/50x50" {% endif%} class="friend-profile-icon img-circle img-responsive img-center pull-left list-group-item-text" alt="Profile Image"/>
-        <span>
-        <h4 class="list-group-item-heading">{{friend}}</h4>
-        <p class="list-group-item-text" style="font-size: smaller;">{{friend.host}}</p>
-    </span>
-        </a>
-        {% endfor %}
-        {% if friends|length > 8 %}
-        <a class="list-group-item" href='#'>See More Friends ...</a>
-        {% elif friends|length == 0 %}
-        <label class="list-group-item" href='#'>No Friends</label>
-        {% endif %}
-    </div>
-
-    <!-- Display profile owner's follower list --> 
-    <div class="list-group sidebar" >
-        <h4 class="list-group-item list-group-item-info">Followers</h4>
-        {% for follower in followers|slice:":8" %}
-         <a class="list-group-item" style="height: 75px;" href="{% url 'user_profile' follower.id %}">
-        <img src={% if follower.picture %} '/media/{{follower.picture}}' {% else %} "http://placehold.it/50x50" {% endif%} class="friend-profile-icon img-circle img-responsive img-center pull-left list-group-item-text" alt="Profile Image"/>
-        <span>
-        <h4 class="list-group-item-heading">{{follower}}</h4>
-        <p class="list-group-item-text" style="font-size: smaller;">{{follower.host}}</p>
-    </span>
-        </a>
-        {% endfor %}
-        {% if followers|length > 8 %}
-        <a class="list-group-item" href='#'>See More Followers ...</a>
-        {% elif friends|length == 0 %}
-        <label class="list-group-item" href='#'>No Followers</label>
-        {% endif %}
-    </div>
-</div>
-
 {% endblock %}
