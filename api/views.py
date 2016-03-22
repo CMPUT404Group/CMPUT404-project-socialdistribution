@@ -445,6 +445,7 @@ class CommentList(generics.GenericAPIView):
         except Post.DoesNotExist as e:
             return Response({"message":"Post does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
+        data = request.data
         # check if it is a remote node
         remoteNode = getRemoteNode(request.user)
 
