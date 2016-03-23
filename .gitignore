@@ -22,6 +22,13 @@ node_modules
 .sass-cache
 .idea
 
+# Ignore all image file in this project
+media
+.jpg
+.jpeg
+.png
+.git
+
 # Cached files
 .py~
 .html~

@@ -164,7 +164,7 @@ def explore_post(request, node_id, post_id):
                     values["author"]["id"] = str(author.id)
                     values["author"]["host"] = author.host
                     values["author"]["displayName"] = author.displayname
-                    values["author"]["github"] = author.github_name
+                    values["author"]["github"] = author.github
                     values["visibility"] = "PUBLIC"
                     # opener = urllib2.build_opener(urllib2.HTTPHandler)
                     # req = urllib2.Request(url)
@@ -258,19 +258,25 @@ def my_stream(request):
         # postSerializer = PostSerializer(jsonResponse["posts"], many=True)
         # posts = postSerializer.data
 
+        # author = Author.objects.get(user=request.user)
         followList = []
-        # notification on if logged in author has new follower
-        followList = []
-        followRelationships = Friending.objects.filter(friend=author)
+        followRelationships = Friending.objects.filter(author=author)
         for relationship in followRelationships:
             followList.append(relationship.friend)
-
-        if len(followList) > author.previous_follower_num:
+            
+        # notification on if logged in author has new follower
+        followerList = []
+        followerRelationships = Friending.objects.filter(friend=author)
+        for relationship in followerRelationships:
+            followerList.append(relationship.friend)
+        if len(followerList) > author.previous_follower_num:
             author.noti = True
-            author.previous_follower_num = len(followList)
+            author.previous_follower_num = len(followerList)
         else:
             author.noti = False
         author.save()
+
+
         posts1 = Post.objects.filter(author=author).order_by('-published')
 
         pks = []
@@ -287,19 +293,6 @@ def my_stream(request):
         posts2 = Post.objects.filter(id__in=pks)
         posts = posts1 | posts2
         posts.order_by('-published')
-
-        # notification on if logged in author has new follower
-        followList = []
-        followRelationships = Friending.objects.filter(friend=author)
-        for relationship in followRelationships:
-            followList.append(relationship.friend)
-
-        if len(followList) > author.previous_follower_num:
-            author.noti = True
-            author.previous_follower_num = len(followList)
-        else:
-            author.noti = False
-        author.save()
 
         form = PostForm()
         return render(request, 'post/myStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList})

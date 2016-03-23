@@ -246,6 +246,99 @@ window.onload = function() {
     return author_profile_obj;
   }
 
+  // for unfollow we only consider locally
+  function sendLocalUnFriendRequest(unfollower_id, unfollowee_obj){
+    var unfollowee_id = unfollowee_obj["id"]
+
+    $.ajax({
+      url: '/api/author/' + unfollower_id + '/',
+      type: "GET",
+      contentType: "application/json",
+      beforeSend: function(xhr, settings){
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function(response, statusText, xhr){
+        console.log(xhr.status);
+        if (xhr.status == 200) {
+          var unfollower_author_obj = parseProfileResponse(response);
+          var JSONobject = { "query": "friendrequest", "author": unfollower_author_obj, "friend": unfollowee_obj};
+          var jsonData = JSON.stringify(JSONobject);
+          console.log(jsonData);
+          $.ajax({
+            url: 'http://' + window.location.host + '/api/friendrequest/' + unfollowee_obj["id"],
+            type: "DELETE",
+            data: jsonData,
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            beforeSend: function(xhr, settings){
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function(response2) {
+              console.log(response2);
+              toastr.info("Unfollowed!");
+              $("button#unfollow-btn-"+unfollowee_id).text("Unfollowed");
+              $("button#unfollow-btn-"+unfollowee_id).removeClass("unfollow-btn");
+              $("button#unfollow-btn-"+unfollowee_id).removeClass("btn-warning");
+              $("button#unfollow-btn-"+unfollowee_id).addClass("btn-info");
+            },
+            error: function(xhr, ajaxOptions, error) {
+              console.log(xhr.status);
+              console.log(xhr.responseText);
+              console.log(error);
+              toastr.error("Error. Could not send unfollow request");
+            }
+          });
+        }
+        else {
+          toastr.error("Author not found.");
+        }
+      },
+      error: function(xhr, ajaxOptions, error) {
+        console.log(xhr.status);
+        console.log(xhr.responseText);
+        console.log(error);
+        toastr.error("Error. Could not send request");
+      }
+    });
+  }
+
+  // button about unfollow someone
+  $("button.unfollow-btn").one("click", function(event){
+    var author_id = this.id.slice(13);
+    var unfollower_id = document.getElementById('logged-in-author').getAttribute("data");
+    console.log(author_id)
+    console.log(unfollower_id)
+
+    $.ajax({
+      url: 'http://' + window.location.host + '/api/author/' + author_id,
+      type: "GET",
+      contentType: "application/json",
+      beforeSend: function(xhr, settings){
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function(response, statusText, xhr) {
+        if (xhr.status == 200) {
+          var host = response["host"];
+          if (host == undefined) {
+            toastr.error("Error. Unknown host.");
+            return;
+          }
+          var unfollowee_obj = parseProfileResponse(response);
+          if ((host == 'http://' + window.location.host) || (host == 'http://' + window.location.host + '/')){
+            sendLocalUnFriendRequest(unfollower_id, unfollowee_obj);
+          }
+        }
+      },
+      error: function(xhr, ajaxOptions, error){
+        console.log(xhr.status);
+        console.log(xhr.responseText);
+        console.log(error);
+        toastr.error("Error. Cound not send unfollow request");
+      }
+    })
+  });
+
+
   function sendLocalFriendRequest(follower_id, followee_author_obj) {
     var followee_id = followee_author_obj["id"]
 

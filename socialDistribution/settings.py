@@ -88,7 +88,10 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
+# os.environ["HEROKU_POSTGRESQL_ONYX_URL"] = 'postgres://ouojucpaysfzdn:D99gHsSUyVG6GFtVTzmGaQrVEW@ec2-107-22-248-209.compute-1.amazonaws.com:5432/dp73t5fm0m6lq'
+# DATABASES = {
+#     'default': dj_database_url.config(default=os.environ["HEROKU_POSTGRESQL_ONYX_URL"])
+# }
 
 
 # Internationalization
