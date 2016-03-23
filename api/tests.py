@@ -37,7 +37,7 @@ class APIPostList(TestCase):
         validUser.set_password('testing') 
         validUser.save()
 
-        self.author = Author.objects.create(user=validUser, github_name="tester")
+        self.author = Author.objects.create(user=validUser, github="tester")
 
     def test_unauthenticated(self):
         resp1 = self.client.get('/api/posts/')
@@ -89,7 +89,7 @@ class APIPostDetail(TestCase):
         user1 = User.objects.create(username=username1)
         user1.set_password(password1) 
         user1.save()
-        author1 = Author.objects.create(user=user1, github_name=username1)
+        author1 = Author.objects.create(user=user1, github=username1)
         self.basicAuthEncoding1 =  base64.encodestring(username1 + "@" + username1 + ":" + password1)
 
         username2 = "tester2"
@@ -97,7 +97,7 @@ class APIPostDetail(TestCase):
         user2 = User.objects.create(username=username2)
         user2.set_password(password2) 
         user2.save()
-        author2 = Author.objects.create(user=user2, github_name=username2)
+        author2 = Author.objects.create(user=user2, github=username2)
         self.basicAuthEncoding2 =  base64.encodestring(username2 + "@" + username2 + ":" + password2)
 
         username3 = "tester3"
@@ -105,7 +105,7 @@ class APIPostDetail(TestCase):
         user3 = User.objects.create(username=username3)
         user3.set_password(password3) 
         user3.save()
-        author3 = Author.objects.create(user=user3, github_name=username3)
+        author3 = Author.objects.create(user=user3, github=username3)
         self.basicAuthEncoding3 =  base64.encodestring(username3 + "@" + username3 + ":" + password3)
 
         # 1 friends with 2
@@ -278,7 +278,7 @@ class APICommentList(TestCase):
         user1 = User.objects.create(username=username1)
         user1.set_password(password1) 
         user1.save()
-        author1 = Author.objects.create(user=user1, github_name=username1)
+        author1 = Author.objects.create(user=user1, github=username1)
         self.basicAuthEncoding1 =  base64.encodestring(username1 + "@" + username1 + ":" + password1)
 
         username2 = "tester2"
@@ -286,7 +286,7 @@ class APICommentList(TestCase):
         user2 = User.objects.create(username=username2)
         user2.set_password(password2) 
         user2.save()
-        author2 = Author.objects.create(user=user2, github_name=username2)
+        author2 = Author.objects.create(user=user2, github=username2)
         self.basicAuthEncoding2 =  base64.encodestring(username2 + "@" + username2 + ":" + password2)
 
         username3 = "tester3"
@@ -294,7 +294,7 @@ class APICommentList(TestCase):
         user3 = User.objects.create(username=username3)
         user3.set_password(password3) 
         user3.save()
-        author3 = Author.objects.create(user=user3, github_name=username3)
+        author3 = Author.objects.create(user=user3, github=username3)
         self.basicAuthEncoding3 =  base64.encodestring(username3 + "@" + username3 + ":" + password3)
 
         # 1 friends with 2
@@ -373,7 +373,7 @@ class APICommentDetail(TestCase):
         user1 = User.objects.create(username=username1)
         user1.set_password(password1) 
         user1.save()
-        author1 = Author.objects.create(user=user1, github_name=username1)
+        author1 = Author.objects.create(user=user1, github=username1)
         self.basicAuthEncoding1 =  base64.encodestring(username1 + "@" + username1 + ":" + password1)
 
         username2 = "tester2"
@@ -381,7 +381,7 @@ class APICommentDetail(TestCase):
         user2 = User.objects.create(username=username2)
         user2.set_password(password2) 
         user2.save()
-        author2 = Author.objects.create(user=user2, github_name=username2)
+        author2 = Author.objects.create(user=user2, github=username2)
         self.basicAuthEncoding2 =  base64.encodestring(username2 + "@" + username2 + ":" + password2)
 
         username3 = "tester3"
@@ -389,7 +389,7 @@ class APICommentDetail(TestCase):
         user3 = User.objects.create(username=username3)
         user3.set_password(password3) 
         user3.save()
-        author3 = Author.objects.create(user=user3, github_name=username3)
+        author3 = Author.objects.create(user=user3, github=username3)
         self.basicAuthEncoding3 =  base64.encodestring(username3 + "@" + username3 + ":" + password3)
 
         # 1 friends with 2
@@ -598,8 +598,8 @@ class ApiPostModelTestCase(TestCase):
     def setUp(self):
         user = User.objects.create(username="bob")
         user1 = User.objects.create(username="sam")
-        author = Author.objects.create(user=user1, github_name="sammy")
-        author1 = Author.objects.create(user=user, github_name="bobby")
+        author = Author.objects.create(user=user1, github="sammy")
+        author1 = Author.objects.create(user=user, github="bobby")
         post = Post.objects.create(id=post_id, title="Title", contentType="text/plain", 
                           content="this is my post data", author=author, published=date, 
                             visibility="PUBLIC", image_url="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTu-eC39iANJccZL5c6oKKFdRyRldGt5UT1gCTpXbRkOSb2IFAv")
@@ -611,8 +611,8 @@ class ApiPostModelTestCase(TestCase):
     def test_friending(self):
         user = User.objects.create(username="cam")
         user1 = User.objects.create(username="mitchel")
-        author1 = Author.objects.create(user=user1, github_name="mitchel")
-        author = Author.objects.create(user=user, github_name="cam")
+        author1 = Author.objects.create(user=user1, github="mitchel")
+        author = Author.objects.create(user=user, github="cam")
         Friending.objects.create(author=author, friend=author1)
         friending = Friending.objects.get(author=author)
         self.assertEqual(friending.author,author)
@@ -642,7 +642,7 @@ class ApiPostModelTestCase(TestCase):
         user = User.objects.get(username="sam")
         author = Author.objects.get(user=user)
         self.assertEqual(author.user.username, "sam")
-        self.assertEqual(author.github_name, "sammy")
+        self.assertEqual(author.github, "sammy")
 
         #test that we can get the comment back
         comment = Comment.objects.get(id=c_id)
@@ -666,9 +666,9 @@ class ApiUrlsTestCase(TestCase):
         user.set_password('hello') 
         user.save()
 
-        sam = Author.objects.create(user=user2, github_name="sammy", host="differenthost")
-        bob = Author.objects.create(user=user1, github_name="bobby")
-        john = Author.objects.create(user=user3, github_name="johnny", host="same")
+        sam = Author.objects.create(user=user2, github="sammy", host="differenthost")
+        bob = Author.objects.create(user=user1, github="bobby")
+        john = Author.objects.create(user=user3, github="johnny", host="same")
         tester = Author.objects.create(user=user, host="same")
 
         self.assertEqual(tester.host, john.host)

@@ -224,7 +224,7 @@ def explore_post(request, node_id, post_id):
                     values["author"]["id"] = str(author.id)
                     values["author"]["host"] = author.host
                     values["author"]["displayName"] = author.displayname
-                    values["author"]["github"] = author.github_name
+                    values["author"]["github"] = author.github
                     values["visibility"] = "PUBLIC"
                     # opener = urllib2.build_opener(urllib2.HTTPHandler)
                     # req = urllib2.Request(url)
@@ -304,15 +304,22 @@ def my_stream(request):
         ##################### notification on if logged in author has new follower
         followList = []
         followRelationships = Friending.objects.filter(friend=author)
+
         for relationship in followRelationships:
             followList.append(relationship.friend)
-
-        if len(followList) > author.previous_follower_num:
+            
+        # notification on if logged in author has new follower
+        followerList = []
+        followerRelationships = Friending.objects.filter(friend=author)
+        for relationship in followerRelationships:
+            followerList.append(relationship.friend)
+        if len(followerList) > author.previous_follower_num:
             author.noti = True
-            author.previous_follower_num = len(followList)
+            author.previous_follower_num = len(followerList)
         else:
             author.noti = False
         author.save()
+
         ################## end of notification block
 
         posts = []
@@ -359,10 +366,16 @@ def my_stream(request):
         except urllib2.HTTPError, e:
             print("Couldnt get posts for local friend "+friend.user.username)
         #sort the posts so that the most recent is at the top
+<<<<<<< HEAD
         #posts2 = Post.objects.filter(id__in=pk_local)
         #posts = posts1 | posts2
         #posts.order_by('-published')
         print(posts)
+=======
+        posts2 = Post.objects.filter(id__in=pks)
+        posts = posts1 | posts2
+        posts.order_by('-published')
+>>>>>>> 1703308fb1f2f15979809710eacc55c6ca405540
 
         form = PostForm()
         return render(request, 'post/myStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList})
