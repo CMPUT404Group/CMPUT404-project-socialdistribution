@@ -17,7 +17,7 @@ urlpatterns = [
 
 	url(r'^friends/(?P<author_id1>[^/]+)/$',views.FriendingCheck.as_view()),
 	url(r'^friends/(?P<author_id1>[^/]+)/(?P<author_id2>[^/]+)/$',views.FriendingCheck.as_view()),
-	
+
 	url(r'^friendrequest/$',views.FriendRequest.as_view(), name='friendrequest'),
 	url(r'^friendrequest/(?P<request_pk>[^/]+)$',views.FriendRequest.as_view())
 

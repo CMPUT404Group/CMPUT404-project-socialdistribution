@@ -1010,6 +1010,18 @@ class FriendingCheck(generics.GenericAPIView):
 
 
 class FriendRequest(generics.GenericAPIView):
+    '''
+    POST or DELETE for send friend request(following) or delete a friend request(unfollow)
+
+    POST : http://service/api/friendrequest/
+        * Makes a friend request POST to the api a json message
+        * Able to make friends locally and remotely
+
+    DELETE : http://service/api/friendrequest/<author_id>
+        * Removes the corresponding friend request
+        * Unfriend has done locally
+
+    '''
     serializer_class = FriendingSerializer
     queryset = Friending.objects.all()
 
