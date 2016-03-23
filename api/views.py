@@ -769,7 +769,7 @@ class AuthorTimeline(generics.GenericAPIView):
 
             if author_pk != None:
                 try:
-                    author = Author.objects.get(id=author_pk, host='http://' + request.get_host() + '/')
+                    author = Author.objects.get(id=author_pk)
                 except Author.DoesNotExist as e:
                     return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -816,7 +816,7 @@ class AuthorTimeline(generics.GenericAPIView):
             else:   # author_pk != None
                 # ensure author exists
                 try:
-                    viewee = Author.objects.get(id=author_pk, host='http://' + request.get_host() + '/')
+                    viewee = Author.objects.get(id=author_pk)
                 except Author.DoesNotExist as e:
                     return Response(status=status.HTTP_404_NOT_FOUND)
 
