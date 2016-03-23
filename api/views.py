@@ -463,6 +463,7 @@ class CommentList(generics.GenericAPIView):
                     author = Author.objects.get(id=author_serializer.data["id"])
                 except Author.DoesNotExist as e:
                     author = Author.objects.create(id=author_serializer.data["id"])
+                    print author_serializer.data
                     for key in author_serializer.data.keys():
                         if author_serializer.data[key] != None:
                             author.key = author_serializer.data[key]
