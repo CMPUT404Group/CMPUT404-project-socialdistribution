@@ -741,7 +741,7 @@ class AuthorList(generics.GenericAPIView):
         if (not request.user.is_authenticated()):
             return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
-        authors = Author.objects.all(host=request.get_host())
+        authors = Author.objects.filter(host=request.get_host())
         serializer = AuthorSerializer(authors, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
