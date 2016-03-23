@@ -459,9 +459,17 @@ class CommentList(generics.GenericAPIView):
                 return Response({"message": "This node & authors on this node are not allowed to see this post & thus cannot comment"}, status=status.HTTP_403_FORBIDDEN)
             else:
                 author_serializer = AuthorSerializer(data["author"])
-                # author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
-                author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=author_serializer.data["host"], github=author_serializer.data["github"])
-                author.save()
+                try:
+                    author = Author.objects.get(id=author_serializer.data["id"], host=remoteNode.url)
+                except Author.DoesNotExist as e:
+                    author = Author.objects.create(id=author_serializer.data["id"])
+                    for key in author_serializer.data.keys():
+                        if author_serializer.data[key] != None:
+                            author.key = author_serializer.data[key]
+
+                    # author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
+                    # author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=author_serializer.data["host"], github=author_serializer.data["github"])
+                    author.save()
 
                 serializer = CommentSerializer(data=data)
 

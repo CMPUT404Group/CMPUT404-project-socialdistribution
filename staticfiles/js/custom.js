@@ -210,7 +210,7 @@ window.onload = function() {
     event.preventDefault();
     var formData = document.getElementById('id_github').value;
     var authorID = $("#editGithubForm").data("author-id");
-    var Data = JSON.stringify({ "id": authorID ,"github_name": "http://github.com/"+formData});
+    var Data = JSON.stringify({ "id": authorID ,"github": "http://github.com/"+formData});
     $.ajax({
       url: 'http://' + window.location.host + '/api/author/' + authorID + '/',
       type: "POST",
@@ -227,7 +227,7 @@ window.onload = function() {
         $("form#editGithubForm").trigger("reset");
         // change wuthor github
         $("#id-github").empty();
-        $("#id-github").html("github: " + response.github_name);
+        $("#id-github").html("github: " + response.github);
         toastr.info("Github Updated!");
       },
       error: function(xhr, ajaxOptions, error) {
@@ -245,6 +245,7 @@ window.onload = function() {
     delete author_profile_obj["friends"];
     return author_profile_obj;
   }
+
 
   // for unfollow we only consider locally
   function sendLocalUnFriendRequest(unfollower_id, unfollowee_obj){
@@ -565,8 +566,10 @@ window.onload = function() {
     if (username === "") {
       $("button#closeChooseAuthorModal").click();
     } else {
-      checkUserName(username);
+      authorCallback(true, username);
+    //   checkUserName(username);
     }
+
   });
 
   //if nothing is entered. reset the radio button
@@ -579,19 +582,19 @@ window.onload = function() {
       }
   });
 
-  //send an ajax request to see if that userpae exists
-  function checkUserName(username){
-    $.ajax({
-      url: "/author/"+username+"/",
-      complete: function(e,xhr,settings){
-        if(e.status === 200) {
-          authorCallback(true, username);
-        } else if (e.status === 404) {
-          authorCallback(false, username);
-        }
-      }
-    });
-  }
+  //send an ajax request to see if that username exists - now we are using the user ids so this wont work
+  // function checkUserName(username){
+  //   $.ajax({
+  //     url: "/author/"+username+"/",
+  //     complete: function(e,xhr,settings){
+  //       if(e.status === 200) {
+  //         authorCallback(true, username);
+  //       } else if (e.status === 404) {
+  //         authorCallback(false, username);
+  //       }
+  //     }
+  //   });
+  // }
 
   //respond correctly if it is an actual user or not
   function authorCallback(result,username){
@@ -604,6 +607,58 @@ window.onload = function() {
     } else {
       alert("That is not a valid username. Try again");
     }
+  }
+
+  $("#get_github_events").click(function(){
+    $("#github_body").empty();
+    var github_html = $('#id-github').html();
+    if (github_html != "github: ") {
+      var github_name = github_html.split(" ")[1].split("/")[3]
+      //need to check that its a valid github name
+      var u_url = "https://api.github.com/users/"+github_name;
+      checkGHUserName(u_url, github_name);
+    } else {
+      alert("no github name provided");
+    }
+  });
+
+  function githubCallback(result, url, username){
+    var path = url +"/events";
+    console.log(path);
+    if (result === true) {
+      $.getJSON(path, function (data) {
+          //$("#github_body").html("Under Construction -> Data received still need to make it more reader friendly.");
+          $.each(data, function (i, field) {
+              $("#github_body").append("<p>"+"<b>"+field["type"]+"</b>"+" to "+field["repo"]["name"]+"</p>"+"<p>"+"<b>Message:</b>"+field["payload"]["commits"][0]["message"]+"</p><br/>")
+              //var textNode = document.createTextNode(i+ " " +JSON.stringify(field));
+              //var textNode = document.createTextNode(JSON.stringify(JSON.stringify(field)));
+              //var $newdiv = $( "<div id='github_event_"+i+"'/>" );
+              //$("#github_body").append($newdiv);
+              //$("#github_event_"+i).append(textNode);
+              // only get most recent 5 events
+              if (i > 5) {
+                //$("#github_body").append("<b>Older Activity Hidden</b>");
+                return false;
+              }
+          });
+      });
+    } else {
+      alert(username+" is not a valid github username");
+    }
+  }
+
+  //send an ajax request to see if that username exists - now we are using the user ids so this wont work
+  function checkGHUserName(url, username){
+    $.ajax({
+      url: url,
+      complete: function(e,xhr,settings){
+        if(e.status === 200) {
+          githubCallback(true, url);
+        } else if (e.status === 404) {
+          githubCallback(false, url, username);
+        }
+      }
+    });
   }
 
 // use bootstrap tooltip to display the small pop-up box
