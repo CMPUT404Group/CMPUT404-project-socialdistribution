@@ -129,11 +129,71 @@ def explore(request, node_id=None):
                 posts = postSerializer.data
 
                 form = PostForm()
+                print(posts)
                 return render(request, 'explore.html', {'node':node,'posts': posts, 'form': form, 'loggedInAuthor': author, 'nodes': nodes, 'all':False})
             except urllib2.HTTPError, e:
                 return render(request, "404_page.html", {'message': "HTTP ERROR: "+str(e.code)+" "+e.reason, 'loggedInAuthor': author},status=404)
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
+'''
+Get all the posts for a local author
+'''
+
+def get_local(request, author_id):
+    #checks what node it is on and returns the public posts from that node
+    author = Author.objects.get(user=request.user)
+    url = "http://cmput404-team-4b.herokuapp.com/api/posts/"
+    opener = urllib2.build_opener(urllib2.HTTPHandler)
+    req = urllib2.Request(url)
+        # set credentials on request
+    creds =  base64.b64encode("test:test")
+    req.add_header("Authorization", "Basic " + creds) 
+    x = opener.open(req)
+    y = x.read()
+    jsonResponse = json.loads(y)
+    postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+    return postSerializer.data
+
+
+'''
+Get all posts for <author> from team5
+'''
+def get_team5(request, author_id, node_id):
+    #checks what node it is on and returns the public posts from that node
+    author = Author.objects.get(user=request.user)
+    node = Node.objects.get(id=node_id)
+    url = node.url + "api/author/"+str(author_id)+"/posts/"
+    opener = urllib2.build_opener(urllib2.HTTPHandler)
+    req = urllib2.Request(url)
+        # set credentials on request
+    creds =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"
+    req.add_header("Authorization", "JWT " + creds) 
+    x = opener.open(req)
+    y = x.read()
+    jsonResponse = json.loads(y)
+    postSerializer = PostSerializer(jsonResponse["results"], many=True)
+    return postSerializer.data
+
+
+'''
+Get all posts for <author> from team6
+'''
+def get_team6(request, author_id, node_id):
+    #checks what node it is on and returns the public posts from that node
+    author = Author.objects.get(user=request.user)
+    node = Node.objects.get(id=node_id)
+    url = node.url + "api/author/"+str(author_id)+"/posts/"
+    opener = urllib2.build_opener(urllib2.HTTPHandler)
+    req = urllib2.Request(url)
+
+    # set credentials on request
+    creds = base64.b64encode("team4:team4team4")
+    req.add_header("Authorization", "Basic " + creds)
+    x = opener.open(req)
+    y = x.read()
+    jsonResponse = json.loads(y)
+    postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+    return postSerializer.data
 
 '''
 Renders the post clicked from the explore page
@@ -143,7 +203,7 @@ def explore_post(request, node_id, post_id):
         author = Author.objects.get(user=request.user)
         node = Node.objects.get(id=node_id)
         if node_id == None:
-            return render(request, 'postDetail.html', {'loggedInAuthor': author, 'nodes': nodes})
+            return render(request, 'postDetail.html', {'loggedInAuthor': author, 'nodes': nodes, "remote":True})
         else:
             #checks what node it is on and returns the public posts from that node
             try:
@@ -210,6 +270,18 @@ def explore_post(request, node_id, post_id):
 '''
 Renders the My Stream page
 '''
+        #other way of doing it - bring in posts from node4A
+        # url = "http://cmput404team4A.herokuapp.com/api/posts/"
+        # opener = urllib2.build_opener(urllib2.HTTPHandler)
+        # req = urllib2.Request(url)
+        # encodedValue = base64.b64encode("ab432861-f7bc-4b5b-9261-86c167615d6@nodeTeam4A:nodeTeam4A")
+        # req.add_header("Authorization", "Basic " + encodedValue)
+        # x = opener.open(req)
+        # y = x.read()
+        # jsonResponse = json.loads(y)
+        # postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+        # posts = postSerializer.data
+
 def my_stream(request):
     if (request.user.is_authenticated()):
         if request.method == "POST":
@@ -229,37 +301,7 @@ def my_stream(request):
 
         author = Author.objects.get(user=request.user)
 
-        posts1 = Post.objects.filter(author=author).order_by('-published')
-
-        pks = []
-
-        #add the posts by the people we are friends with into our myStream
-        friend_pairs = Friending.objects.filter(author=author)
-        for i in range(len(friend_pairs)):
-            friend_posts = Post.objects.filter(author=friend_pairs[i].friend)
-            for j in range(len(friend_posts)):
-                if isAllowed(request.user, friend_posts[j].id):
-                    pks.append(friend_posts[j].id)
-
-        #sort the posts so that the most recent is at the top
-        posts2 = Post.objects.filter(id__in=pks)
-        posts = posts1 | posts2
-        posts.order_by('-published')
-
-        #bring in posts from node4A
-        # url = "http://cmput404team4A.herokuapp.com/api/posts/"
-        # opener = urllib2.build_opener(urllib2.HTTPHandler)
-        # req = urllib2.Request(url)
-        # encodedValue = base64.b64encode("ab432861-f7bc-4b5b-9261-86c167615d6@nodeTeam4A:nodeTeam4A")
-        # req.add_header("Authorization", "Basic " + encodedValue)
-        # x = opener.open(req)
-        # y = x.read()
-        # jsonResponse = json.loads(y)
-        # postSerializer = PostSerializer(jsonResponse["posts"], many=True)
-        # posts = postSerializer.data
-
-        followList = []
-        # notification on if logged in author has new follower
+        ##################### notification on if logged in author has new follower
         followList = []
         followRelationships = Friending.objects.filter(friend=author)
         for relationship in followRelationships:
@@ -271,35 +313,56 @@ def my_stream(request):
         else:
             author.noti = False
         author.save()
-        posts1 = Post.objects.filter(author=author).order_by('-published')
+        ################## end of notification block
 
-        pks = []
+        posts = []
 
         #add the posts by the people we are friends with into our myStream
         friend_pairs = Friending.objects.filter(author=author)
         for i in range(len(friend_pairs)):
-            friend_posts = Post.objects.filter(author=friend_pairs[i].friend)
-            for j in range(len(friend_posts)):
-                if isAllowed(request.user, friend_posts[j].id):
-                    pks.append(friend_posts[j].id)
+            posts_all = []
+            friend = friend_pairs[i].friend
+            #these are from our local friends
+            if friend.host == request.get_host():
+                try:
+                    posts_all = get_local(request, friend.id)
 
+                    print("C")
+                except urllib2.HTTPError, e:
+                    print("Couldnt get posts for local friend "+friend.user.username)
+            #these are from our remote friends
+            else:
+                if friend.host == "project-c404.rhcloud.com/api":
+                    node = "1a3f4b77-a4b7-405e-9dd7-fcb40e925c61"
+                    try:
+                        posts_all = get_team6(request, friend.id, node)
+                        print("B")
+                    except urllib2.HTTPError, e:
+                        print("Couldnt get posts for remote friend "+friend.user.username)
+                elif friend.host == "" :
+                    node = "55e70a0a-a284-4ffb-b192-08d083f4f164"
+                    try:
+                        posts_all = get_team5(request, friend.id, node)
+                        print("A")
+                    except urllib2.HTTPError, e:
+                        print("Couldnt get posts for remote friend "+friend.user.username)
+                else:
+                    pass
+            for j in range(len(posts_all)):
+                if isAllowed(author, posts_all[j]):
+                    posts.append(friend_posts[j])
+
+        #get all posts by the logged in author
+        try:      
+            posts.append(get_local(request, author.id))
+            print("D -"+author.id)
+        except urllib2.HTTPError, e:
+            print("Couldnt get posts for local friend "+friend.user.username)
         #sort the posts so that the most recent is at the top
-        posts2 = Post.objects.filter(id__in=pks)
-        posts = posts1 | posts2
-        posts.order_by('-published')
-
-        # notification on if logged in author has new follower
-        followList = []
-        followRelationships = Friending.objects.filter(friend=author)
-        for relationship in followRelationships:
-            followList.append(relationship.friend)
-
-        if len(followList) > author.previous_follower_num:
-            author.noti = True
-            author.previous_follower_num = len(followList)
-        else:
-            author.noti = False
-        author.save()
+        #posts2 = Post.objects.filter(id__in=pk_local)
+        #posts = posts1 | posts2
+        #posts.order_by('-published')
+        print(posts)
 
         form = PostForm()
         return render(request, 'post/myStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList})
@@ -327,7 +390,10 @@ Renders the page for specific post (including the post's comments)
 
 def post_detail(request, post_pk):
     if (request.user.is_authenticated()):
-        if (isAllowed(request.user,post_pk)):
+        post = Post.objects.get(id=post_pk)
+        print(post)
+        viewer = Author.objects.get(user=request.user)
+        if (isAllowed(viewer,post)):
             if request.method == "POST":
                 response = _submitCommentForm(request, post_pk)
 
@@ -373,7 +439,7 @@ def post_edit(request, post_pk):
         post = Post.objects.get(pk=post_pk)
         form = PostForm(instance=post)
         author = Author.objects.get(user=request.user)    
-        return render(request, 'post/postDetail.html', {'post': post, 'form': form, 'loggedInAuthor': author})
+        return render(request, 'post/postDetail.html', {'post': post, 'form': form, 'loggedInAuthor': author, "remote":False})
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
@@ -449,10 +515,8 @@ def user_profile(request, user_id):
 checks if a user is allowed access to a file
 
 '''
-def isAllowed(user,pk):
-    post = Post.objects.get(id=pk)
+def isAllowed(viewer, post):
     privacy = post.visibility
-    viewer = Author.objects.get(user=user)
 
     #if the post was created by the user allow access
     if viewer == post.author :
@@ -517,4 +581,3 @@ def postChangeUserPassword(request, profile_owner):
             #I DONT THINK WE NEED TO USE SERIALIZER or anything HERE???
             return True
     return False
-    
