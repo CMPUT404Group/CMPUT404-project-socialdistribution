@@ -164,7 +164,7 @@ def explore_post(request, node_id, post_id):
                     values["author"]["id"] = str(author.id)
                     values["author"]["host"] = author.host
                     values["author"]["displayName"] = author.displayname
-                    values["author"]["github"] = author.github_name
+                    values["author"]["github"] = author.github
                     values["visibility"] = "PUBLIC"
                     # opener = urllib2.build_opener(urllib2.HTTPHandler)
                     # req = urllib2.Request(url)
