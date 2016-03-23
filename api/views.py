@@ -1055,7 +1055,7 @@ class FriendRequest(generics.GenericAPIView):
                 atLeastOneAuthorIsLocal = True
             # else is remote author sending the request
         except Author.DoesNotExist as e:
-            # not local author - create remote author w/o user
+        # not local author - create remote author w/o user
             author = Author.objects.create(id=author_req["id"], displayname=author_req["displayname"], host=author_req["host"])
             author.save()
 
