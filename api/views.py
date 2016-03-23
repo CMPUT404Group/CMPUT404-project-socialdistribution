@@ -455,10 +455,13 @@ class CommentList(generics.GenericAPIView):
                 return Response({"message": "This node & authors on this node are not allowed to see this post & thus cannot comment"}, status=status.HTTP_403_FORBIDDEN)
             else:
                 author_serializer = AuthorSerializer(data["author"])
-                # author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
-                author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=author_serializer.data["host"], github=author_serializer.data["github"])
-                # TODO :ADD GITHUB AFTER CHANGING OUR GITHUB MODEL FROM GITHUB_NAME TO GITHUB
-                author.save()
+                try:
+                    author = Author.objects.get(id=author_serializer.data["id"])
+                except Author.DoesNotExist as e:
+                    # author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
+                    author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=author_serializer.data["host"], github=author_serializer.data["github"])
+                    # TODO :ADD GITHUB AFTER CHANGING OUR GITHUB MODEL FROM GITHUB_NAME TO GITHUB
+                    author.save()
 
                 serializer = CommentSerializer(data=data)
 
