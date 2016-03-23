@@ -741,7 +741,7 @@ class AuthorList(generics.GenericAPIView):
         if (not request.user.is_authenticated()):
             return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
-        authors = Author.objects.all()
+        authors = Author.objects.all(host=request.get_host())
         serializer = AuthorSerializer(authors, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -768,7 +768,7 @@ class AuthorTimeline(generics.GenericAPIView):
 
             if author_pk != None:
                 try:
-                    author = Author.objects.get(id=author_pk)
+                    author = Author.objects.get(id=author_pk, host=request.get_host())
                 except Author.DoesNotExist as e:
                     return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -815,7 +815,7 @@ class AuthorTimeline(generics.GenericAPIView):
             else:   # author_pk != None
                 # ensure author exists
                 try:
-                    viewee = Author.objects.get(id=author_pk)
+                    viewee = Author.objects.get(id=author_pk, host=request.get_host())
                 except Author.DoesNotExist as e:
                     return Response(status=status.HTTP_404_NOT_FOUND)
 
