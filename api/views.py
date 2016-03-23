@@ -385,6 +385,10 @@ class CommentList(generics.GenericAPIView):
     POST : http://service/api/posts/<post_pk>/comments/
         * Creates a new comment attached to the post specified by post_pk
 
+        Required fields for the body of a post are:
+        "author" (the Author object making the post), 
+        "comment" (the comment you wish to make),
+        "contentType" (plaintext or markdown),
     '''
     pagination_class = ListPaginator
     serializer_class = CommentSerializer
@@ -456,11 +460,15 @@ class CommentList(generics.GenericAPIView):
             else:
                 author_serializer = AuthorSerializer(data["author"])
                 try:
-                    author = Author.objects.get(id=author_serializer.data["id"])
+                    author = Author.objects.get(id=author_serializer.data["id"], host=remoteNode.url)
                 except Author.DoesNotExist as e:
+                    author = Author.objects.create(id=author_serializer.data["id"])
+                    for key in author_serializer.data.keys():
+                        if author_serializer.data[key] != None:
+                            author.key = author_serializer.data[key]
+
                     # author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
-                    author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=author_serializer.data["host"], github=author_serializer.data["github"])
-                    # TODO :ADD GITHUB AFTER CHANGING OUR GITHUB MODEL FROM GITHUB_NAME TO GITHUB
+                    # author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=author_serializer.data["host"], github=author_serializer.data["github"])
                     author.save()
 
                 serializer = CommentSerializer(data=data)
@@ -477,6 +485,7 @@ class CommentList(generics.GenericAPIView):
 
         else:
             try:
+
                 author = Author.objects.get(id=data["author"]["id"])
                 # author = Author.objects.get(user=request.user)
             except Author.DoesNotExist as e:
