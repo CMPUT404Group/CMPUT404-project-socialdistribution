@@ -460,7 +460,7 @@ class CommentList(generics.GenericAPIView):
             else:
                 author_serializer = AuthorSerializer(data["author"])
                 try:
-                    author = Author.objects.get(id=author_serializer.data["id"], host=remoteNode.url)
+                    author = Author.objects.get(id=author_serializer.data["id"])
                 except Author.DoesNotExist as e:
                     author = Author.objects.create(id=author_serializer.data["id"])
                     for key in author_serializer.data.keys():
