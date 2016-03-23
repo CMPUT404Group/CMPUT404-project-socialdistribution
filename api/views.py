@@ -474,7 +474,7 @@ class CommentList(generics.GenericAPIView):
 
         else:
             try:
-                author = Author.objects.get(id=data.author.id)
+                author = Author.objects.get(id=data["author"]["id"])
                 # author = Author.objects.get(user=request.user)
             except Author.DoesNotExist as e:
                 return Response({"message": "Author does not exist"}, status=status.HTTP_403_FORBIDDEN)
