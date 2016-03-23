@@ -464,10 +464,16 @@ class CommentList(generics.GenericAPIView):
                 except Author.DoesNotExist as e:
                     author = Author.objects.create(id=author_serializer.data["id"])
                     print author_serializer.data
-                    for key in author_serializer.data.keys():
-                        if author_serializer.data[key] != None:
-                            author.key = author_serializer.data[key]
+                    # alist = []
 
+                for key in author_serializer.data.keys():
+                    if author_serializer.data[key] != None:
+                        if key == 'host':
+                            author.host = author_serializer.data[key]
+                        elif key == 'displayname':
+                            author.displayname = author_serializer.data[key]
+                        elif key == 'github':
+                            author.github = author_serializer.data[key]
                     # author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
                     # author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=author_serializer.data["host"], github=author_serializer.data["github"])
                     author.save()
