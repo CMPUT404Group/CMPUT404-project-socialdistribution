@@ -366,16 +366,6 @@ def my_stream(request):
         except urllib2.HTTPError, e:
             print("Couldnt get posts for local friend "+friend.user.username)
         #sort the posts so that the most recent is at the top
-<<<<<<< HEAD
-        #posts2 = Post.objects.filter(id__in=pk_local)
-        #posts = posts1 | posts2
-        #posts.order_by('-published')
-        print(posts)
-=======
-        posts2 = Post.objects.filter(id__in=pks)
-        posts = posts1 | posts2
-        posts.order_by('-published')
->>>>>>> 1703308fb1f2f15979809710eacc55c6ca405540
 
         form = PostForm()
         return render(request, 'post/myStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList})
