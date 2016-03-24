@@ -189,54 +189,27 @@ def get_team6(request, author_id, node_id):
     return postSerializer.data
 
 '''
-Get one post from a local author
+Get one post from team5 -> ("http://disporia-cmput404.rhcloud.com/api/posts/", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ")
 '''
-def get_localPost(post_id):
+
+'''
+Get one post from team6 -> ("http://project-c404.rhcloud.com/api/posts/", "Basic " + base64.b64encode("team4:team4team4"))
+'''
+
+'''
+Get a single post from someone's API
+'''
+def get_APIPost(post_id, host, header):
     #checks what node it is on and returns the public posts from that node
-    url = "http://cmput404-team-4b.herokuapp.com/api/posts/"+str(post_id)
+    url = host+str(post_id)
     opener = urllib2.build_opener(urllib2.HTTPHandler)
     req = urllib2.Request(url)
     # set credentials on request
-    creds =  base64.b64encode("test:test")
-    req.add_header("Authorization", "Basic " + creds) 
+    req.add_header("Authorization", header)
     x = opener.open(req)
     y = x.read()
     jsonResponse = json.loads(y)
     postSerializer = PostSerializer(jsonResponse)
-    return postSerializer.data
-
-'''
-Get one post from team5
-'''
-def get_team5Post(post_id):
-    #checks what node it is on and returns the public posts from that node
-    url = "http://disporia-cmput404.rhcloud.com/api/posts/"+str(post_id)
-    opener = urllib2.build_opener(urllib2.HTTPHandler)
-    req = urllib2.Request(url)
-    # set credentials on request
-    creds =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"
-    req.add_header("Authorization", "JWT " + creds) 
-    x = opener.open(req)
-    y = x.read()
-    jsonResponse = json.loads(y)
-    postSerializer = PostSerializer(jsonResponse["results"])
-    return postSerializer.data
-
-'''
-Get one post from team6
-'''
-def get_team6Post(post_id):
-    #checks what node it is on and returns the public posts from that node
-    url = "http://project-c404.rhcloud.com/api/posts/"+str(post_id)
-    opener = urllib2.build_opener(urllib2.HTTPHandler)
-    req = urllib2.Request(url)
-    # set credentials on request
-    creds = base64.b64encode("team4:team4team4")
-    req.add_header("Authorization", "Basic " + creds)
-    x = opener.open(req)
-    y = x.read()
-    jsonResponse = json.loads(y)
-    postSerializer = PostSerializer(jsonResponse["post"])
     return postSerializer.data
 '''
 Create Comment to send to remote host
@@ -292,18 +265,18 @@ def explore_post(request, node_id, post_id):
             try:
                 #get the post
                 if node.url == "http://project-c404.rhcloud.com/":
-                    post = get_team6Post(post_id)
+                    post = get_APIPost(post_id,"http://project-c404.rhcloud.com/api/posts/", "Basic " + base64.b64encode("team4:team4team4"))
                 elif node.url == "http://disporia-cmput404.rhcloud.com/":
-                    post = get_team5Post(post_id)
+                    post = get_APIPost(post_id,"http://disporia-cmput404.rhcloud.com/api/posts/", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ")
 
                 #create and send the comment if its allowed
                 if request.method == "POST":  
                     if (isAllowed(author,post)):                   
                         send_comment(request, post_id, node_id)
                         if node.url == "http://project-c404.rhcloud.com/":
-                            post = get_team6Post(post_id)
+                            post = get_APIPost(post_id,"http://project-c404.rhcloud.com/api/posts/", "Basic " + base64.b64encode("team4:team4team4"))
                         elif node.url == "http://disporia-cmput404.rhcloud.com/":
-                            post = get_team5Post(post_id)
+                            post = get_APIPost(post_id, "http://disporia-cmput404.rhcloud.com/api/posts/", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ")
                     else:
                         return HttpResponseForbidden("You are not allowed to access this page")
 
@@ -428,19 +401,19 @@ def post_detail(request, post_pk):
         Found = False
         print(post_pk)
         try:
-            post = get_localPost(post_pk)
+            post = get_APIPost(post_pk,"http://cmput404-team-4b.herokuapp.com/api/posts/","Basic "+base64.b64encode("test:test"))
             Found = True
         except urllib2.HTTPError, e:
             print("Not a local Post. Error: "+str(e.code))
         try:
-            post = get_team5Post(post_pk)
+            post = get_APIPost(post_pk,"http://disporia-cmput404.rhcloud.com/api/posts/", "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ")
             node = "55e70a0a-a284-4ffb-b192-08d083f4f164"
             page = explore_post(request, node, post_pk)
             return page
         except urllib2.HTTPError, e:
             print("Not a team 5 Post. Error: "+str(e.code))
         try:
-            post = get_team6Post(post_pk)
+            post = get_APIPost(post_pk,"http://project-c404.rhcloud.com/api/posts/", "Basic " + base64.b64encode("team4:team4team4"))
             node = "1a3f4b77-a4b7-405e-9dd7-fcb40e925c61"
             page = explore_post(request, node, post_pk)
             return page
@@ -453,20 +426,8 @@ def post_detail(request, post_pk):
                     #response = _submitCommentForm(request, post_pk)
                     response = send_comment(request, post_pk, None)
 
-                    # # Empty Form Submitted
-                    # if response == None:
-                    #     # alert user form was empty
-                    #     pass
-                    # else:
-                    #     # -- TODO : display post success or failure on postDetail.html -- #
-                    #     if ((response.status_code == 201) or (response.status_code == 200)):
-                    #         return HttpResponseRedirect(reverse('post_detail_success', kwargs={'post_pk': post_pk}))
-                    #     else:  # 400 error
-                    #         # alert user of the error
-                    #         pass
-
                 #post = Post.objects.get(pk=post_pk)
-                post = get_localPost(post_pk)
+                post = get_APIPost(post_pk,"http://cmput404-team-4b.herokuapp.com/api/posts/","Basic "+base64.b64encode("test:test"))
                 form = CommentForm()
                 author = Author.objects.get(user=request.user)
                 return render(request, 'post/postDetail.html', {'remote':True,'post': post, 'commentForm': form, 'loggedInAuthor': author})
