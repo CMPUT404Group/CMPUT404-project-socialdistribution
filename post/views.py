@@ -107,7 +107,7 @@ def explore(request, node_id=None):
             opener = urllib2.build_opener(urllib2.HTTPHandler)
             req = urllib2.Request(url)
             credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
-                        "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"}
+                        "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg3MDI5Mzl9.cGDfv2lhFLNqOON3P4tq-LvoSTtarC5gIa1rG-ST5CA"}
             try:
                 # set credentials on request
                 if node.url == "http://project-c404.rhcloud.com/":
@@ -263,7 +263,6 @@ def explore_post(request, node_id, post_id):
         else:
             #checks what node it is on and returns the public posts from that node
             try:
-                #get the post
                 if node.url == "http://project-c404.rhcloud.com/":
                     post = get_APIPost(post_id,"http://project-c404.rhcloud.com/api/posts/", "Basic " + base64.b64encode("team4:team4team4"))
                 elif node.url == "http://disporia-cmput404.rhcloud.com/":
