@@ -140,11 +140,11 @@ def get_APIAuthorPosts(friend_id):
     local = get_local(friend_id)
     team5 = get_team5(friend_id)
     team6 = get_team6(friend_id)
-    if len(local) > 0:
+    if local != None and len(local) > 0:
         return local
-    elif len(team5) > 0:
+    elif  team5 != None and len(team5) > 0:
         return team5
-    elif len(team6) > 0:
+    elif team6 != None and len(team6) > 0:
         return team6
     else:
         return []
@@ -155,7 +155,7 @@ Get all the posts for a local author
 def get_local(author_id):
     #checks what node it is on and returns the public posts from that node
     try:
-        url = "http://cmput404-team-4b.herokuapp.com/api/author/"+author_id+"/posts"
+        url = "http://cmput404-team-4b.herokuapp.com/api/author/"+str(author_id)+"/posts"
         opener = urllib2.build_opener(urllib2.HTTPHandler)
         req = urllib2.Request(url)
         # set credentials on request
