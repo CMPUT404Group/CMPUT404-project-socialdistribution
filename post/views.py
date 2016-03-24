@@ -109,7 +109,7 @@ def explore(request, node_id=None):
             opener = urllib2.build_opener(urllib2.HTTPHandler)
             req = urllib2.Request(url)
             credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
-                        "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"}
+                        "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg3MDI5Mzl9.cGDfv2lhFLNqOON3P4tq-LvoSTtarC5gIa1rG-ST5CA"}
             try:
                 # set credentials on request
                 if node.url == "http://project-c404.rhcloud.com/":
@@ -151,7 +151,7 @@ def explore_post(request, node_id, post_id):
                 #get the post info
 
                 credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
-                     "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg2MDQ5OTV9.yiiY5evZBCFhjUgCI0U5C76LrluI9eepyOqKUmLdcPE"}
+                     "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg3MDI5Mzl9.cGDfv2lhFLNqOON3P4tq-LvoSTtarC5gIa1rG-ST5CA"}
 
                 #create the comment to be sent
                 if request.method == "POST":
