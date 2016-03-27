@@ -929,10 +929,19 @@ class FriendingCheck(generics.GenericAPIView):
         # ensure user is authenticated
         if (not request.user.is_authenticated()):
             return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
-
-
+        
+        author1 = Author.objects.get(id=author_id1)
+        # check if request is for remote node, if so handle it
+        remoteNode1 = getRemoteNode(author1.user)
+        if remoteNode1 !=None:
+            return Response({"message":"first author is a remote user on another node, for information of this remote user use the api of the remote node"})
+        
         # returns whether or not author_id1 & author_id2 are friends or not
         if author_id2 != None:
+            author2 = Author.objects.get(id=author_id2)
+            remoteNode2 = getRemoteNode(author2.user)
+            if remoteNode2 !=None:
+                return Response({"message":"second author is a remote user on another node, for information of this remote user use the api of the remote node"})    
             aList = Friending.objects.filter(author__id=author_id1, friend__id=author_id2)
             bList = Friending.objects.filter(author__id=author_id2, friend__id=author_id1)
             result = list(chain(aList, bList))
@@ -946,10 +955,10 @@ class FriendingCheck(generics.GenericAPIView):
         # returns all friends of author_1
         else:
 
-            # check if request is from remote node, if so handle it
-            remoteNode = getRemoteNode(request.user)
-            if remoteNode != None:
-                return Response({"message":"This is a remote user on another node, to see their friends, use the api of the remote user's original node"}, status=status.HTTP_400_BAD_REQUEST)
+            # check if request is from remote node, if so handle it (they don't have permission to see everyone's friends on our node)
+            # remoteNode = getRemoteNode(request.user)
+            # if remoteNode != None:
+            #     return Response({"message":"This is a remote user on another node, you only have permission of the api of your original node"}, status=status.HTTP_400_BAD_REQUEST)
                 # author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
                 # # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
                 # # else, create a new author object w/o user
@@ -961,11 +970,8 @@ class FriendingCheck(generics.GenericAPIView):
                 #     author.save()
 
             # local author - get from db
-            else:
-                author  = Author.objects.get(user=request.user)
-
-            author_id = author.id
-            friendsList = getAllFriends(author_id)
+            #else:
+            friendsList = getAllFriends(author_id1)
             return Response({'query':'friends', 'authors': friendsList}, status=status.HTTP_200_OK)
 
     def post(self, request, author_id1, format=None):

@@ -617,8 +617,7 @@ def isAllowed(viewer,post):
     else:
         return False
 
-# ref: http://stackoverflow.com/questions/16700968/check-existing-password-and-reset-password
-# HASN'T BEEN QUITE TESTED OR IMPLEMENTED COMPLETELY YET
+# adapted from: http://stackoverflow.com/questions/16700968/check-existing-password-and-reset-password
 def postChangeUserPassword(request, profile_owner):
     old_password = str(request.POST['old_password'].strip())
     print(old_password)
@@ -630,6 +629,5 @@ def postChangeUserPassword(request, profile_owner):
         if saveuser.check_password(old_password):
             saveuser.set_password(request.POST['reset_password']);
             saveuser.save()
-            #I DONT THINK WE NEED TO USE SERIALIZER or anything HERE???
             return True
     return False
