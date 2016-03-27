@@ -22,7 +22,7 @@ document.getElementById("explore").setAttribute("class", "active");
         <li class="list-group-item" style="padding: 1em">
         <span>
             <a href={% url 'explore_host' n.id %}>
-            <h4 id="n_name" class="list-group-item-heading">{{n.hostname}}</h4>
+            <h4 id="n_name" class="list-group-item-heading">{{n}}</h4>
             </a>
         </span>
         </li>
@@ -37,7 +37,7 @@ document.getElementById("explore").setAttribute("class", "active");
         <li class="list-group-item" style="padding: 1em">
         <span>
             <a href={% url 'explore_host' n.id %}>
-            <h4 id="n_name" class="list-group-item-heading">{{n.hostname}}</h4>
+            <h4 id="n_name" class="list-group-item-heading">{{n}}</h4>
             </a>
         </span>
         </li>
@@ -46,7 +46,7 @@ document.getElementById("explore").setAttribute("class", "active");
     </ul>
 </div>
 
-<h1>{{node.hostname}}</h1>
+<h1>{{node}}</h1>
 
 {% for post in posts %}
 <div class="row post">
