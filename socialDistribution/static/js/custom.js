@@ -385,13 +385,13 @@ window.onload = function() {
   $("button.remote-follow-btn").one("click", function(event) {
     // remote-follow-btn-{{post.author.id}}
     var author_id = this.id.slice(18); 
-    var displayName = $(this).data('displayname');
+    var displayname = $(this).data('displayname');
     var remoteHost = $(this).data('host');
 
     var follower_id = document.getElementById('logged-in-author').getAttribute("data");
     var follower_displayname = $('#logged-in-author').data("displayname");
 
-    let authorProfile = { 'id' : author_id, 'host': host, 'displayname': displayname };
+    let authorProfile = { 'id' : author_id, 'host': remoteHost, 'displayname': displayname };
     let followerProfile = { 'id' : follower_id, 'host': 'http://' + window.location.host + '/', 'displayname': follower_displayname };
 
     // HARD CODED
