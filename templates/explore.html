@@ -8,7 +8,7 @@ document.getElementById("explore").setAttribute("class", "active");
 </script>
 
 
-<div id="logged-in-author" data="{{loggedInAuthor.id}}"></div>
+<div id="logged-in-author" data="{{loggedInAuthor.id}}" data-displayname="{{loggedInAuthor.displayname}}"></div>
 
 <div>
     <h4 class="list-group-item list-group-item-info">Nodes</h4>
@@ -63,7 +63,7 @@ document.getElementById("explore").setAttribute("class", "active");
     {% endif %}
     <img id="id-user-profile-image"
          class="profile-photo-icon img-circle img-responsive img-center pull-left"
-         data-toggle="tooltip" title="{{ post.author }}"
+         data-toggle="tooltip" title="{{ post.author.github }}"
          alt="Profile Image"
         {% if post.author.picture %}
          src="/media/{{ post.author.picture }}"/>
@@ -75,9 +75,9 @@ document.getElementById("explore").setAttribute("class", "active");
 
     {% if  loggedInAuthor.id != post.author.id %}
         {% if post.author not in followList %}
-            <button  id='follow-btn-{{post.author.id}}' class="follow-btn btn-sm btn-success pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;"> Follow </button>
+            <button  id='remote-follow-btn-{{post.author.id}}' class="remote-follow-btn btn-sm btn-success pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;" data-host='{{post.author.host}}' data-displayname='{{post.author.displayname}}'> Follow </button>
         {% else %}
-            <button  id='unfollow-btn-{{post.author.id}}' class="unfollow-btn btn-sm btn-warning pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;"> Unfollow </button>
+            <button  id='unfollow-btn-{{post.author.id}}' class="unfollow-btn btn-sm btn-warning pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;" data-host='{{post.author.host}}' data-displayname='{{post.author.displayname}}'> Unfollow </button>
         {% endif %}
     {% endif %}
 

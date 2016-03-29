@@ -21,7 +21,7 @@ document.getElementById("manager").setAttribute("class", "active");
         <a href="{% url 'user_profile' author.id %}">
         <img id="user-profile-image-{{author.id}}"
          class="manage profile-photo img-circle img-responsive img-center pull-left create-post"
-         data-toggle="tooltip" title="{{ author }}"
+         data-toggle="tooltip" title="{{ author.displayname }}"
          alt="Profile Image"
         {% if author.picture %}
          src="/media/{{ author.picture }}"/></a>

@@ -340,210 +340,117 @@ window.onload = function() {
   });
 
 
-  function sendLocalFriendRequest(follower_id, followee_author_obj) {
-    var followee_id = followee_author_obj["id"]
-
-    // get follower_id object to formulate friend request
-    $.ajax({
-      url: 'http://' + window.location.host + '/api/author/' + follower_id,
-      type: "GET",
-      contentType: "application/json",
-      beforeSend: function(xhr, settings) {
-        xhr.setRequestHeader("X-CSRFToken", csrftoken);
-      },
-      success: function(response, statusText, xhr) {
-        if (xhr.status == 200) {
-          var follower_author_obj = parseProfileResponse(response);
-          var JSONobject = { "query": "friendrequest", "author":  follower_author_obj, "friend": followee_author_obj };
-          var jsonData = JSON.stringify( JSONobject);
-          console.log(jsonData);
-          $.ajax({
-            url: 'http://' + window.location.host + '/api/friendrequest/',
-            type: "POST",
-            data:  jsonData,
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            beforeSend: function(xhr, settings) {
-              xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            },
-            success: function(response2) {
-              console.log(response2);
-              toastr.info("Followed!");
-              $("button#follow-btn-"+followee_id).text("Followed");
-              $("button#follow-btn-"+followee_id).removeClass("follow-btn");
-              $("button#follow-btn-"+followee_id).removeClass("btn-success");
-              $("button#follow-btn-"+followee_id).addClass("btn-info");
-            },
-            error: function(xhr, ajaxOptions, error) {
-              console.log(xhr.status);
-              console.log(xhr.responseText);
-              console.log(error);
-              toastr.error("Error. Could not send request");
-            }
-          });
-        }
-        else {
-          toastr.error("Author not found.");
-        }
-      },
-      error: function(xhr, ajaxOptions, error) {
-        console.log(xhr.status);
-        console.log(xhr.responseText);
-        console.log(error);
-        toastr.error("Error. Could not send request");
-      }
-    });
-  }
-
-  function sendRemoteFriendRequest(follower_id, followee_author_obj, remote_host_url) {
+  function sendRemoteFriendRequest(follower_author_obj, followee_author_obj, remote_host_url) {
     var followee_id = followee_author_obj["id"];
     var remote_url = remote_host_url;
     if (remote_host_url.slice(-1) != '/') {
-      remote_url = remote_host_url = '/';
+      remote_url = remote_host_url + '/';
     }
 
-    // get follower_id object to formulate friend request
+    var JSONobject = { "query": "friendrequest", "author":  follower_author_obj, "friend": followee_author_obj };
+    var jsonData = JSON.stringify( JSONobject);
+    console.log(jsonData);
     $.ajax({
-      url: 'http://' + window.location.host + '/api/author/' + follower_id,
-      type: "GET",
-      contentType: "application/json",
+      url: remote_host_url + 'api/friendrequest/',
+      type: "POST",
+      data:  jsonData,
+      contentType: 'application/json; charset=utf-8',
+      dataType: 'json',
       beforeSend: function(xhr, settings) {
-        xhr.setRequestHeader("X-CSRFToken", csrftoken);
         // put authentication credentials to REMOTE SITES here - may be different for each group
+        if (remote_host_url == "http://project-c404.rhcloud.com/") {
+          xhr.setRequestHeader("Authorization", "Basic " + btoa("team4:team4team4"));
+        }
+        // put else if other remote site credentials here
       },
       success: function(response, statusText, xhr) {
-        if (xhr.status == 200) {
-          var follower_author_obj = parseProfileResponse(response);
-          var JSONobject = { "query": "friendrequest", "author":  follower_author_obj, "friend": followee_author_obj };
-          var jsonData = JSON.stringify( JSONobject);
-          console.log(jsonData);
-          $.ajax({
-            url: remote_url + 'api/friendrequest/',
-            type: "POST",
-            data:  jsonData,
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            beforeSend: function(xhr, settings) {
-              // put authentication credentials to REMOTE SITES here - may be different for each group
-              xhr.setRequestHeader("Authorization", "Basic " + btoa( follower_id + "@nodeHost4B:host4b"));
-            },
-            success: function(response2, statusText, xhr) {
-              console.log(response2);
-              if (xhr.status == 200 || xhr.status == 201) {
-                toastr.info("Followed!");
-                $("button#follow-btn-"+followee_id).text("Followed");
-                $("button#follow-btn-"+followee_id).removeClass("follow-btn");
-                $("button#follow-btn-"+followee_id).removeClass("btn-success");
-                $("button#follow-btn-"+followee_id).addClass("btn-info");
-                
-                // // remote node friend request success - now record it in our db by hitting our api
-                $.ajax({
-                  url: "http://" + window.location.host + '/api/friendrequest/',
-                  type: "POST",
-                  data:  jsonData,
-                  contentType: 'application/json; charset=utf-8',
-                  dataType: 'json',
-                  beforeSend: function(xhr, settings) {
-                    // put authentication credentials   - OUR OWN CREDENTIALS TO OUR SITE
-                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                    // xhr.setRequestHeader("Authorization", "Basic " + btoa( follower_id + "@:city"));
-                  },
-                  success: function(response3, statusText, xhr) {
-                  },
-                  error: function(xhr, ajaxOptions, error) {
-                    console.log(xhr.status);
-                    console.log(xhr.responseText);
-                    console.log(error);
-                    toastr.error("Error. Response from remote node is not 200 or 201 - Remote node friend request success but local node friend request unsuccessful"); 
-
-                  }
-                });
-              }
-              else {
-                console.log(xhr.status);
-                console.log(xhr.responseText);
-                toastr.error("Error. Response from remote node is not 200 or 201"); 
-              }
-            },
-            error: function(xhr, ajaxOptions, error) {
-              console.log(xhr.status);
-              console.log(xhr.responseText);
-              console.log(error);
-              toastr.error("Error. Could not send request");
-            }
-          });
-        }
-        else {
-          toastr.error("Author not found.");
+        console.log(response);
+        if (xhr.status == 200 || xhr.status == 201) {
+          toastr.info("Followed!");
+          $("button#follow-btn-"+followee_id).text("Followed");
+          $("button#follow-btn-"+followee_id).removeClass("follow-btn");
+          $("button#follow-btn-"+followee_id).removeClass("btn-success");
+          $("button#follow-btn-"+followee_id).addClass("btn-info");
         }
       },
       error: function(xhr, ajaxOptions, error) {
+        toastr.error("Error. Response from remote node is not 200 or 201");
         console.log(xhr.status);
         console.log(xhr.responseText);
-        console.log(error);
-        toastr.error("Error. Could not send request");
       }
     });
-  }
+  };
+
+  // click button to follow someone
+  $("button.remote-follow-btn").one("click", function(event) {
+    // remote-follow-btn-{{post.author.id}}
+    var author_id = this.id.slice(18); 
+    var displayName = $(this).data('displayname');
+    var remoteHost = $(this).data('host');
+
+    var follower_id = document.getElementById('logged-in-author').getAttribute("data");
+    var follower_displayname = $('#logged-in-author').data("displayname");
+
+    let authorProfile = { 'id' : author_id, 'host': host, 'displayname': displayname };
+    let followerProfile = { 'id' : follower_id, 'host': 'http://' + window.location.host + '/', 'displayname': follower_displayname };
+
+    // HARD CODED
+    if (remoteHost == "project-c404.rhcloud.com/api") {
+      remoteHost = "http://project-c404.rhcloud.com/";
+    }
+
+    sendRemoteFriendRequest(followerProfile, authorProfile, remoteHost);
+  });
+
 
 
 
   // click button to follow someone
   $("button.follow-btn").one("click", function(event) {
-    var author_id = this.id.slice(11);
+    // follow-btn-{{post.author.id}}
+    var author_id = this.id.slice(11); 
+    var author_displayname = $(this).data('displayname');
+    var author_host = $(this).data('host');
+
     var follower_id = document.getElementById('logged-in-author').getAttribute("data");
+    var follower_displayname = $('#logged-in-author').data("displayname");
 
-    // we assume that follower_id (loggedInAuthor sending the friend request) is an author on our node
+    let authorProfile = { 'id' : author_id, 'host': author_host, 'displayname': author_displayname };
+    let followerProfile = { 'id' : follower_id, 'host': 'http://' + window.location.host + '/', 'displayname': follower_displayname };
 
-    // check if followee (person being followed) is a local or remote author
-    // var checkAuthorNodeRequest 
-    // hit out api, if followee id has a profile page, check their host to see if remote or local
-    // else if followee id doesn't have a profile page on our node, its a remote
+    sendLocalFriendRequest(followerProfile, authorProfile);
+  });
+
+  function sendLocalFriendRequest(follower_author_obj, followee_author_obj) {
+    var JSONobject = { "query": "friendrequest", "author":  follower_author_obj, "friend": followee_author_obj };
+    var jsonData = JSON.stringify( JSONobject);
+    console.log(jsonData);
+
     $.ajax({
-      url: 'http://' + window.location.host + '/api/author/' + author_id,
-      type: "GET",
+      url: 'http://' + window.location.host + '/api/friendrequest/',
+      type: "POST",
+      data:  jsonData,
       contentType: "application/json",
       beforeSend: function(xhr, settings) {
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
       },
       success: function(response, statusText, xhr) {
-        // console.log(response);
-        // console.log(statusText);
-        // console.log(xhr.status)
-        if (xhr.status == 200) {
-          var host = response["host"];
-          if (host == undefined) {
-            toastr.error("Error. Unknown host.");
-            return;
-          }
-          // console.log(host);
-          var followee_author_obj = parseProfileResponse(response);
-          if ((host == 'http://' + window.location.host) || (host == 'http://' + window.location.host + '/')) {
-            // is a local author - send request to our api
-            sendLocalFriendRequest(follower_id, followee_author_obj);    // parameters : source author id, destination author object
-          }
-          else {
-            // is a remote author - send request to remote node's api
-            sendRemoteFriendRequest(follower_id, followee_author_obj, host);   // parameters : source author id, destination author object, destination/remote host
-          }
+        console.log(response);
+        if (xhr.status == 200 || xhr.status == 201) {
+          toastr.info("Followed!");
+          $("button#follow-btn-"+followee_id).text("Followed");
+          $("button#follow-btn-"+followee_id).removeClass("follow-btn");
+          $("button#follow-btn-"+followee_id).removeClass("btn-success");
+          $("button#follow-btn-"+followee_id).addClass("btn-info");
         }
       },
       error: function(xhr, ajaxOptions, error) {
+        toastr.error("Error. Response is not 200 or 201");
         console.log(xhr.status);
         console.log(xhr.responseText);
-        console.log(error);
-        if (xhr.status == 404) {
-          console.log("IN HERERLKE*U)*&");
-          // var followee_author_obj = parseProfileResponse(response);
-          // is a remote author - send request to remote node's api
-          // sendRemoteFriendRequest(follower_id, followee_author_obj, host);   // parameters : source author id, destination author object, destination/remote host
-        }
-
-        toastr.error("Error. Could not send request");
-
       }
-    })
-  });
+    });
+  };
 
   // on manager's page, click author's profile pic, shows author's firiends
   // $("img.")
@@ -629,7 +536,7 @@ window.onload = function() {
       $.getJSON(path, function (data) {
           //$("#github_body").html("Under Construction -> Data received still need to make it more reader friendly.");
           $.each(data, function (i, field) {
-              $("#github_body").append("<p><b>"+field["type"]+"</b> to "+field["repo"]["name"]+"</p>");
+              $("#github_body").append("<p>"+"<b>"+field["type"]+"</b>"+" to "+field["repo"]["name"]+"</p>"+"<p>"+"<b>Message:</b>"+field["payload"]["commits"][0]["message"]+"</p><br/>")
               //var textNode = document.createTextNode(i+ " " +JSON.stringify(field));
               //var textNode = document.createTextNode(JSON.stringify(JSON.stringify(field)));
               //var $newdiv = $( "<div id='github_event_"+i+"'/>" );
