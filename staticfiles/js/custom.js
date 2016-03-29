@@ -425,7 +425,7 @@ window.onload = function() {
     var JSONobject = { "query": "friendrequest", "author":  follower_author_obj, "friend": followee_author_obj };
     var jsonData = JSON.stringify( JSONobject);
     console.log(jsonData);
-
+    var followee_id = followee_author_obj['id'];
     $.ajax({
       url: 'http://' + window.location.host + '/api/friendrequest/',
       type: "POST",
