@@ -17,15 +17,16 @@ CONTENT_TYPE_CHOICES = (
 class Author(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
-    github = models.CharField(max_length=40, blank=True, default="http://github.com/defunkt")
+    github = models.CharField(max_length=40, blank=True, default="http://github.com/default")
     picture = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     host = models.CharField(max_length=40, default="http://127.0.0.1:8000/")
-    displayname = models.CharField(max_length=40, default="defaultUsername")
+    displayname = models.CharField(max_length=40, default="defaultDisplayName")
     previous_follower_num = models.PositiveIntegerField(default=0)
     noti = models.BooleanField(default=False)
 
     def __unicode__(self):
         # return self.user.username
+        self.displayname = self.user.username
         return self.displayname
 
 class Node(models.Model):
@@ -35,7 +36,7 @@ class Node(models.Model):
     url = models.CharField(max_length=200)
 
     def __unicode__(self):
-        return self.hostname
+        return self.user.username
 
 class Post(models.Model):
     PUBLIC = 'PUBLIC'

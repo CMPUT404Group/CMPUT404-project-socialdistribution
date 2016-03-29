@@ -23,7 +23,7 @@ document.getElementById("my_stream").setAttribute("class", "active");
     {% endif %}
     <img id="id-user-profile-image"
          class="profile-photo-icon img-circle img-responsive img-center pull-left"
-         data-toggle="tooltip" title="{{ post.author }}"
+         data-toggle="tooltip" title="{{ post.author.displayname }}"
          alt="Profile Image"
         {% if post.author.picture %}
          src="/media/{{ post.author.picture }}"/>

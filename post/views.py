@@ -39,8 +39,6 @@ def _submitPostForm(request, post_pk=None):
 '''
 Renders the Public Stream page
 '''
-
-
 def public_stream(request):
     if (request.user.is_authenticated()):
         if request.method == "POST":
@@ -109,7 +107,7 @@ def explore(request, node_id=None):
             opener = urllib2.build_opener(urllib2.HTTPHandler)
             req = urllib2.Request(url)
             credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
-                        "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"}
+                        "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg3MDI5Mzl9.cGDfv2lhFLNqOON3P4tq-LvoSTtarC5gIa1rG-ST5CA"}
             try:
                 # set credentials on request
                 if node.url == "http://project-c404.rhcloud.com/":
@@ -136,72 +134,216 @@ def explore(request, node_id=None):
         return HttpResponseRedirect(reverse('accounts_login'))
 
 '''
+Finds the posts for an author_id
+'''
+def get_APIAuthorPosts(friend_id):
+    local = get_local(friend_id)
+    team5 = get_team5(friend_id)
+    team6 = get_team6(friend_id)
+    if local != None and len(local) > 0:
+        return local
+    elif  team5 != None and len(team5) > 0:
+        return team5
+    elif team6 != None and len(team6) > 0:
+        return team6
+    else:
+        return []
+
+'''
+Get all the posts for a local author
+'''
+def get_local(author_id):
+    #checks what node it is on and returns the public posts from that node
+    try:
+        url = "http://cmput404-team-4b.herokuapp.com/api/author/"+str(author_id)+"/posts"
+        opener = urllib2.build_opener(urllib2.HTTPHandler)
+        req = urllib2.Request(url)
+        # set credentials on request
+        creds =  base64.b64encode("test:test")
+        req.add_header("Authorization", "Basic " + creds) 
+        x = opener.open(req)
+        y = x.read()
+        jsonResponse = json.loads(y)
+        postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+        return postSerializer.data
+    except urllib2.HTTPError, e:
+        print("Local Error: "+str(e.code))
+
+'''
+Get all posts for <author> from team5
+'''
+def get_team5(author_id):
+    #checks what node it is on and returns the public posts from that node
+    try:
+        url = "http://disporia-cmput404.rhcloud.com/api/author/"+str(author_id)+"/posts/"
+        opener = urllib2.build_opener(urllib2.HTTPHandler)
+        req = urllib2.Request(url)
+        # set credentials on request
+        creds =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"
+        req.add_header("Authorization", "JWT " + creds) 
+        x = opener.open(req)
+        y = x.read()
+        jsonResponse = json.loads(y)
+        postSerializer = PostSerializer(jsonResponse["results"], many=True)
+        return postSerializer.data
+    except urllib2.HTTPError, e:
+        print("team5 Error: "+str(e.code))
+
+'''
+Get all posts for <author> from team6
+'''
+def get_team6(author_id):
+    try:
+        #checks what node it is on and returns the public posts from that node
+        url = "http://project-c404.rhcloud.com/api/author/"+str(author_id)+"/posts/"
+        opener = urllib2.build_opener(urllib2.HTTPHandler)
+        req = urllib2.Request(url)
+        # set credentials on request
+        creds = base64.b64encode("team4:team4team4")
+        req.add_header("Authorization", "Basic " + creds)
+        x = opener.open(req)
+        y = x.read()
+        jsonResponse = json.loads(y)
+        if len(jsonResponse) > 0:
+            postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+            return postSerializer.data
+        else:
+            return []
+    except urllib2.HTTPError, e:
+        print("team 6 Error: "+str(e.code))
+
+'''
+Get a single post from someone's API
+'''
+def get_APIPost(post_id, host, header):
+    #checks what node it is on and returns the public posts from that node
+    url = host+str(post_id)
+    opener = urllib2.build_opener(urllib2.HTTPHandler)
+    req = urllib2.Request(url)
+    # set credentials on request
+    req.add_header("Authorization", header)
+    x = opener.open(req)
+    y = x.read()
+    jsonResponse = json.loads(y)
+    postSerializer = PostSerializer(jsonResponse)
+    return postSerializer.data
+
+'''
+Get all the friends for a particular author
+'''
+def get_APIFriends(person_id):
+    t6_url = "http://project-c404.rhcloud.com/api/friends/"
+    t6_h = "Basic " + base64.b64encode("team4:team4team4")
+    t5_url = "http://disporia-cmput404.rhcloud.com/api/friends/"
+    t5_h = "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"
+    opener = urllib2.build_opener(urllib2.HTTPHandler)
+    try:
+        url = "http://cmput404-team-4b.herokuapp.com/api/friends/" + str(person_id)
+        req = urllib2.Request(url)
+        creds = base64.b64encode("test:test")
+        req.add_header("Authorization", "Basic " + creds)
+        x = opener.open(req)
+        y = x.read()
+        return json.loads(y)["authors"]
+    except urllib2.HTTPError, e:
+        print("Not a local Person. Error: "+str(e.code))
+    try:
+        url = t5_url+str(person_id)
+        req = urllib2.Request(url)
+        req.add_header("Authorization", t5_h)
+        x = opener.open(req)
+        y = x.read()
+        return json.loads(y)["authors"]
+    except urllib2.HTTPError, e:
+        print("Not a team 5 Person. Error: "+str(e.code))
+    try:
+        url = t6_url+str(person_id)
+        req = urllib2.Request(url)
+        req.add_header("Authorization", t6_h)
+        x = opener.open(req)
+        y = x.read()
+        return json.loads(y)["authors"]
+    except urllib2.HTTPError, e:
+        print("Not a team 6 Person. Error: "+str(e.code))
+
+'''
+Create Comment to send to remote host
+'''
+def send_comment(request, post_id, node_id=None):
+    credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
+        "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg2MDQ5OTV9.yiiY5evZBCFhjUgCI0U5C76LrluI9eepyOqKUmLdcPE"}
+    data = request.POST
+    author = Author.objects.get(user=request.user)
+    comment = {}
+    comment["comment"] = data["comment"]
+    comment["contentType"] = data["contentType"]
+    comment["author"] = {}
+    comment["author"]["id"] = str(author.id)
+    comment["author"]["host"] = author.host
+    comment["author"]["displayName"] = author.displayname
+    comment["author"]["github"] = author.github
+    comment["visibility"] = "PUBLIC"
+    print(author.id)
+    print(author.host)
+    #send it to a remote host
+    if node_id != None:
+        node = Node.objects.get(id=node_id)
+        if node.url == "http://project-c404.rhcloud.com/":
+            url = node.url + "api/posts/" + post_id +"/comments/"
+            creds = base64.b64encode(credentials[node.url])
+            headers = {"Authorization" : "Basic " + creds}
+            comment["author"]["url"] = "project-c404.rhcloud.com/api/author/a9661f41-827a-4588-bfcb-61bcfcf316ba"
+        elif node.url == "http://disporia-cmput404.rhcloud.com/":
+            url = node.url + "api/posts/" + post_id +"/comments"
+            creds = credentials[node.url]
+            headers = {"Authorization": "JWT " + creds}
+            comment["author"]["url"] = "team4_url"
+    #send it to a local host
+    else:
+        url = "http://cmput404-team-4b.herokuapp.com/api/posts/" + post_id +"/comments/"
+        creds = base64.b64encode("test:test")
+        headers = {"Authorization" : "Basic " + creds}
+        #comment["author"]["id"] = "46410191-43e4-4a41-bd61-c8bd08e366f2"
+    r = requests.post(url, json=comment, headers=headers)
+
+'''
 Renders the post clicked from the explore page
 '''
 def explore_post(request, node_id, post_id):
+    t6_url = "http://project-c404.rhcloud.com/api/posts/"
+    t6_h = "Basic " + base64.b64encode("team4:team4team4")
+    t5_url = "http://disporia-cmput404.rhcloud.com/api/posts/"
+    t5_h = "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"
     if (request.user.is_authenticated()):
         author = Author.objects.get(user=request.user)
         node = Node.objects.get(id=node_id)
         if node_id == None:
-            return render(request, 'postDetail.html', {'loggedInAuthor': author, 'nodes': nodes})
+            return render(request, 'postDetail.html', {'loggedInAuthor': author, 'nodes': nodes, "remote":True})
         else:
             #checks what node it is on and returns the public posts from that node
             try:
-                node = Node.objects.get(id=node_id)
-                #get the post info
-
-                credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
-                     "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg2MDQ5OTV9.yiiY5evZBCFhjUgCI0U5C76LrluI9eepyOqKUmLdcPE"}
-
-                #create the comment to be sent
-                if request.method == "POST":
-                    # set credentials on request                    
-                    data = request.POST
-                    values = {}
-                    values["comment"] = data["comment"]
-                    values["contentType"] = data["contentType"]
-                    values["author"] = {}
-                    values["author"]["id"] = str(author.id)
-                    values["author"]["host"] = author.host
-                    values["author"]["displayName"] = author.displayname
-                    values["author"]["github"] = author.github
-                    values["visibility"] = "PUBLIC"
-                    # opener = urllib2.build_opener(urllib2.HTTPHandler)
-                    # req = urllib2.Request(url)
-                    if node.url == "http://project-c404.rhcloud.com/":
-                        url = node.url + "api/posts/" + post_id +"/comments/"
-                        creds = base64.b64encode(credentials[node.url])
-                        headers = {"Authorization" : "Basic " + creds}
-                        values["author"]["url"] = "project-c404.rhcloud.com/api/author/a9661f41-827a-4588-bfcb-61bcfcf316ba"
-                    elif node.url == "http://disporia-cmput404.rhcloud.com/":
-                        url = node.url + "api/posts/" + post_id +"/comments"
-                        creds = credentials[node.url]
-                        headers = {"Authorization": "JWT " + creds}
-                        values["author"]["url"] = "team4_url"
-
-                    r = requests.post(url, json=values, headers=headers)
-                    #send the request
-                    print r.json()
-                    print r.status_code
-
-                url = node.url + "api/posts/" + post_id +"/"
-                opener = urllib2.build_opener(urllib2.HTTPHandler)
-                req = urllib2.Request(url)
                 if node.url == "http://project-c404.rhcloud.com/":
-                    creds = base64.b64encode(credentials[node.url])
-                    req.add_header("Authorization", "Basic " + creds)
+                    post = get_APIPost(post_id,t6_url, t6_h)
                 elif node.url == "http://disporia-cmput404.rhcloud.com/":
-                     creds = credentials[node.url]
-                     req.add_header("Authorization", "JWT " + creds)
-                
-                x = opener.open(req)
-                y = x.read()
-                jsonResponse = json.loads(y)
-                postSerializer = PostSerializer(jsonResponse)
-                post = postSerializer.data
-                commentForm = CommentForm()
-                return render(request, 'post/postDetail.html', {'remote':True, 'post': post, 'commentForm': commentForm, 'loggedInAuthor': author, 'node': node})
+                    post = get_APIPost(post_id,t5_url, t5_h)
 
+                #create and send the comment if its allowed
+                if request.method == "POST":  
+                    if (isAllowed(author,post)):                   
+                        send_comment(request, post_id, node_id)
+                        if node.url == "http://project-c404.rhcloud.com/":
+                            post = get_APIPost(post_id,t6_url, t6_h)
+                        elif node.url == "http://disporia-cmput404.rhcloud.com/":
+                            post = get_APIPost(post_id, t5_url, t5_h)
+                    else:
+                        return HttpResponseForbidden("You are not allowed to access this page")
+
+                #display the post if its allowed
+                if (isAllowed(author,post)):
+                    commentForm = CommentForm()
+                    return render(request, 'post/postDetail.html', {'remote':True, 'post': post, 'commentForm': commentForm, 'loggedInAuthor': author, 'node': node})
+                else:
+                    return HttpResponseForbidden("You are not allowed to access this page")
             except urllib2.HTTPError, e:
                 return render(request, "404_page.html", {'message': "HTTP ERROR: "+str(e.code)+" "+e.reason, 'loggedInAuthor': author},status=e.code)
     else:
@@ -229,38 +371,10 @@ def my_stream(request):
 
         author = Author.objects.get(user=request.user)
 
-        posts1 = Post.objects.filter(author=author).order_by('-published')
-
-        pks = []
-
-        #add the posts by the people we are friends with into our myStream
-        friend_pairs = Friending.objects.filter(author=author)
-        for i in range(len(friend_pairs)):
-            friend_posts = Post.objects.filter(author=friend_pairs[i].friend)
-            for j in range(len(friend_posts)):
-                if isAllowed(request.user, friend_posts[j].id):
-                    pks.append(friend_posts[j].id)
-
-        #sort the posts so that the most recent is at the top
-        posts2 = Post.objects.filter(id__in=pks)
-        posts = posts1 | posts2
-        posts.order_by('-published')
-
-        #bring in posts from node4A
-        # url = "http://cmput404team4A.herokuapp.com/api/posts/"
-        # opener = urllib2.build_opener(urllib2.HTTPHandler)
-        # req = urllib2.Request(url)
-        # encodedValue = base64.b64encode("ab432861-f7bc-4b5b-9261-86c167615d6@nodeTeam4A:nodeTeam4A")
-        # req.add_header("Authorization", "Basic " + encodedValue)
-        # x = opener.open(req)
-        # y = x.read()
-        # jsonResponse = json.loads(y)
-        # postSerializer = PostSerializer(jsonResponse["posts"], many=True)
-        # posts = postSerializer.data
-
-        # author = Author.objects.get(user=request.user)
+        ##################### notification on if logged in author has new follower
         followList = []
-        followRelationships = Friending.objects.filter(author=author)
+        followRelationships = Friending.objects.filter(friend=author)
+
         for relationship in followRelationships:
             followList.append(relationship.friend)
             
@@ -275,73 +389,93 @@ def my_stream(request):
         else:
             author.noti = False
         author.save()
+        ################## end of notification block
 
-
-        posts1 = Post.objects.filter(author=author).order_by('-published')
-
-        pks = []
-
+        posts = []
         #add the posts by the people we are friends with into our myStream
-        friend_pairs = Friending.objects.filter(author=author)
-        for i in range(len(friend_pairs)):
-            friend_posts = Post.objects.filter(author=friend_pairs[i].friend)
-            for j in range(len(friend_posts)):
-                if isAllowed(request.user, friend_posts[j].id):
-                    pks.append(friend_posts[j].id)
+        viewer_id = author.id
+        #viewer_id = "4fd7e786-7307-47e0-80d4-2c7a5cd14cb4" - Test it with this when not on the heroku account
+        friends = get_APIFriends(viewer_id)
+        if friends != None:
+            for i in range(len(friends)):
+                posts_all = []
+                friend = friends[i]
+                #get all the posts for a friend
+                posts_all = get_APIAuthorPosts(friend.id)
+                for j in range(len(posts_all)):
+                    if isAllowed(author, posts_all[j]):
+                        posts.append(posts_all[j])
 
-        #sort the posts so that the most recent is at the top
-        posts2 = Post.objects.filter(id__in=pks)
-        posts = posts1 | posts2
-        posts.order_by('-published')
+        #get all posts by the logged in author
+        try:      
+            mine = get_APIAuthorPosts(viewer_id)
+            posts.extend(mine)
+            print mine
+        except urllib2.HTTPError, e:
+            print("Couldnt get own posts "+author.user.username+" "+str(e.code))
 
+        #TODO order from newest to oldest
         form = PostForm()
         return render(request, 'post/myStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList})
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
+# '''
+# Handles submitting the Comment form - used when creating a new Comment
+# '''
 
-'''
-Handles submitting the Comment form - used when creating a new Comment
-'''
-
-
-def _submitCommentForm(request, post_pk):
-    if request.method == "POST":
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            response = CommentList.as_view()(request, post_pk)  # makes post call to API
-            return response
-
+# def _submitCommentForm(request, post_pk):
+#     if request.method == "POST":
+#         form = CommentForm(request.POST)
+#         if form.is_valid():
+#             response = CommentList.as_view()(request, post_pk)  # makes post call to API
+#             return response
 
 '''
 Renders the page for specific post (including the post's comments)
 '''
-
-
 def post_detail(request, post_pk):
+    t5_url = "http://disporia-cmput404.rhcloud.com/api/posts/"
+    t5_h = "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"
     if (request.user.is_authenticated()):
-        if (isAllowed(request.user,post_pk)):
-            if request.method == "POST":
-                response = _submitCommentForm(request, post_pk)
+        viewer = Author.objects.get(user=request.user)
+        ####TEMPORARY Check what node the post came from
+        Found = False
+        try:
+            post = get_APIPost(post_pk,"http://cmput404-team-4b.herokuapp.com/api/posts/","Basic " + base64.b64encode("test:test"))
+            Found = True
+        except urllib2.HTTPError, e:
+            print("Not a local Post. Error: "+str(e.code))
+        try:
+            post = get_APIPost(post_pk,t5_url, t5_h)
+            node = "55e70a0a-a284-4ffb-b192-08d083f4f164"
+            page = explore_post(request, node, post_pk)
+            return page
+        except urllib2.HTTPError, e:
+            print("Not a team 5 Post. Error: "+str(e.code))
+        try:
+            post = get_APIPost(post_pk,"http://project-c404.rhcloud.com/api/posts/", "Basic " + base64.b64encode("team4:team4team4"))
+            node = "1a3f4b77-a4b7-405e-9dd7-fcb40e925c61"
+            page = explore_post(request, node, post_pk)
+            return page
+        except urllib2.HTTPError, e:
+            print("Not a team 6 Post. Error: "+str(e.code))
+        #############################
+        if Found == True:
+            if (isAllowed(viewer,post)):
+                if request.method == "POST":
+                    #response = _submitCommentForm(request, post_pk)
+                    response = send_comment(request, post_pk, None)
 
-                # Empty Form Submitted
-                if response == None:
-                    # alert user form was empty
-                    pass
-                else:
-                    # -- TODO : display post success or failure on postDetail.html -- #
-                    if ((response.status_code == 201) or (response.status_code == 200)):
-                        return HttpResponseRedirect(reverse('post_detail_success', kwargs={'post_pk': post_pk}))
-                    else:  # 400 error
-                        # alert user of the error
-                        pass
 
-            post = Post.objects.get(pk=post_pk)
-            form = CommentForm()
-            author = Author.objects.get(user=request.user)
-            return render(request, 'post/postDetail.html', {'remote':False,'post': post, 'commentForm': form, 'loggedInAuthor': author})
+                post = get_APIPost(post_pk,"http://cmput404-team-4b.herokuapp.com/api/posts/","Basic "+base64.b64encode("test:test"))
+                form = CommentForm()
+                author = Author.objects.get(user=request.user)
+                return render(request, 'post/postDetail.html', {'remote':True,'post': post, 'commentForm': form, 'loggedInAuthor': author})
+            else:
+                return HttpResponseForbidden("You are not allowed to access this page")
         else:
-            return HttpResponseForbidden("You are not allowed to access this page")
+            return render(request, "404_page.html", {'message': "Post Not Found",'loggedInAuthor': viewer},status=404)
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
@@ -440,62 +574,50 @@ def user_profile(request, user_id):
 
 '''
 checks if a user is allowed access to a file
-
 '''
-def isAllowed(user,pk):
-    post = Post.objects.get(id=pk)
-    privacy = post.visibility
-    viewer = Author.objects.get(user=user)
-
+def isAllowed(viewer,post):
+    #viewer_id = viewer.id
+    viewer_id = "4fd7e786-7307-47e0-80d4-2c7a5cd14cb4"
+    privacy = post["visibility"]
+    print (privacy)
     #if the post was created by the user allow access
-    if viewer == post.author :
+    if viewer_id == post["author"]["id"]:
         return True
     #if it is a public post allow everypne access
     elif privacy == "PUBLIC":
         return True
     elif privacy == "SERVER_ONLY":
-        if viewer.host == post.author.host:
+        if viewer.host == post["author"]["host"]:
             return True
         else:
             return False
-    #checks if another post is being shared with you
+    #checks if another post is being shared with you -> not too great
     elif privacy == "OTHERAUTHOR":
-        user = User.objects.get(username=post.other_author)
-        other_author = Author.objects.get(user=user)
-        if other_author.id == viewer.id:
+        other_username = post["other_author"]
+        if other_username == viewer.user.username:
             return True
         else:
             return False
-    #check if the user is in the friend list
+    #check if the user is in the friend list - TODO
     elif privacy == "FRIENDS" or privacy == "FOAF":
-        friend_pairs = Friending.objects.filter(author=post.author)
-        friends = []
-        for i in range(len(friend_pairs)):
-            backwards = Friending.objects.filter(author=friend_pairs[i].friend,friend=post.author)
-            if len(backwards) > 0:
-                friends.append(friend_pairs[i].friend)
-        if viewer in friends:
+        #get the author's friends
+        friend_id = post["author"]["id"]
+        friends = get_APIFriends(friend_id)
+        if viewer_id in friends:
             return True
-        #check if the user is in the FoaF list
         elif privacy == "FOAF":
+            #check the friend of friends
             for i in range(len(friends)):
-                fofriend_pairs = Friending.objects.filter(author=friends[i])
-                fofriends = []
-                for j in range(len(fofriend_pairs)):
-                    backwards = Friending.objects.filter(friend=friends[i],author=fofriend_pairs[j].friend)
-                    if len(backwards) > 0:
-                        fofriends.append(fofriend_pairs[j].friend)
-                if viewer in fofriends:
+                fofriends = get_APIFriends(friends[i])
+                if viewer_id in fofriends:
                     return True
-        #if not a friend return false
+            return False
         else:
             return False
     else:
         return False
 
-
-# ref: http://stackoverflow.com/questions/16700968/check-existing-password-and-reset-password
-# HASN'T BEEN QUITE TESTED OR IMPLEMENTED COMPLETELY YET
+# adapted from: http://stackoverflow.com/questions/16700968/check-existing-password-and-reset-password
 def postChangeUserPassword(request, profile_owner):
     old_password = str(request.POST['old_password'].strip())
     print(old_password)
@@ -507,7 +629,5 @@ def postChangeUserPassword(request, profile_owner):
         if saveuser.check_password(old_password):
             saveuser.set_password(request.POST['reset_password']);
             saveuser.save()
-            #I DONT THINK WE NEED TO USE SERIALIZER or anything HERE???
             return True
     return False
-    
