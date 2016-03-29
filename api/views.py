@@ -1078,6 +1078,7 @@ class FriendRequest(generics.GenericAPIView):
         bothLocalAuthors = False
         try:
             author = Author.objects.get(id=author_req["id"])
+            print author
             # it's a local user
             if request.get_host() in author.host: # author.user != None: 
                 atLeastOneAuthorIsLocal = True
@@ -1089,6 +1090,7 @@ class FriendRequest(generics.GenericAPIView):
 
         try:
             friend = Author.objects.get(id=friend_req["id"])
+            print friend
             # it's a local user
             if request.get_host() in friend.host: # friend.user != None:
                 if atLeastOneAuthorIsLocal:
