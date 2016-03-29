@@ -97,8 +97,13 @@ def explore(request, node_id=None):
     if (request.user.is_authenticated()):
         nodes = Node.objects.all()
         author = Author.objects.get(user=request.user)
+        followList = []
+        followRelationships = Friending.objects.filter(author=author)
+        for relationship in followRelationships:
+            followList.append(relationship.friend.id)
+        
         if node_id == None:
-            return render(request, 'explore.html', {'loggedInAuthor': author, 'nodes': nodes, 'all':True})
+            return render(request, 'explore.html', {'loggedInAuthor': author, 'nodes': nodes, 'all':True, 'followList': followList})
         else:
             #checks what node it is on and returns the public posts from that node
             
@@ -127,7 +132,7 @@ def explore(request, node_id=None):
                 posts = postSerializer.data
 
                 form = PostForm()
-                return render(request, 'explore.html', {'node':node,'posts': posts, 'form': form, 'loggedInAuthor': author, 'nodes': nodes, 'all':False})
+                return render(request, 'explore.html', {'node':node,'posts': posts, 'form': form, 'loggedInAuthor': author, 'nodes': nodes, 'all':False, 'followList': followList})
             except urllib2.HTTPError, e:
                 return render(request, "404_page.html", {'message': "HTTP ERROR: "+str(e.code)+" "+e.reason, 'loggedInAuthor': author},status=404)
     else:

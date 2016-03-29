@@ -73,8 +73,8 @@ document.getElementById("explore").setAttribute("class", "active");
     </a>
     </div>
 
-    {% if  loggedInAuthor.id != post.author.id %}
-        {% if post.author not in followList %}
+    {% if loggedInAuthor.id != post.author.id %}
+        {% if post.author.id not in followList %}
             <button  id='remote-follow-btn-{{post.author.id}}' class="remote-follow-btn btn-sm btn-success pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;" data-host='{{post.author.host}}' data-displayname='{{post.author.displayname}}'> Follow </button>
         {% else %}
             <button  id='unfollow-btn-{{post.author.id}}' class="unfollow-btn btn-sm btn-warning pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;" data-host='{{post.author.host}}' data-displayname='{{post.author.displayname}}'> Unfollow </button>
