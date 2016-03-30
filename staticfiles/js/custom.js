@@ -399,8 +399,10 @@ window.onload = function() {
 
     let authorProfile = { 'id' : author_id, 'host': remoteHost, 'displayName': displayName };
     let followerProfile = { 'id' : follower_id, 'host': 'http://' + window.location.host + '/', 'displayName': follower_displayName, "url": "http://"+window.location.host+'/author/'+follower_id };
-    console.log("FOLLOWEE PROFILE : " + str(authorProfile));
-    console.log("FOLLOWER PROFILE : " + str(followerProfile));
+    console.log("FOLLOWEE PROFILE : ");
+    console.log(authorProfile);
+    console.log("FOLLOWER PROFILE : ");
+    console.log(followerProfile);
 
     // HARD CODED
     if (remoteHost == "project-c404.rhcloud.com/api") {
