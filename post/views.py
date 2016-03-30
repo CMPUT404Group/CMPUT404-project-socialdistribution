@@ -122,7 +122,7 @@ def explore(request, node_id=None):
                     x = opener.open(req)
                     y = x.read()
                     jsonResponse = json.loads(y)
-                    postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+                    postSerializer = PostSerializer(jsonResponse, many=True)
                 elif node.url == "http://disporia-cmput404.rhcloud.com/":
                     creds = credentials[node.url]
                     req.add_header("Authorization", "JWT " + creds)
