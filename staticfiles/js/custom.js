@@ -343,15 +343,18 @@ window.onload = function() {
   function sendRemoteFriendRequest(follower_author_obj, followee_author_obj, remote_host_url) {
     var followee_id = followee_author_obj["id"];
     var remote_url = remote_host_url;
-    if (remote_host_url.slice(-1) != '/') {
-      remote_url = remote_host_url + '/';
+    if (remote_host_url.startsWith("http://") == false) {
+      remote_url = "http://" + remote_host_url
+    }
+    if (remote_url.slice(-1) != '/') {
+      remote_url = remote_url + '/';
     }
 
     var JSONobject = { "query": "friendrequest", "author":  follower_author_obj, "friend": followee_author_obj };
     var jsonData = JSON.stringify( JSONobject);
     console.log(jsonData);
     $.ajax({
-      url: remote_host_url + 'api/friendrequest/',
+      url: remote_url + 'api/friendrequest/',
       type: "POST",
       data:  jsonData,
       contentType: 'application/json; charset=utf-8',
@@ -374,7 +377,7 @@ window.onload = function() {
         }
       },
       error: function(xhr, ajaxOptions, error) {
-        toastr.error("Error. Response from remote node is not 200 or 201");
+        toastr.error("Remote Node Error :  " + xhr.status);
         console.log(xhr.status);
         console.log(xhr.responseText);
       }
@@ -385,14 +388,15 @@ window.onload = function() {
   $("button.remote-follow-btn").one("click", function(event) {
     // remote-follow-btn-{{post.author.id}}
     var author_id = this.id.slice(18);
-    var displayName = $(this).data('displayName');
+    var displayName = $(this).data('displayname');
     var remoteHost = $(this).data('host');
-
     var follower_id = document.getElementById('logged-in-author').getAttribute("data");
-    var follower_displayName = $('#logged-in-author').data("displayName");
+    var follower_displayName = $('#logged-in-author').data("displayname");
 
     let authorProfile = { 'id' : author_id, 'host': remoteHost, 'displayName': displayName };
     let followerProfile = { 'id' : follower_id, 'host': 'http://' + window.location.host + '/', 'displayName': follower_displayName };
+    console.log("FOLLOWEE PROFILE : " + authorProfile);
+    console.log("FOLLOWER PROFILE : " + followerProfile);
 
     // HARD CODED
     if (remoteHost == "project-c404.rhcloud.com/api") {
@@ -536,7 +540,9 @@ window.onload = function() {
       $.getJSON(path, function (data) {
           //$("#github_body").html("Under Construction -> Data received still need to make it more reader friendly.");
           $.each(data, function (i, field) {
-              $("#github_body").append("<p>"+"<b>"+field["type"]+"</b>"+" to "+field["repo"]["name"]+"</p>"+"<p>"+"<b>Message:</b>"+field["payload"]["commits"][0]["message"]+"</p><br/>")
+              if (field["payload"]["commits"] != undefined) {
+                $("#github_body").append("<p>"+"<b>"+field["type"]+"</b>"+" to "+field["repo"]["name"]+"</p>"+"<p>"+"<b>Message:</b>"+field["payload"]["commits"][0]["message"]+"</p><br/>")
+              }
               //var textNode = document.createTextNode(i+ " " +JSON.stringify(field));
               //var textNode = document.createTextNode(JSON.stringify(JSON.stringify(field)));
               //var $newdiv = $( "<div id='github_event_"+i+"'/>" );

@@ -521,7 +521,9 @@ class CommentList(generics.GenericAPIView):
                     # author = Author.objects.create(id=author_serializer.data["id"], displayName=author_serializer.data["displayName"], host=remoteNode.url)
                     # author = Author.objects.create(id=author_serializer.data["id"], displayName=author_serializer.data["displayName"], host=author_serializer.data["host"], github=author_serializer.data["github"])
                     author.save()
-
+        else:
+            author = Author.objects.get(user=request.user)
+        
         author_id = author.id
         try:
             if (isAllowed(post_pk, author_id)):
