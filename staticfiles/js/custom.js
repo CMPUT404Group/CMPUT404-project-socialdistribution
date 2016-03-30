@@ -369,6 +369,7 @@ window.onload = function() {
       success: function(response, statusText, xhr) {
         console.log(response);
         if (xhr.status == 200 || xhr.status == 201) {
+          sendLocalFriendRequest(follower_author_obj, followee_author_obj);
           toastr.info("Followed!");
           $("button#follow-btn-"+followee_id).text("Followed");
           $("button#follow-btn-"+followee_id).removeClass("follow-btn");
@@ -394,9 +395,9 @@ window.onload = function() {
     var follower_displayName = $('#logged-in-author').data("displayname");
 
     let authorProfile = { 'id' : author_id, 'host': remoteHost, 'displayName': displayName };
-    let followerProfile = { 'id' : follower_id, 'host': 'http://' + window.location.host + '/', 'displayName': follower_displayName };
-    console.log("FOLLOWEE PROFILE : " + authorProfile);
-    console.log("FOLLOWER PROFILE : " + followerProfile);
+    let followerProfile = { 'id' : follower_id, 'host': 'http://' + window.location.host + '/', 'displayName': follower_displayName, "url": "http://"+window.location.host+'/author/'+follower_id };
+    console.log("FOLLOWEE PROFILE : " + str(authorProfile));
+    console.log("FOLLOWER PROFILE : " + str(followerProfile));
 
     // HARD CODED
     if (remoteHost == "project-c404.rhcloud.com/api") {
@@ -449,7 +450,7 @@ window.onload = function() {
         }
       },
       error: function(xhr, ajaxOptions, error) {
-        toastr.error("Error. Response is not 200 or 201");
+        toastr.error("Local Error. Response is not 200 or 201");
         console.log(xhr.status);
         console.log(xhr.responseText);
       }
