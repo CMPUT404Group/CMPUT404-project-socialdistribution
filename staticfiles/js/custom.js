@@ -629,7 +629,7 @@ window.onload = function() {
       $.getJSON(path, function (data) {
           //$("#github_body").html("Under Construction -> Data received still need to make it more reader friendly.");
           $.each(data, function (i, field) {
-              $("#github_body").append("<p>"+"<b>"+field["type"]+"</b>"+" to "+field["repo"]["name"]+"</p>"+"<p>"+"<b>Message:</b>"+field["payload"]["commits"][0]["message"]+"</p><br/>")
+              $("#github_body").append("<p><b>"+field["type"]+"</b> to "+field["repo"]["name"]+"</p>");
               //var textNode = document.createTextNode(i+ " " +JSON.stringify(field));
               //var textNode = document.createTextNode(JSON.stringify(JSON.stringify(field)));
               //var $newdiv = $( "<div id='github_event_"+i+"'/>" );
