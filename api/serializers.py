@@ -9,7 +9,7 @@ class AuthorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Author
-        fields = ('id', 'github', 'picture', 'host', 'displayname')
+        fields = ('id', 'github', 'picture', 'host', 'displayName')
 
 
 class FriendingSerializer(serializers.ModelSerializer):

@@ -72,7 +72,7 @@ def public_stream(request):
         followRelationships = Friending.objects.filter(author=author)
         for relationship in followRelationships:
             followList.append(relationship.friend)
-            
+
         # notification on if logged in author has new follower
         followerList = []
         followerRelationships = Friending.objects.filter(friend=author)
@@ -101,12 +101,12 @@ def explore(request, node_id=None):
         followRelationships = Friending.objects.filter(author=author)
         for relationship in followRelationships:
             followList.append(relationship.friend.id)
-        
+
         if node_id == None:
             return render(request, 'explore.html', {'loggedInAuthor': author, 'nodes': nodes, 'all':True, 'followList': followList})
         else:
             #checks what node it is on and returns the public posts from that node
-            
+
             node = Node.objects.get(id=node_id)
             url = node.url + "api/posts/"
             opener = urllib2.build_opener(urllib2.HTTPHandler)
@@ -124,7 +124,7 @@ def explore(request, node_id=None):
                     postSerializer = PostSerializer(jsonResponse["posts"], many=True)
                 elif node.url == "http://disporia-cmput404.rhcloud.com/":
                     creds = credentials[node.url]
-                    req.add_header("Authorization", "JWT " + creds) 
+                    req.add_header("Authorization", "JWT " + creds)
                     x = opener.open(req)
                     y = x.read()
                     jsonResponse = json.loads(y)
@@ -165,7 +165,7 @@ def get_local(author_id):
         req = urllib2.Request(url)
         # set credentials on request
         creds =  base64.b64encode("test:test")
-        req.add_header("Authorization", "Basic " + creds) 
+        req.add_header("Authorization", "Basic " + creds)
         x = opener.open(req)
         y = x.read()
         jsonResponse = json.loads(y)
@@ -185,7 +185,7 @@ def get_team5(author_id):
         req = urllib2.Request(url)
         # set credentials on request
         creds =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"
-        req.add_header("Authorization", "JWT " + creds) 
+        req.add_header("Authorization", "JWT " + creds)
         x = opener.open(req)
         y = x.read()
         jsonResponse = json.loads(y)
@@ -285,7 +285,7 @@ def send_comment(request, post_id, node_id=None):
     comment["author"] = {}
     comment["author"]["id"] = str(author.id)
     comment["author"]["host"] = author.host
-    comment["author"]["displayName"] = author.displayname
+    comment["author"]["displayName"] = author.displayName
     comment["author"]["github"] = author.github
     comment["visibility"] = "PUBLIC"
     print(author.id)
@@ -333,8 +333,8 @@ def explore_post(request, node_id, post_id):
                     post = get_APIPost(post_id,t5_url, t5_h)
 
                 #create and send the comment if its allowed
-                if request.method == "POST":  
-                    if (isAllowed(author,post)):                   
+                if request.method == "POST":
+                    if (isAllowed(author,post)):
                         send_comment(request, post_id, node_id)
                         if node.url == "http://project-c404.rhcloud.com/":
                             post = get_APIPost(post_id,t6_url, t6_h)
@@ -382,7 +382,7 @@ def my_stream(request):
 
         for relationship in followRelationships:
             followList.append(relationship.friend)
-            
+
         # notification on if logged in author has new follower
         followerList = []
         followerRelationships = Friending.objects.filter(friend=author)
@@ -412,7 +412,7 @@ def my_stream(request):
                         posts.append(posts_all[j])
 
         #get all posts by the logged in author
-        try:      
+        try:
             mine = get_APIAuthorPosts(viewer_id)
             posts.extend(mine)
             print mine
@@ -504,7 +504,7 @@ def post_edit(request, post_pk):
 
         post = Post.objects.get(pk=post_pk)
         form = PostForm(instance=post)
-        author = Author.objects.get(user=request.user)    
+        author = Author.objects.get(user=request.user)
         return render(request, 'post/postDetail.html', {'post': post, 'form': form, 'loggedInAuthor': author})
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
@@ -571,9 +571,9 @@ def user_profile(request, user_id):
 
         return render(request, "user_profile.html",
                       {'posts': posts, 'form': form, 'profile_owner': profile_owner, 'loggedInAuthor': logged_author, 'followList': followList, 'followers': followers, 'friends': friends})
-        
+
         # user_account is profile's owner
-        # author is the one who logged into the system 
+        # author is the one who logged into the system
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
@@ -628,7 +628,7 @@ def postChangeUserPassword(request, profile_owner):
     print(old_password)
     reset_password = str(request.POST['reset_password'].strip())
     new_password = str(request.POST['new_password'].strip())
-       
+
     if (old_password and reset_password and reset_password == new_password):
         saveuser = User.objects.get(id=profile_owner.user.id)
         if saveuser.check_password(old_password):

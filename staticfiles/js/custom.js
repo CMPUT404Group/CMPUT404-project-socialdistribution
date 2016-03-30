@@ -140,7 +140,7 @@ window.onload = function() {
   /* -- Hide Upload Image Modal Initially -- */
   $("#uploadImageModal").hide();
   $("#uploadProfileImageModal").hide();
-  
+
   $("#uploadImageForm").submit(function(event){
     event.preventDefault();
     var formData = new FormData($("#uploadImageForm")[0]);
@@ -384,15 +384,15 @@ window.onload = function() {
   // click button to follow someone
   $("button.remote-follow-btn").one("click", function(event) {
     // remote-follow-btn-{{post.author.id}}
-    var author_id = this.id.slice(18); 
-    var displayname = $(this).data('displayname');
+    var author_id = this.id.slice(18);
+    var displayName = $(this).data('displayName');
     var remoteHost = $(this).data('host');
 
     var follower_id = document.getElementById('logged-in-author').getAttribute("data");
-    var follower_displayname = $('#logged-in-author').data("displayname");
+    var follower_displayName = $('#logged-in-author').data("displayName");
 
-    let authorProfile = { 'id' : author_id, 'host': remoteHost, 'displayname': displayname };
-    let followerProfile = { 'id' : follower_id, 'host': 'http://' + window.location.host + '/', 'displayname': follower_displayname };
+    let authorProfile = { 'id' : author_id, 'host': remoteHost, 'displayName': displayName };
+    let followerProfile = { 'id' : follower_id, 'host': 'http://' + window.location.host + '/', 'displayName': follower_displayName };
 
     // HARD CODED
     if (remoteHost == "project-c404.rhcloud.com/api") {
@@ -408,15 +408,15 @@ window.onload = function() {
   // click button to follow someone
   $("button.follow-btn").one("click", function(event) {
     // follow-btn-{{post.author.id}}
-    var author_id = this.id.slice(11); 
-    var author_displayname = $(this).data('displayname');
+    var author_id = this.id.slice(11);
+    var author_displayName = $(this).data('displayName');
     var author_host = $(this).data('host');
 
     var follower_id = document.getElementById('logged-in-author').getAttribute("data");
-    var follower_displayname = $('#logged-in-author').data("displayname");
+    var follower_displayName = $('#logged-in-author').data("displayName");
 
-    let authorProfile = { 'id' : author_id, 'host': author_host, 'displayname': author_displayname };
-    let followerProfile = { 'id' : follower_id, 'host': 'http://' + window.location.host + '/', 'displayname': follower_displayname };
+    let authorProfile = { 'id' : author_id, 'host': author_host, 'displayName': author_displayName };
+    let followerProfile = { 'id' : follower_id, 'host': 'http://' + window.location.host + '/', 'displayName': follower_displayName };
 
     sendLocalFriendRequest(followerProfile, authorProfile);
   });
@@ -570,6 +570,6 @@ window.onload = function() {
 
 // use bootstrap tooltip to display the small pop-up box
   $(document).ready(function(){
-      $('[data-toggle="tooltip"]').tooltip(); 
+      $('[data-toggle="tooltip"]').tooltip();
   });
 };

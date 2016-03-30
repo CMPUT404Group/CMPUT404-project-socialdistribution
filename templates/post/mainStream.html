@@ -7,7 +7,7 @@
 document.getElementById("public_stream").setAttribute("class", "active");
 </script>
 
-<div id="logged-in-author" data="{{loggedInAuthor.id}}" data-displayname="{{loggedInAuthor.displayname}}"></div>
+<div id="logged-in-author" data="{{loggedInAuthor.id}}" data-displayName="{{loggedInAuthor.displayName}}"></div>
 
 {% include "post/createPost.html" with icon=loggedInAuthor.picture %}
 
@@ -33,24 +33,24 @@ document.getElementById("public_stream").setAttribute("class", "active");
     </a>
     </div>
 
-        
+
     {% if  loggedInAuthor.id != post.author.id %}
         {% if post.author not in followList %}
-            <button  id='follow-btn-{{post.author.id}}' class="follow-btn btn-sm btn-success pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;" data-host='{{post.author.host}}' data-displayname='{{post.author.displayname}}'> Follow </button>
+            <button  id='follow-btn-{{post.author.id}}' class="follow-btn btn-sm btn-success pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;" data-host='{{post.author.host}}' data-displayName='{{post.author.displayName}}'> Follow </button>
         {% else %}
-            <button  id='unfollow-btn-{{post.author.id}}' class="unfollow-btn btn-sm btn-warning pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;" data-host='{{post.author.host}}' data-displayname='{{post.author.displayname}}'> Unfollow </button>
+            <button  id='unfollow-btn-{{post.author.id}}' class="unfollow-btn btn-sm btn-warning pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;" data-host='{{post.author.host}}' data-displayName='{{post.author.displayName}}'> Unfollow </button>
         {% endif %}
     {% endif %}
 
     <div class="panel panel-primary media-body">
     	<div class='panel-heading'> <a class='title' href='{% url "post_detail" post.id %}'> {{ post.title }} </a> <span class='date'> {{ post.published }} </span> </div>
-    	<div class='panel-body'> 
+    	<div class='panel-body'>
     		{% if post.contentType == "text/x-markdown" %}
     			{{ post.content|markdown }}
 			{% else %}
 				{{ post.content|urlize|slice:"500" }}
                 {% if post.content|length > 500 %}
-                <a class='read_more' href='{% url "post_detail" post.id %}'> Continue Reading... </a> 
+                <a class='read_more' href='{% url "post_detail" post.id %}'> Continue Reading... </a>
                 {% endif %}
     		{% endif %}
 

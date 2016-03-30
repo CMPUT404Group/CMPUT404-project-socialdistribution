@@ -50,7 +50,7 @@ def isAllowed(post_pk, author_id):
 
     if post.visibility == Post.PUBLIC:
         return True
-    
+
     privacy = post.visibility
     viewer = Author.objects.get(id=author_id)
 
@@ -104,7 +104,7 @@ def isAllowed(post_pk, author_id):
 
 
 '''
-Parameters : 
+Parameters :
     * author_id
 Return:
     * list of all friends (list of Author ids)
@@ -122,7 +122,7 @@ def getAllFriends(author_id):
 
 
 '''
-Parameters : 
+Parameters :
     * author_id
 Return:
     * list of all friends of friends (list of Author ids) - no duplicates
@@ -154,7 +154,7 @@ def getRemoteAuthorProfile(node_url, request):
         req.add_header("Authorization", "JWT " + creds)
     elif node_url == "":
         encodedValue = base64.b64encode("nodeHost4B@nodeHost4B:host4b")
-        request.add_header("Authorization", "Basic " + encodedValue ) #Header, Value 
+        request.add_header("Authorization", "Basic " + encodedValue ) #Header, Value
 
     x = opener.open(req)
     y = x.read()
@@ -164,7 +164,7 @@ def getRemoteAuthorProfile(node_url, request):
     print author_serializer.data
     return author_serializer
 
-''' 
+'''
 Returns True if request.user is a Node
 Returns False if request.user is an Author
 '''
@@ -188,7 +188,7 @@ def postChangeUserPassword(request):
         old_password = request.POST['old_password'].strip()
         reset_password = request.POST['reset_password'].strip()
         new_password = request.POST['new_password'].strip()
-       
+
         if (old_password & reset_password & reset_password == new_password):
             saveuser = User.objects.get(id=request.user.id)
             if user.check_password(old_password):
@@ -202,7 +202,7 @@ class PostList(generics.GenericAPIView):
     '''
     Lists all Posts  |  Create a new Post / Update an existing post
 
-    GET : http://service/api/posts/ 
+    GET : http://service/api/posts/
         * Returns a list of all public posts on the server - most recent to least recent order
 
     POST : http://service/api/posts/
@@ -279,9 +279,9 @@ class PostList(generics.GenericAPIView):
 class PostDetail(generics.GenericAPIView):
 
     '''
-    Gets a specific Post / Updates a Post / Deletes a Post 
+    Gets a specific Post / Updates a Post / Deletes a Post
 
-    GET : http://service/api/posts/<post_pk> 
+    GET : http://service/api/posts/<post_pk>
         * Returns the post with id post_pk
 
     PUT : http://service/api/posts/<post_pk>
@@ -290,7 +290,7 @@ class PostDetail(generics.GenericAPIView):
     DELETE : http://service/api/posts/<post_pk>
         * Deletes the post specified by the post_pk
 
-    ''' 
+    '''
 
     serializer_class = PostSerializer
     queryset = Post.objects.all()
@@ -335,7 +335,7 @@ class PostDetail(generics.GenericAPIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
             return Response({"message": "User is not allowed to see this post"}, status=status.HTTP_403_FORBIDDEN)
-       
+
        # If its a local author - return the post
         if request.get_host() in author.host:
             serializer = PostSerializer(post)
@@ -351,13 +351,13 @@ class PostDetail(generics.GenericAPIView):
         # is a remote author - assume remote author is already authenticated by remote node
         author_id = request.META.get("HTTP_REMOTE_USER")
         author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
-        # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
+        # get remoteAuthor's Author object in our database (has id, displayName, host only - no user) if we already have it
         # else, create a new author object w/o user
         # author = remoteAuthor here
         try:
             author = Author.objects.get(id=author_serializer.data["id"])
         except Author.DoesNotExist as e:
-            author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
+            author = Author.objects.create(id=author_serializer.data["id"], displayName=author_serializer.data["displayName"], host=remoteNode.url)
             author.save()
 
         if (isAllowed(pk, author_id)):
@@ -365,7 +365,7 @@ class PostDetail(generics.GenericAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response({"message": "User is not allowed to see this post"}, status=status.HTTP_403_FORBIDDEN)
-       
+
     def put(self, request, pk, format=None):
         data = request.data
 
@@ -460,13 +460,13 @@ class CommentList(generics.GenericAPIView):
         remoteNode = getRemoteNode(request.user)
         if remoteNode != None:
             author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
-            # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
+            # get remoteAuthor's Author object in our database (has id, displayName, host only - no user) if we already have it
             # else, create a new author object w/o user
             # author = remoteAuthor here
             try:
                 author = Author.objects.get(id=author_serializer.data["id"])
             except Author.DoesNotExist as e:
-                author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
+                author = Author.objects.create(id=author_serializer.data["id"], displayName=author_serializer.data["displayName"], host=remoteNode.url)
                 author.save()
 
         # local author - get from db
@@ -514,12 +514,12 @@ class CommentList(generics.GenericAPIView):
                     if author_serializer.data[key] != None:
                         if key == 'host':
                             author.host = author_serializer.data[key]
-                        elif key == 'displayname':
-                            author.displayname = author_serializer.data[key]
+                        elif key == 'displayName':
+                            author.displayName = author_serializer.data[key]
                         elif key == 'github':
                             author.github = author_serializer.data[key]
-                    # author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
-                    # author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=author_serializer.data["host"], github=author_serializer.data["github"])
+                    # author = Author.objects.create(id=author_serializer.data["id"], displayName=author_serializer.data["displayName"], host=remoteNode.url)
+                    # author = Author.objects.create(id=author_serializer.data["id"], displayName=author_serializer.data["displayName"], host=author_serializer.data["host"], github=author_serializer.data["github"])
                     author.save()
 
         author_id = author.id
@@ -536,10 +536,10 @@ class CommentList(generics.GenericAPIView):
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
                 else:
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            
+
             else:
                 return Response({"message": "User is not allowed to see this post/comment"}, status=status.HTTP_403_FORBIDDEN)
-        
+
         except Post.DoesNotExist as e:
             return Response({"message":"Corresponding post does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -573,13 +573,13 @@ class CommentDetail(generics.GenericAPIView):
         remoteNode = getRemoteNode(request.user)
         if remoteNode != None:
             author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
-            # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
+            # get remoteAuthor's Author object in our database (has id, displayName, host only - no user) if we already have it
             # else, create a new author object w/o user
             # author = remoteAuthor here
             try:
                 author = Author.objects.get(id=author_serializer.data["id"])
             except Author.DoesNotExist as e:
-                author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
+                author = Author.objects.create(id=author_serializer.data["id"], displayName=author_serializer.data["displayName"], host=remoteNode.url)
                 author.save()
 
         # local author - get from db
@@ -872,7 +872,7 @@ class AuthorDetail(generics.GenericAPIView):
         # # remote author
         # if request.get_host() not in author.host:
         #     return Response({"message": "This author is not on this node. It is a remote author on another node."}, status=status.HTTP_404_NOT_FOUND)
-        
+
         # else local author
         serializer = AuthorSerializer(author)
 
@@ -910,7 +910,7 @@ class AuthorDetail(generics.GenericAPIView):
         if request.user == author.user:
             print "1"
             serializer = AuthorSerializer(author, data=request.data)
-            print "2"  
+            print "2"
             if serializer.is_valid():
                 print "DEBUG : API - views.py - AuthorDetail"
                 serializer.save()
@@ -939,19 +939,19 @@ class FriendingCheck(generics.GenericAPIView):
         # ensure user is authenticated
         if (not request.user.is_authenticated()):
             return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
-        
+
         author1 = Author.objects.get(id=author_id1)
         # check if request is for remote node, if so handle it
         remoteNode1 = getRemoteNode(author1.user)
         if remoteNode1 !=None:
             return Response({"message":"first author is a remote user on another node, for information of this remote user use the api of the remote node"})
-        
+
         # returns whether or not author_id1 & author_id2 are friends or not
         if author_id2 != None:
             author2 = Author.objects.get(id=author_id2)
             remoteNode2 = getRemoteNode(author2.user)
             if remoteNode2 !=None:
-                return Response({"message":"second author is a remote user on another node, for information of this remote user use the api of the remote node"})    
+                return Response({"message":"second author is a remote user on another node, for information of this remote user use the api of the remote node"})
             aList = Friending.objects.filter(author__id=author_id1, friend__id=author_id2)
             bList = Friending.objects.filter(author__id=author_id2, friend__id=author_id1)
             result = list(chain(aList, bList))
@@ -960,7 +960,7 @@ class FriendingCheck(generics.GenericAPIView):
             else:
                 friends = False
             return Response({'query':'friends', 'authors': [author_id1, author_id2], 'friends':friends}, status=status.HTTP_200_OK)
-        
+
 
         # returns all friends of author_1
         else:
@@ -970,13 +970,13 @@ class FriendingCheck(generics.GenericAPIView):
             # if remoteNode != None:
             #     return Response({"message":"This is a remote user on another node, you only have permission of the api of your original node"}, status=status.HTTP_400_BAD_REQUEST)
                 # author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
-                # # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
+                # # get remoteAuthor's Author object in our database (has id, displayName, host only - no user) if we already have it
                 # # else, create a new author object w/o user
                 # # author = remoteAuthor here
                 # try:
                 #     author = Author.objects.get(id=author_serializer.data["id"])
                 # except Author.DoesNotExist as e:
-                #     author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
+                #     author = Author.objects.create(id=author_serializer.data["id"], displayName=author_serializer.data["displayName"], host=remoteNode.url)
                 #     author.save()
 
             # local author - get from db
@@ -994,13 +994,13 @@ class FriendingCheck(generics.GenericAPIView):
         if remoteNode != None:
             return Response({"message":"This is a remote user on another node, to use this service, use the api of the remote user's original node"}, status=status.HTTP_400_BAD_REQUEST)
             # author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
-            # # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
+            # # get remoteAuthor's Author object in our database (has id, displayName, host only - no user) if we already have it
             # # else, create a new author object w/o user
             # # author = remoteAuthor here
             # try:
             #     author = Author.objects.get(id=author_serializer.data["id"])
             # except Author.DoesNotExist as e:
-            #     author = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
+            #     author = Author.objects.create(id=author_serializer.data["id"], displayName=author_serializer.data["displayName"], host=remoteNode.url)
             #     author.save()
 
         # local author - get from db
@@ -1054,13 +1054,13 @@ class FriendRequest(generics.GenericAPIView):
         # remoteNode = getRemoteNode(request.user)
         # if remoteNode != None:
         #     author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
-        #     # get remoteAuthor's Author object in our database (has id, displayname, host only - no user) if we already have it
+        #     # get remoteAuthor's Author object in our database (has id, displayName, host only - no user) if we already have it
         #     # else, create a new author object w/o user
         #     # author_of_request = remoteAuthor here
         #     try:
         #         author_of_request = Author.objects.get(id=author_serializer.data["id"])
         #     except Author.DoesNotExist as e:
-        #         author_of_request = Author.objects.create(id=author_serializer.data["id"], displayname=author_serializer.data["displayname"], host=remoteNode.url)
+        #         author_of_request = Author.objects.create(id=author_serializer.data["id"], displayName=author_serializer.data["displayName"], host=remoteNode.url)
         #         author_of_request.save()
 
         # # local author - get from db
@@ -1080,12 +1080,12 @@ class FriendRequest(generics.GenericAPIView):
             author = Author.objects.get(id=author_req["id"])
             print author
             # it's a local user
-            if request.get_host() in author.host: # author.user != None: 
+            if request.get_host() in author.host: # author.user != None:
                 atLeastOneAuthorIsLocal = True
             # else is remote author sending the request
         except Author.DoesNotExist as e:
         # not local author - create remote author w/o user
-            author = Author.objects.create(id=author_req["id"], displayname=author_req["displayname"], host=author_req["host"])
+            author = Author.objects.create(id=author_req["id"], displayName=author_req["displayName"], host=author_req["host"])
             author.save()
 
         try:
@@ -1116,14 +1116,14 @@ class FriendRequest(generics.GenericAPIView):
         try:
             friendship = Friending.objects.get(author=author, friend=friend)
             return Response({"message":"Relationship between author & friend already exists."}, status=status.HTTP_200_OK)
-        except Friending.DoesNotExist as e:    
+        except Friending.DoesNotExist as e:
             serializer = FriendingSerializer(data=data)
             if serializer.is_valid():
                 serializer.validated_data["author"] = author
                 serializer.validated_data["friend"] = friend
                 serializer.save()
                 noti = Notification.objects.create(notificatee=Author.objects.get(id=friend_req["id"]), follower=Author.objects.get(id=author_req["id"]))
-                noti.save()        
+                noti.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

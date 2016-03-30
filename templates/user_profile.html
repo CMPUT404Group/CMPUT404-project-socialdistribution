@@ -13,7 +13,7 @@
     {% else %}
     <img id="id-user-profile-image" class="profile-photo img-circle img-responsive img-center pull-left create-post" src="http://placehold.it/175x175">
     {% endif %}
-    
+
     <div class="media-body" style="padding-left: 3em;">
         <!-- Do some logic here : follow, unfollow, accept etc -->
         {% if profile_owner != loggedInAuthor %}
@@ -24,20 +24,20 @@
             {% endif %}
         {% else %}
             <!-- Display button to change password- -->
-            <button id='changePassword' type="button" class="password-btn btn btn-default pull-right" style="position: relative; top: 1.5em; right: 1.5em;" data-toggle="modal" data-target="#changePasswordModal">Change Password</button> 
+            <button id='changePassword' type="button" class="password-btn btn btn-default pull-right" style="position: relative; top: 1.5em; right: 1.5em;" data-toggle="modal" data-target="#changePasswordModal">Change Password</button>
         {% endif %}
         <!-- Display required user info on profile page -->
         <h1> {{ profile_owner.user.username }} </h1>
         <div>
             <p style="color: grey;">host: {{ profile_owner.host }} </p>
             <p style="color: grey;">username: {{ profile_owner.user.username }} </p>
-            <p style="color: grey;">displayname: {{ profile_owner.displayname }} </p>
+            <p style="color: grey;">displayname: {{ profile_owner.displayName }} </p>
             <p style="color: grey;">url: {{ profile_owner.host }}author/{{ profile_owner.id }} </p>
             <p id="id-email" style="color: grey;">email: {{profile_owner.user.email}} </p>
             <p id="id-github" style="color: grey;">github: {{ profile_owner.github }}</p>
             <!-- Triggers editGithubModal -->
             {% if profile_owner == loggedInAuthor %}
-            <button id='editGithubTrigger' type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#editGithubModal"><i class="fa fa-edit"></i></button> 
+            <button id='editGithubTrigger' type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#editGithubModal"><i class="fa fa-edit"></i></button>
             {% endif %}
         </div>
     </div>
@@ -56,7 +56,7 @@
 <!-- display profile owner's github activity -->
 <span id="github_name" data="{{ profile_owner.github }}"></span>
 <div id="github_events" class="panel panel-primary"/>
-  <div class="panel-heading" style="font-size:2em">Github Activity                            
+  <div class="panel-heading" style="font-size:2em">Github Activity
     <button id='get_github_events' type="button" class="btn btn-primary" style="color:black; background-color:white; position: absolute; right:1em;" >Get Github Activity</button></div>
   <div id="github_body" class="panel-body"></div>
 </div>
@@ -84,7 +84,7 @@
         {% endif %}
     </div>
 
-    <!-- Display profile owner's follower list --> 
+    <!-- Display profile owner's follower list -->
     <div class="list-group sidebar" >
         <h4 class="list-group-item list-group-item-info">Followers</h4>
         {% for follower in followers|slice:":8" %}
@@ -116,16 +116,16 @@
 
     <div class="panel panel-primary media-body">
         <div class='panel-heading'> <a class='title' href='{% url "post_detail" post.id %}'> {{ post.title }} </a> <span class='date'> {{ post.published }} </span> </div>
-        <div class='panel-body'> 
+        <div class='panel-body'>
             {% if post.contentType == "text/x-markdown" %}
-                {{ post.content|markdown }} 
+                {{ post.content|markdown }}
             {% else %}
                 {{ post.content|urlize|slice:"500" }}
                 {% if post.content|length > 500 %}
-                <a class='read_more' href='{% url "post_detail" post.id %}'> Continue Reading... </a> 
+                <a class='read_more' href='{% url "post_detail" post.id %}'> Continue Reading... </a>
                 {% endif %}
             {% endif %}
-            
+
             <br/>
             {% if post.image_url %}
                 <img src="{{ post.image_url }}" />
