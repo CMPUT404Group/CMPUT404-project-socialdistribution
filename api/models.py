@@ -19,7 +19,7 @@ class Author(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     github = models.CharField(max_length=40, blank=True, default="http://github.com/default")
     picture = models.ImageField(upload_to='profile_images/', blank=True, null=True)
-    host = models.CharField(max_length=40, default="http://127.0.0.1:8000/")
+    host = models.CharField(max_length=100, default="http://127.0.0.1:8000/")
     displayName = models.CharField(max_length=40, default="defaultDisplayName")
     previous_follower_num = models.PositiveIntegerField(default=0)
     noti = models.BooleanField(default=False)
