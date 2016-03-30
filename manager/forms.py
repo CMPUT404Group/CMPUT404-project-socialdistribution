@@ -5,4 +5,4 @@ from api.models import Author
 class AuthorForm(forms.ModelForm):
     class Meta:
         model = Author
-        fields = ('github', 'picture', 'displayname')
+        fields = ('github', 'picture', 'displayName')
