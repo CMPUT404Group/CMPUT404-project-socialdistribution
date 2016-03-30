@@ -113,7 +113,7 @@ def explore(request, node_id=None):
             req = urllib2.Request(url)
             credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
                         "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg3MDI5Mzl9.cGDfv2lhFLNqOON3P4tq-LvoSTtarC5gIa1rG-ST5CA",\
-                        "http://mighty-cliffs-82717.herokuapp.com/" : "team4:team4" }
+                        "http://mighty-cliffs-82717.herokuapp.com/" : "Team4:team4" }
             try:
                 # set credentials on request
                 if node.url == "http://project-c404.rhcloud.com/" or node.url == "http://mighty-cliffs-82717.herokuapp.com/":
@@ -215,7 +215,7 @@ def get_team6(author_id):
         y = x.read()
         jsonResponse = json.loads(y)
         if len(jsonResponse) > 0:
-            postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+            postSerializer = PostSerializer(jsonResponse, many=True)
             return postSerializer.data
         else:
             return []
@@ -232,7 +232,7 @@ def get_team7(author_id):
         opener = urllib2.build_opener(urllib2.HTTPHandler)
         req = urllib2.Request(url)
         # set credentials on request
-        creds = base64.b64encode("team4:team4")
+        creds = base64.b64encode("Team4:team4")
         req.add_header("Authorization", "Basic " + creds)
         x = opener.open(req)
         y = x.read()
@@ -270,7 +270,7 @@ def get_APIFriends(person_id):
     t5_url = "http://disporia-cmput404.rhcloud.com/api/friends/"
     t5_h = "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg1OTE1Nzd9.WjbgA_s-cWtNHzURwAceZOYuD4RASsSqqFiwnY58FqQ"
     t7_url = "http://mighty-cliffs-82717.herokuapp.com/api/friends/"
-    t7_h = "Basic " + base64.b64encode("team4:team4")
+    t7_h = "Basic " + base64.b64encode("Team4:team4")
     opener = urllib2.build_opener(urllib2.HTTPHandler)
     try:
         url = "http://cmput404-team-4b.herokuapp.com/api/friends/" + str(person_id)
@@ -316,7 +316,7 @@ Create Comment to send to remote host
 def send_comment(request, post_id, node_id=None):
     credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
         "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg2MDQ5OTV9.yiiY5evZBCFhjUgCI0U5C76LrluI9eepyOqKUmLdcPE",\
-        "http://mighty-cliffs-82717.herokuapp.com/": "team4:team4"}
+        "http://mighty-cliffs-82717.herokuapp.com/": "Team4:team4"}
     data = request.POST
     author = Author.objects.get(user=request.user)
     comment = {}
@@ -362,7 +362,7 @@ Renders the post clicked from the explore page
 '''
 def explore_post(request, node_id, post_id):
     t7_url = "http://mighty-cliffs-82717.herokuapp.com/api/posts/"
-    t7_h = "Basic " + base64.b64encode("team4:team4")
+    t7_h = "Basic " + base64.b64encode("Team4:team4")
     t6_url = "http://project-c404.rhcloud.com/api/posts/"
     t6_h = "Basic " + base64.b64encode("team4:team4team4")
     t5_url = "http://disporia-cmput404.rhcloud.com/api/posts/"
@@ -518,7 +518,7 @@ def post_detail(request, post_pk):
         except urllib2.HTTPError, e:
             print("Not a team 6 Post. Error: "+str(e.code))
         try:
-            post = get_APIPost(post_pk,"http:/mighty-cliffs-82717.herokuapp.com/api/posts/", "Basic " + base64.b64encode("team4:team4"))
+            post = get_APIPost(post_pk,"http:/mighty-cliffs-82717.herokuapp.com/api/posts/", "Basic " + base64.b64encode("Team4:team4"))
             node = "c1893d94-cbb4-4dfa-a137-85b4637b58dc"
             page = explore_post(request, node, post_pk)
             return page

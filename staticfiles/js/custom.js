@@ -361,8 +361,11 @@ window.onload = function() {
       dataType: 'json',
       beforeSend: function(xhr, settings) {
         // put authentication credentials to REMOTE SITES here - may be different for each group
-        if (remote_host_url == "http://project-c404.rhcloud.com/") {
+        if (remote_url == "http://project-c404.rhcloud.com/") {
           xhr.setRequestHeader("Authorization", "Basic " + btoa("team4:team4team4"));
+        }
+        else if (remote_host == "http://mighty-cliffs-82717.herokuapp.com/") {
+          xhr.setRequestHeader("Authorization", "Basic " + btoa("Team4:team4"));
         }
         // put else if other remote site credentials here
       },
