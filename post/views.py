@@ -406,7 +406,7 @@ def my_stream(request):
                 posts_all = []
                 friend = friends[i]
                 #get all the posts for a friend
-                posts_all = get_APIAuthorPosts(friend.id)
+                posts_all = get_APIAuthorPosts(friend)
                 for j in range(len(posts_all)):
                     if isAllowed(author, posts_all[j]):
                         posts.append(posts_all[j])

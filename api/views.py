@@ -943,17 +943,16 @@ class FriendingCheck(generics.GenericAPIView):
             return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
         author1 = Author.objects.get(id=author_id1)
-        # check if request is for remote node, if so handle it
         remoteNode1 = getRemoteNode(author1.user)
-        if remoteNode1 !=None:
-            return Response({"message":"first author is a remote user on another node, for information of this remote user use the api of the remote node"})
 
         # returns whether or not author_id1 & author_id2 are friends or not
         if author_id2 != None:
+             # check if request is for only remote nodes, if so handle it
             author2 = Author.objects.get(id=author_id2)
             remoteNode2 = getRemoteNode(author2.user)
-            if remoteNode2 !=None:
-                return Response({"message":"second author is a remote user on another node, for information of this remote user use the api of the remote node"})
+            if remoteNode1 !=None and remoteNode2 !=None:
+                return Response({"message":"both authors are a remote users on another node, for information of these remote users use the api of the remote nodes"})
+
             aList = Friending.objects.filter(author__id=author_id1, friend__id=author_id2)
             bList = Friending.objects.filter(author__id=author_id2, friend__id=author_id1)
             result = list(chain(aList, bList))
@@ -962,24 +961,12 @@ class FriendingCheck(generics.GenericAPIView):
             else:
                 friends = False
             return Response({'query':'friends', 'authors': [author_id1, author_id2], 'friends':friends}, status=status.HTTP_200_OK)
-
-
+        
         # returns all friends of author_1
         else:
-
-            # check if request is from remote node, if so handle it (they don't have permission to see everyone's friends on our node)
-            # remoteNode = getRemoteNode(request.user)
-            # if remoteNode != None:
-            #     return Response({"message":"This is a remote user on another node, you only have permission of the api of your original node"}, status=status.HTTP_400_BAD_REQUEST)
-                # author_serializer = getRemoteAuthorProfile(remoteNode.url, request)
-                # # get remoteAuthor's Author object in our database (has id, displayName, host only - no user) if we already have it
-                # # else, create a new author object w/o user
-                # # author = remoteAuthor here
-                # try:
-                #     author = Author.objects.get(id=author_serializer.data["id"])
-                # except Author.DoesNotExist as e:
-                #     author = Author.objects.create(id=author_serializer.data["id"], displayName=author_serializer.data["displayName"], host=remoteNode.url)
-                #     author.save()
+            # check if request is for a remote node, if so handle it
+            if remoteNode1 !=None:
+                return Response({"message":"This is a remote user on another node, for info on this remote user use the api of the remote node"}, status=status.HTTP_400_BAD_REQUEST)
 
             # local author - get from db
             #else:
