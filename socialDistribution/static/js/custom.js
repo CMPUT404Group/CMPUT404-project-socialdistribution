@@ -303,6 +303,28 @@ window.onload = function() {
     });
   }
 
+
+    $("button.remote-follow-btn").one("click", function(event) {
+    // remote-follow-btn-{{post.author.id}}
+    var author_id = this.id.slice(18);
+    var displayName = $(this).data('displayname');
+    var remoteHost = $(this).data('host');
+    var follower_id = document.getElementById('logged-in-author').getAttribute("data");
+    var follower_displayName = $('#logged-in-author').data("displayname");
+
+    let authorProfile = { 'id' : author_id, 'host': remoteHost, 'displayName': displayName };
+    let followerProfile = { 'id' : follower_id, 'host': 'http://' + window.location.host + '/', 'displayName': follower_displayName };
+    console.log("FOLLOWEE PROFILE : " + authorProfile);
+    console.log("FOLLOWER PROFILE : " + followerProfile);
+
+    // HARD CODED
+    if (remoteHost == "project-c404.rhcloud.com/api") {
+      remoteHost = "http://project-c404.rhcloud.com/";
+    }
+
+    sendRemoteFriendRequest(followerProfile, authorProfile, remoteHost);
+  });
+
   // button about unfollow someone
   $("button.unfollow-btn").one("click", function(event){
     var author_id = this.id.slice(13);
