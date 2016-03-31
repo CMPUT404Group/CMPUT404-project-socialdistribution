@@ -247,7 +247,62 @@ window.onload = function() {
     return author_profile_obj;
   }
 
-  
+
+  // for unfollow we only consider locally
+  function sendLocalUnFriendRequest(unfollower_id, unfollowee_obj){
+    var unfollowee_id = unfollowee_obj["id"]
+
+    $.ajax({
+      url: '/api/author/' + unfollower_id + '/',
+      type: "GET",
+      contentType: "application/json",
+      beforeSend: function(xhr, settings){
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function(response, statusText, xhr){
+        console.log(xhr.status);
+        if (xhr.status == 200) {
+          var unfollower_author_obj = parseProfileResponse(response);
+          var JSONobject = { "query": "friendrequest", "author": unfollower_author_obj, "friend": unfollowee_obj};
+          var jsonData = JSON.stringify(JSONobject);
+          console.log(jsonData);
+          $.ajax({
+            url: 'http://' + window.location.host + '/api/friendrequest/' + unfollowee_obj["id"],
+            type: "DELETE",
+            data: jsonData,
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            beforeSend: function(xhr, settings){
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function(response2) {
+              console.log(response2);
+              toastr.info("Unfollowed!");
+              $("button#unfollow-btn-"+unfollowee_id).text("Unfollowed");
+              $("button#unfollow-btn-"+unfollowee_id).removeClass("unfollow-btn");
+              $("button#unfollow-btn-"+unfollowee_id).removeClass("btn-warning");
+              $("button#unfollow-btn-"+unfollowee_id).addClass("btn-info");
+            },
+            error: function(xhr, ajaxOptions, error) {
+              console.log(xhr.status);
+              console.log(xhr.responseText);
+              console.log(error);
+              toastr.error("Error. Could not send unfollow request");
+            }
+          });
+        }
+        else {
+          toastr.error("Author not found.");
+        }
+      },
+      error: function(xhr, ajaxOptions, error) {
+        console.log(xhr.status);
+        console.log(xhr.responseText);
+        console.log(error);
+        toastr.error("Error. Could not send request");
+      }
+    });
+  }
 
 
     $("button.remote-follow-btn").one("click", function(event) {
