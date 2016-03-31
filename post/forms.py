@@ -7,7 +7,7 @@ class PostForm(forms.ModelForm):
         model = Post
         fields = ('title', 'content', 
                   'published', 'author', 'other_author', 
-                  'visibility', 'contentType', 'image_url')
+                  'visibility', 'contentType', 'image')
         exclude = ['published', 'author']
         widgets = {
             'visibility': forms.RadioSelect,

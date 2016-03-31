@@ -164,7 +164,8 @@ window.onload = function() {
         // disable add image button in create post form
         $("#uploadImageTrigger").prop("disabled", true);
         // add image url to form's hidden image_url field (on create post form)
-        $("input#id_image_url").val(response.photo);
+        console.log(response.photo);
+        $("input#id_image").val("http://" + window.location.host + response.photo);
         toastr.info("Image Uploaded!");
       },
       error: function(xhr, ajaxOptions, error) {
@@ -361,19 +362,23 @@ window.onload = function() {
       dataType: 'json',
       beforeSend: function(xhr, settings) {
         // put authentication credentials to REMOTE SITES here - may be different for each group
-        if (remote_host_url == "http://project-c404.rhcloud.com/") {
+        if (remote_url == "http://project-c404.rhcloud.com/") {
           xhr.setRequestHeader("Authorization", "Basic " + btoa("team4:team4team4"));
+        }
+        else if (remote_url == "http://mighty-cliffs-82717.herokuapp.com/") {
+          xhr.setRequestHeader("Authorization", "Basic " + btoa("Team4:team4"));
         }
         // put else if other remote site credentials here
       },
       success: function(response, statusText, xhr) {
         console.log(response);
         if (xhr.status == 200 || xhr.status == 201) {
+          sendLocalFriendRequest(follower_author_obj, followee_author_obj);
           toastr.info("Followed!");
-          $("button#follow-btn-"+followee_id).text("Followed");
-          $("button#follow-btn-"+followee_id).removeClass("follow-btn");
-          $("button#follow-btn-"+followee_id).removeClass("btn-success");
-          $("button#follow-btn-"+followee_id).addClass("btn-info");
+          $("button#remote-follow-btn-"+followee_id).text("Followed");
+          $("button#remote-follow-btn-"+followee_id).removeClass("follow-btn");
+          $("button#remote-follow-btn-"+followee_id).removeClass("btn-success");
+          $("button#remote-follow-btn-"+followee_id).addClass("btn-info");
         }
       },
       error: function(xhr, ajaxOptions, error) {
@@ -394,9 +399,11 @@ window.onload = function() {
     var follower_displayName = $('#logged-in-author').data("displayname");
 
     let authorProfile = { 'id' : author_id, 'host': remoteHost, 'displayName': displayName };
-    let followerProfile = { 'id' : follower_id, 'host': 'http://' + window.location.host + '/', 'displayName': follower_displayName };
-    console.log("FOLLOWEE PROFILE : " + authorProfile);
-    console.log("FOLLOWER PROFILE : " + followerProfile);
+    let followerProfile = { 'id' : follower_id, 'host': 'http://' + window.location.host + '/', 'displayName': follower_displayName, "url": "http://"+window.location.host+'/author/'+follower_id };
+    console.log("FOLLOWEE PROFILE : ");
+    console.log(authorProfile);
+    console.log("FOLLOWER PROFILE : ");
+    console.log(followerProfile);
 
     // HARD CODED
     if (remoteHost == "project-c404.rhcloud.com/api") {
@@ -449,7 +456,7 @@ window.onload = function() {
         }
       },
       error: function(xhr, ajaxOptions, error) {
-        toastr.error("Error. Response is not 200 or 201");
+        toastr.error("Local Error. Response is not 200 or 201");
         console.log(xhr.status);
         console.log(xhr.responseText);
       }
