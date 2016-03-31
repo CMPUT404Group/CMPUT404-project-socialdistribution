@@ -69,7 +69,7 @@ class Post(models.Model):
     published = models.DateTimeField(default=timezone.now)
     visibility = models.CharField(max_length=18, choices=VISIBILITY_SETTING_CHOICES, default=FRIENDS)
     # comments = models.ForeignKey('api.Comment', related_name='post')
-    image_url = models.CharField(max_length=200, blank=True, null=True)
+    image = models.CharField(max_length=200, blank=True, null=True)
     other_author = models.CharField(max_length=30,blank=True,null=True)
 
 
