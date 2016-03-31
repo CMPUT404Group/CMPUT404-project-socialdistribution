@@ -517,7 +517,7 @@ def post_detail(request, post_pk):
         except urllib2.HTTPError, e:
             print("Not a team 6 Post. Error: "+str(e.code))
         try:
-            post = get_APIPost(post_pk,"http:/mighty-cliffs-82717.herokuapp.com/api/posts/", "Basic " + base64.b64encode("Team4:team4"))
+            post = get_APIPost(post_pk,"http://mighty-cliffs-82717.herokuapp.com/api/posts/", "Basic " + base64.b64encode("Team4:team4"))
             node = "c1893d94-cbb4-4dfa-a137-85b4637b58dc"
             page = explore_post(request, node, post_pk)
             return page
