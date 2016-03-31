@@ -145,7 +145,7 @@ def user_logout(request):
 def manager(request):
     if request.user.is_staff:
         loggedInAuthor = Author.objects.get(user=request.user)
-        authors = Author.objects.all()
+        authors = Author.objects.filter(host="http://"+request.get_host()+'/')
         nodes = Node.objects.all()
         return render(request, 'manager/admin.html', {'authors': authors, 'loggedInAuthor': loggedInAuthor, 'nodes': nodes})# 
 

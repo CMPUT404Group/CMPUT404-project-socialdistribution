@@ -19,16 +19,21 @@ class Author(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     github = models.CharField(max_length=40, blank=True, default="http://github.com/default")
     picture = models.ImageField(upload_to='profile_images/', blank=True, null=True)
-    host = models.CharField(max_length=40, default="http://127.0.0.1:8000/")
+    host = models.CharField(max_length=100, default="http://127.0.0.1:8000/")
     displayName = models.CharField(max_length=40, default="defaultDisplayName")
     previous_follower_num = models.PositiveIntegerField(default=0)
     noti = models.BooleanField(default=False)
+    url = models.CharField(max_length=200, default="http://127.0.0.1:8000/")
 
     def __unicode__(self):
         # return self.user.username
         if self.displayName == None and self.user != None:
             self.displayName = self.user.username
         return self.displayName
+
+    def save(self, *args, **kwargs):
+        self.url = self.host + 'author/' + str(self.id)
+        super(Author, self).save(*args, **kwargs)
 
 class Node(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -69,9 +74,15 @@ class Post(models.Model):
     published = models.DateTimeField(default=timezone.now)
     visibility = models.CharField(max_length=18, choices=VISIBILITY_SETTING_CHOICES, default=FRIENDS)
     # comments = models.ForeignKey('api.Comment', related_name='post')
-    image_url = models.CharField(max_length=200, blank=True, null=True)
+    image = models.CharField(max_length=200, blank=True, null=True)
     other_author = models.CharField(max_length=30,blank=True,null=True)
+    source = models.CharField(max_length=100, default="http://cmput404-team-4b.herokuapp.com/")
+    origin = models.CharField(max_length=100, default="http://cmput404-team-4b.herokuapp.com/")
 
+    def save(self, *args, **kwargs):
+        self.source = "http://cmput404-team-4b.herokuapp.com/"
+        self.origin = "http://cmput404-team-4b.herokuapp.com/"
+        super(Post, self).save(*args, **kwargs)
 
 class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

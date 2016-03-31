@@ -6,10 +6,9 @@ from django.utils import timezone
 
 class AuthorSerializer(serializers.ModelSerializer):
     picture = serializers.ImageField(use_url=True, required=False)
-
     class Meta:
         model = Author
-        fields = ('id', 'github', 'picture', 'host', 'displayName')
+        fields = ('id', 'github', 'picture', 'host', 'displayName', 'url')
 
 
 class FriendingSerializer(serializers.ModelSerializer):
@@ -37,8 +36,8 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('id', 'title', 'content', 'published', 'author', 'visibility', 'contentType', 'comments', 'image_url',
-                  'other_author')
+        fields = ('id', 'title', 'content', 'published', 'author', 'visibility', 'contentType', 'comments', 'image',
+                  'other_author', 'source', 'origin')
 
 
 class UserSerializer(serializers.ModelSerializer):
