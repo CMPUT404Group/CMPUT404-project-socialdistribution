@@ -28,8 +28,6 @@ credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
 '''
 Handles submitting the Post form - used when creating a new Post
 '''
-
-
 def _submitPostForm(request, post_pk=None):
     if request.method == "POST":
         form = PostForm(request.POST)
@@ -145,17 +143,18 @@ def explore(request, node_id=None):
 Finds the posts for an author_id
 '''
 def get_APIAuthorPosts(friend_id):
+    print friend_id
     local = get_local(friend_id)
-    team5 = get_team5(friend_id)
-    team6 = get_team6(friend_id)
-    team7 = get_team7(friend_id)
     if local != None and len(local) > 0:
         return local
-    elif  team5 != None and len(team5) > 0:
+    team5 = get_team5(friend_id)
+    if  team5 != None and len(team5) > 0:
         return team5
-    elif team6 != None and len(team6) > 0:
+    team6 = get_team5(friend_id)
+    if team6 != None and len(team6) > 0:
         return team6
-    elif team7 != None and len(team7) > 0:
+    team7 = get_team5(friend_id)
+    if team7 != None and len(team7) > 0:
         return team6      
     else:
         return []
@@ -280,6 +279,7 @@ def get_APIFriends(person_id):
         req.add_header("Authorization", "Basic " + creds)
         x = opener.open(req)
         y = x.read()
+        print json.loads(y)["authors"]
         return json.loads(y)["authors"]
     except urllib2.HTTPError, e:
         print("Not a local Person. Error: "+str(e.code))
@@ -441,19 +441,24 @@ def my_stream(request):
         ################## end of notification block
 
         posts = []
+
+        #get the ids of the people you are following
+        friends = []
+        followers =  Friending.objects.filter(author=author)
+        for follower in followers:
+            friends.append(str(follower.friend.id))
         #add the posts by the people we are friends with into our myStream
-        #viewer_id = author.id
-        viewer_id = "13c4bb0f-f324-427e-8722-0f90c57176c4" # Test it with this when not on the heroku account
-        friends = get_APIFriends(viewer_id)
-        if friends != None:
-            for i in range(len(friends)):
-                posts_all = []
-                friend = friends[i]
-                #get all the posts for a friend
-                posts_all = get_APIAuthorPosts(friend)
-                for j in range(len(posts_all)):
-                    if isAllowed(author, posts_all[j]):
-                        posts.append(posts_all[j])
+        viewer_id = author.id
+        #viewer_id = "13c4bb0f-f324-427e-8722-0f90c57176c4" # Test it with this when not on the heroku account
+        friends.extend(get_APIFriends(viewer_id))
+        for i in range(len(friends)):
+            posts_all = []
+            friend = friends[i]
+            #get all the posts for a friend
+            posts_all = get_APIAuthorPosts(friend)
+            for j in range(len(posts_all)):
+                if isAllowed(author, posts_all[j]):
+                    posts.append(posts_all[j])
 
         #get all posts by the logged in author
         try:
@@ -635,8 +640,8 @@ def user_profile(request, user_id):
 checks if a user is allowed access to a file
 '''
 def isAllowed(viewer,post):
-    #viewer_id = viewer.id
-    viewer_id = "13c4bb0f-f324-427e-8722-0f90c57176c4"
+    viewer_id = viewer.id
+    #viewer_id = "13c4bb0f-f324-427e-8722-0f90c57176c4"
     privacy = post["visibility"]
     #if the post was created by the user allow access
     if viewer_id == post["author"]["id"]:
