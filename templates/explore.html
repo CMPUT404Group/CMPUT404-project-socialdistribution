@@ -21,7 +21,7 @@ document.getElementById("explore").setAttribute("class", "active");
 
     <!-- Display a couple ns on top of the specified authors posts -->
     {%if all == False%}
-        {% for n in nodes|slice:":2"%}
+        {% for n in nodes|slice:":3"%}
         <li class="list-group-item" style="padding: 1em">
         <span>
             <a href={% url 'explore_host' n.id %}>
@@ -30,7 +30,7 @@ document.getElementById("explore").setAttribute("class", "active");
         </span>
         </li>
         {% endfor %}
-        {%if nodes|length > 2 %}
+        {%if nodes|length > 3 %}
         <a class="list-group-item" href={% url 'explore' %}>See More nodes ...</a>
         {% endif %}
 
@@ -56,11 +56,6 @@ document.getElementById("explore").setAttribute("class", "active");
 
     <!-- Display post's author's profile image -->
     <div>
-    {% if request.get_host not in post.author.host %}
-        <a href={{post.author.url}}>
-    {% else %}
-        <a href="{% url 'user_profile' post.author.id %}">
-    {% endif %}
     <img id="id-user-profile-image"
          class="profile-photo-icon img-circle img-responsive img-center pull-left"
          data-toggle="tooltip" title="{{ post.author.displayName }}"
