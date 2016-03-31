@@ -374,10 +374,10 @@ window.onload = function() {
         if (xhr.status == 200 || xhr.status == 201) {
           sendLocalFriendRequest(follower_author_obj, followee_author_obj);
           toastr.info("Followed!");
-          $("button#follow-btn-"+followee_id).text("Followed");
-          $("button#follow-btn-"+followee_id).removeClass("follow-btn");
-          $("button#follow-btn-"+followee_id).removeClass("btn-success");
-          $("button#follow-btn-"+followee_id).addClass("btn-info");
+          $("button#remote-follow-btn-"+followee_id).text("Followed");
+          $("button#remote-follow-btn-"+followee_id).removeClass("follow-btn");
+          $("button#remote-follow-btn-"+followee_id).removeClass("btn-success");
+          $("button#remote-follow-btn-"+followee_id).addClass("btn-info");
         }
       },
       error: function(xhr, ajaxOptions, error) {
