@@ -328,6 +328,7 @@ def send_comment(request, post_id, node_id=None):
     comment["author"]["host"] = author.host
     comment["author"]["displayName"] = author.displayName
     comment["author"]["github"] = author.github
+    comment["author"]["url"] = author.url
     comment["visibility"] = "PUBLIC"
     print(author.id)
     print(author.host)
