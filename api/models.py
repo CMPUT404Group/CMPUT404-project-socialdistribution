@@ -79,7 +79,7 @@ class Post(models.Model):
     source = models.CharField(max_length=100, default="http://cmput404-team-4b.herokuapp.com/")
 
     def save(self, *args, **kwargs):
-        self.source = self.host
+        self.source = "http://cmput404-team-4b.herokuapp.com/"
         super(Post, self).save(*args, **kwargs)
 
 class Comment(models.Model):
