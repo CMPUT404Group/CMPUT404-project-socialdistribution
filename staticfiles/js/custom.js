@@ -164,6 +164,7 @@ window.onload = function() {
         // disable add image button in create post form
         $("#uploadImageTrigger").prop("disabled", true);
         // add image url to form's hidden image_url field (on create post form)
+        console.log(response.photo);
         $("input#id_image").val(response.photo);
         toastr.info("Image Uploaded!");
       },
