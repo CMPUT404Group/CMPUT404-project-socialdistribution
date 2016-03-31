@@ -454,7 +454,6 @@ def my_stream(request):
         #add the posts by the people we are friends with into our myStream
         viewer_id = author.id
         #viewer_id = "13c4bb0f-f324-427e-8722-0f90c57176c4" # Test it with this when not on the heroku account
-        friends.extend(get_APIFriends(viewer_id))
         for i in range(len(friends)):
             posts_all = []
             friend = friends[i]
