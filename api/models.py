@@ -77,9 +77,11 @@ class Post(models.Model):
     image = models.CharField(max_length=200, blank=True, null=True)
     other_author = models.CharField(max_length=30,blank=True,null=True)
     source = models.CharField(max_length=100, default="http://cmput404-team-4b.herokuapp.com/")
+    origin = models.CharField(max_length=100, default="http://cmput404-team-4b.herokuapp.com/")
 
     def save(self, *args, **kwargs):
         self.source = "http://cmput404-team-4b.herokuapp.com/"
+        self.origin = "http://cmput404-team-4b.herokuapp.com/"
         super(Post, self).save(*args, **kwargs)
 
 class Comment(models.Model):
