@@ -100,8 +100,7 @@ def explore(request, node_id=None):
         followList = []
         followRelationships = Friending.objects.filter(author=author)
         for relationship in followRelationships:
-            followList.append(relationship.friend.id)
-
+            followList.append(str(relationship.friend.id))
         if node_id == None:
             return render(request, 'explore.html', {'loggedInAuthor': author, 'nodes': nodes, 'all':True, 'followList': followList})
         else:
@@ -122,7 +121,7 @@ def explore(request, node_id=None):
                     x = opener.open(req)
                     y = x.read()
                     jsonResponse = json.loads(y)
-                    postSerializer = PostSerializer(jsonResponse, many=True)
+                    postSerializer = PostSerializer(jsonResponse["posts"], many=True)
                 elif node.url == "http://disporia-cmput404.rhcloud.com/":
                     creds = credentials[node.url]
                     req.add_header("Authorization", "JWT " + creds)
@@ -215,7 +214,7 @@ def get_team6(author_id):
         y = x.read()
         jsonResponse = json.loads(y)
         if len(jsonResponse) > 0:
-            postSerializer = PostSerializer(jsonResponse, many=True)
+            postSerializer = PostSerializer(jsonResponse["posts"], many=True)
             return postSerializer.data
         else:
             return []
