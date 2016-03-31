@@ -18,6 +18,8 @@ import base64
 import urllib
 import requests
 from django.http import HttpResponse
+from django import forms
+from django.contrib.auth import authenticate
 
 # Create your views here.
 '''
@@ -520,8 +522,16 @@ def user_profile(request, user_id):
 
         # Delegates create post form submission
         if request.method == "POST":
-            if 'reset_password' in request.POST:
-                postChangeUserPassword(request, profile_owner)
+            if 'old_password' in request.POST:
+                print("WENT HERE!!!\n")
+                print("request:", request)
+                print("\n\n")
+                changed = postChangeUserPassword(request, profile_owner)
+                if not changed:
+                    #response = "wrong password!"
+                    #response.status_code=100
+                    return HttpResponseRedirect(reverse('user_profile_success', kwargs={'user_id': user_id}), status = 400)
+                    
             else:
                 response = _submitPostForm(request)
 
@@ -631,8 +641,10 @@ def postChangeUserPassword(request, profile_owner):
 
     if (old_password and reset_password and reset_password == new_password):
         saveuser = User.objects.get(id=profile_owner.user.id)
+            
         if saveuser.check_password(old_password):
             saveuser.set_password(request.POST['reset_password']);
             saveuser.save()
             return True
+                        
     return False
