@@ -145,7 +145,6 @@ def explore(request, node_id=None):
 Finds the posts for an author_id
 '''
 def get_APIAuthorPosts(friend_id):
-    print friend_id
     local = get_local(friend_id)
     if local != None and len(local) > 0:
         return local
@@ -198,7 +197,6 @@ def get_team5(author_id):
         postSerializer = PostSerializer(jsonResponse["results"], many=True)
         return postSerializer.data
     except urllib2.HTTPError, e:
-        print author_id
         print("team 5 Error: "+str(e.code))
 
 '''
@@ -221,7 +219,6 @@ def get_team6(author_id):
         else:
             return []
     except urllib2.HTTPError, e:
-        print author_id
         print("team 6 Error: "+str(e.code))
 
 '''
@@ -244,7 +241,6 @@ def get_team7(author_id):
         else:
             return []
     except urllib2.HTTPError, e:
-        print author_id
         print("team 7 Error: "+str(e.code))
 
 '''
@@ -283,7 +279,6 @@ def get_APIFriends(person_id):
         req.add_header("Authorization", "Basic " + creds)
         x = opener.open(req)
         y = x.read()
-        print json.loads(y)["authors"]
         return json.loads(y)["authors"]
     except urllib2.HTTPError, e:
         print("Not a local Person. Error: "+str(e.code))
