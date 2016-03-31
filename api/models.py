@@ -76,7 +76,11 @@ class Post(models.Model):
     # comments = models.ForeignKey('api.Comment', related_name='post')
     image = models.CharField(max_length=200, blank=True, null=True)
     other_author = models.CharField(max_length=30,blank=True,null=True)
+    source = models.CharField(max_length=100, default="http://cmput404-team-4b.herokuapp.com/")
 
+    def save(self, *args, **kwargs):
+        self.source = self.host
+        super(Post, self).save(*args, **kwargs)
 
 class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
