@@ -891,11 +891,7 @@ class AuthorDetail(generics.GenericAPIView):
         serializer = AuthorSerializer(friendsList, many=True)
         responseData["friends"] = serializer.data
 
-        if request.get_host() not in author.host:
-            responseData["url"] = author.host + 'author/' + str(author.id)
-        else:
-            responseData["url"] = author.host + "author/" + author.user.username
-
+        # responseData["url"] = author.host + 'author/' + str(author.id)
         return Response(responseData, status=status.HTTP_200_OK)
 
 

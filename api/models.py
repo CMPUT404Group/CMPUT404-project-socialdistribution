@@ -23,12 +23,17 @@ class Author(models.Model):
     displayName = models.CharField(max_length=40, default="defaultDisplayName")
     previous_follower_num = models.PositiveIntegerField(default=0)
     noti = models.BooleanField(default=False)
+    url = models.CharField(max_length=200, default="http://127.0.0.1:8000/")
 
     def __unicode__(self):
         # return self.user.username
         if self.displayName == None and self.user != None:
             self.displayName = self.user.username
         return self.displayName
+
+    def save(self, *args, **kwargs):
+        self.url = self.host + 'author/' + str(self.id)
+        super(Author, self).save(*args, **kwargs)
 
 class Node(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
