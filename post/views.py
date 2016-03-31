@@ -257,6 +257,8 @@ def get_APIPost(post_id, host, header):
     x = opener.open(req)
     y = x.read()
     jsonResponse = json.loads(y)
+    if host == "http://mighty-cliffs-82717.herokuapp.com/api/posts/":
+        jsonResponse = jsonResponse["post"]
     postSerializer = PostSerializer(jsonResponse)
     return postSerializer.data
 
