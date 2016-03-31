@@ -326,6 +326,41 @@ window.onload = function() {
     sendRemoteFriendRequest(followerProfile, authorProfile, remoteHost);
   });
 
+  // button about unfollow someone
+  $("button.unfollow-btn").one("click", function(event){
+    var author_id = this.id.slice(13);
+    var unfollower_id = document.getElementById('logged-in-author').getAttribute("data");
+    console.log(author_id)
+    console.log(unfollower_id)
+
+    $.ajax({
+      url: 'http://' + window.location.host + '/api/author/' + author_id,
+      type: "GET",
+      contentType: "application/json",
+      beforeSend: function(xhr, settings){
+        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      },
+      success: function(response, statusText, xhr) {
+        if (xhr.status == 200) {
+          var host = response["host"];
+          if (host == undefined) {
+            toastr.error("Error. Unknown host.");
+            return;
+          }
+          var unfollowee_obj = parseProfileResponse(response);
+          if ((host == 'http://' + window.location.host) || (host == 'http://' + window.location.host + '/')){
+            sendLocalUnFriendRequest(unfollower_id, unfollowee_obj);
+          }
+        }
+      },
+      error: function(xhr, ajaxOptions, error){
+        console.log(xhr.status);
+        console.log(xhr.responseText);
+        console.log(error);
+        toastr.error("Error. Cound not send unfollow request");
+      }
+    })
+  });
 
 
   function sendRemoteFriendRequest(follower_author_obj, followee_author_obj, remote_host_url) {
