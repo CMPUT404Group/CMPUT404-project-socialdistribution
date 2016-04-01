@@ -344,7 +344,7 @@ window.onload = function() {
   function sendRemoteFriendRequest(follower_author_obj, followee_author_obj, remote_host_url) {
     var followee_id = followee_author_obj["id"];
     var remote_url = remote_host_url;
-    if (remote_host_url.startsWith("http://") == false) {
+    if ((remote_host_url.startsWith("http://") == false) && (remote_host_url.startsWith("https://") == false)) {
       remote_url = "http://" + remote_host_url
     }
     if (remote_url.slice(-1) != '/') {
@@ -365,7 +365,7 @@ window.onload = function() {
         if (remote_url == "http://project-c404.rhcloud.com/") {
           xhr.setRequestHeader("Authorization", "Basic " + btoa("team4:team4team4"));
         }
-        else if (remote_url == "http://mighty-cliffs-82717.herokuapp.com/") {
+        else if (remote_url == "https://mighty-cliffs-82717.herokuapp.com/") {
           xhr.setRequestHeader("Authorization", "Basic " + btoa("Team4:team4"));
         }
         // put else if other remote site credentials here
