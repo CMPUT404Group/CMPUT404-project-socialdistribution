@@ -585,4 +585,51 @@ window.onload = function() {
   $(document).ready(function(){
       $('[data-toggle="tooltip"]').tooltip();
   });
+
+
+    $("#closechangePasswordModal").click(function(){
+        // clear  form when press close
+        $("form#changePasswordForm").trigger("reset");
+    });
+
+    // display error messages when trying to change passwords incorrectly
+    $("#changePasswordForm").submit(function(event) {
+        event.preventDefault();
+        var oldPass = document.getElementById('old_password').value;
+        var newPass = document.getElementById('new_password').value;
+        var confirmNewPass = document.getElementById('reset_password').value;
+        if (newPass!=confirmNewPass){
+            toastr.info("new passwords did not match!");
+            return
+        }
+        var authorID = $("#changePasswordForm").data("author-id");
+        var Data = "old_password="+oldPass+"&new_password="+newPass+"&reset_password="+confirmNewPass;
+        $.ajax({
+            url: 'http://' + window.location.host + '/author/' + authorID + '/',
+            type: "POST",
+            data: Data,
+            contentType: 'application/x-www-form-urlencoded; charset=utf-8',
+            //dataType: 'json',
+            beforeSend: function(xhr, settings) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+            success: function(response) {
+                // close modal
+                $("button#closechangePasswordModal").click();
+                // clear  form
+                $("form#changePasswordForm").trigger("reset");
+                toastr.info("Password Changed!");
+            },
+            error: function(xhr, ajaxOptions, error) {
+                console.log(xhr.status);
+                console.log(xhr.responseText);
+                console.log(error);
+                toastr.info("old password incorrect!");
+      }
+    });
+  });
+
+
+
+
 };
