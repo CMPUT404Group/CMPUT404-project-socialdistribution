@@ -357,39 +357,45 @@ window.onload = function() {
     var JSONobject = { "query": "friendrequest", "author":  follower_author_obj, "friend": followee_author_obj };
     var jsonData = JSON.stringify( JSONobject);
     console.log(jsonData);
-    $.ajax({
-      url: remote_url + 'api/friendrequest/',
-      type: "POST",
-      data:  jsonData,
-      contentType: 'application/json; charset=utf-8',
-      dataType: 'json',
-      beforeSend: function(xhr, settings) {
-        // put authentication credentials to REMOTE SITES here - may be different for each group
-        if (remote_url == "http://project-c404.rhcloud.com/") {
-          xhr.setRequestHeader("Authorization", "Basic " + btoa("team4:team4team4"));
-        }
-        else if (remote_url == "https://mighty-cliffs-82717.herokuapp.com/") {
-          xhr.setRequestHeader("Authorization", "Basic " + btoa("Team4:team4"));
-        }
-        // put else if other remote site credentials here
-      },
-      success: function(response, statusText, xhr) {
-        console.log(response);
-        if (xhr.status == 200 || xhr.status == 201) {
-          sendLocalFriendRequest(follower_author_obj, followee_author_obj);
-          toastr.info("Followed!");
-          $("button#remote-follow-btn-"+followee_id).text("Followed");
-          $("button#remote-follow-btn-"+followee_id).removeClass("follow-btn");
-          $("button#remote-follow-btn-"+followee_id).removeClass("btn-success");
-          $("button#remote-follow-btn-"+followee_id).addClass("btn-info");
-        }
-      },
-      error: function(xhr, ajaxOptions, error) {
-        toastr.error("Remote Node Error :  " + xhr.status);
-        console.log(xhr.status);
-        console.log(xhr.responseText);
-      }
-    });
+    console.log(remote_url);
+    var url = remote_url + 'api/friendrequest/';
+    if (remote_url.slice(-4) == "api/") {
+      url = remote_url + 'friendrequest/';
+    }
+    console.log(url);
+    // $.ajax({
+    //   url: url,
+    //   type: "POST",
+    //   data:  jsonData,
+    //   contentType: 'application/json; charset=utf-8',
+    //   dataType: 'json',
+    //   beforeSend: function(xhr, settings) {
+    //     // put authentication credentials to REMOTE SITES here - may be different for each group
+    //     if (remote_url == "http://project-c404.rhcloud.com/") {
+    //       xhr.setRequestHeader("Authorization", "Basic " + btoa("team4:team4team4"));
+    //     }
+    //     else if (remote_url == "https://mighty-cliffs-82717.herokuapp.com/") {
+    //       xhr.setRequestHeader("Authorization", "Basic " + btoa("Team4:team4"));
+    //     }
+    //     // put else if other remote site credentials here
+    //   },
+    //   success: function(response, statusText, xhr) {
+    //     console.log(response);
+    //     if (xhr.status == 200 || xhr.status == 201) {
+    //       sendLocalFriendRequest(follower_author_obj, followee_author_obj);
+    //       toastr.info("Followed!");
+    //       $("button#remote-follow-btn-"+followee_id).text("Followed");
+    //       $("button#remote-follow-btn-"+followee_id).removeClass("follow-btn");
+    //       $("button#remote-follow-btn-"+followee_id).removeClass("btn-success");
+    //       $("button#remote-follow-btn-"+followee_id).addClass("btn-info");
+    //     }
+    //   },
+    //   error: function(xhr, ajaxOptions, error) {
+    //     toastr.error("Remote Node Error :  " + xhr.status);
+    //     console.log(xhr.status);
+    //     console.log(xhr.responseText);
+    //   }
+    // });
   };
 
   // click button to follow someone

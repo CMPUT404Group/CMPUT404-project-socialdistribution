@@ -357,8 +357,12 @@ window.onload = function() {
     var JSONobject = { "query": "friendrequest", "author":  follower_author_obj, "friend": followee_author_obj };
     var jsonData = JSON.stringify( JSONobject);
     console.log(jsonData);
+    var url = remote_url + 'api/friendrequest/';
+    if (remote_url.slice(-4) == "api/") {
+      url = remote_url + 'friendrequest/';
+    }
     $.ajax({
-      url: remote_url + 'api/friendrequest/',
+      url: url,
       type: "POST",
       data:  jsonData,
       contentType: 'application/json; charset=utf-8',
