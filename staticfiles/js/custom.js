@@ -405,7 +405,11 @@ window.onload = function() {
     var follower_id = document.getElementById('logged-in-author').getAttribute("data");
     var follower_displayName = $('#logged-in-author').data("displayname");
 
-    let authorProfile = { 'id' : author_id, 'host': remoteHost, 'displayName': displayName, "url": remoteHost +'author/'+author_id };
+    var remote_host_only = remoteHost;
+    if (remoteHost.slice(-3) == "api") {
+      remote_host_only = remoteHost.substr(0,remoteHost.length-3);
+    }
+    let authorProfile = { 'id' : author_id, 'host': remoteHost, 'displayName': displayName, "url": remote_host_only +'author/'+author_id };
     let followerProfile = { 'id' : follower_id, 'host': 'http://' + window.location.host + '/', 'displayName': follower_displayName };
     console.log("FOLLOWEE PROFILE : ");
     console.log(authorProfile);
