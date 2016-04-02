@@ -350,7 +350,8 @@ window.onload = function() {
     if (remote_url.slice(-1) != '/') {
       remote_url = remote_url + '/';
     }
-
+    console.log(follower_author_obj);
+    console.log(followee_author_obj);
     var JSONobject = { "query": "friendrequest", "author":  follower_author_obj, "friend": followee_author_obj };
     var jsonData = JSON.stringify( JSONobject);
     console.log(jsonData);
@@ -398,8 +399,8 @@ window.onload = function() {
     var follower_id = document.getElementById('logged-in-author').getAttribute("data");
     var follower_displayName = $('#logged-in-author').data("displayname");
 
-    let authorProfile = { 'id' : author_id, 'host': remoteHost, 'displayName': displayName };
-    let followerProfile = { 'id' : follower_id, 'host': 'http://' + window.location.host + '/', 'displayName': follower_displayName, "url": "http://"+window.location.host+'/author/'+follower_id };
+    let authorProfile = { 'id' : author_id, 'host': remoteHost, 'displayName': displayName, "url": remoteHost +'author/'+author_id };
+    let followerProfile = { 'id' : follower_id, 'host': 'http://' + window.location.host + '/', 'displayName': follower_displayName };
     console.log("FOLLOWEE PROFILE : ");
     console.log(authorProfile);
     console.log("FOLLOWER PROFILE : ");

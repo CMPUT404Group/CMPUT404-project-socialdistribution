@@ -73,7 +73,6 @@ window.onload = function() {
       type: "DELETE",
       beforeSend: function(xhr, settings) {
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
-
       },
       success: function(response) {
         console.log(response);
@@ -165,7 +164,8 @@ window.onload = function() {
         // disable add image button in create post form
         $("#uploadImageTrigger").prop("disabled", true);
         // add image url to form's hidden image_url field (on create post form)
-        $("input#id_image_url").val(response.photo);
+        console.log(response.photo);
+        $("input#id_image").val("http://" + window.location.host + response.photo);
         toastr.info("Image Uploaded!");
       },
       error: function(xhr, ajaxOptions, error) {
@@ -304,28 +304,6 @@ window.onload = function() {
     });
   }
 
-
-    $("button.remote-follow-btn").one("click", function(event) {
-    // remote-follow-btn-{{post.author.id}}
-    var author_id = this.id.slice(18);
-    var displayName = $(this).data('displayname');
-    var remoteHost = $(this).data('host');
-    var follower_id = document.getElementById('logged-in-author').getAttribute("data");
-    var follower_displayName = $('#logged-in-author').data("displayname");
-
-    let authorProfile = { 'id' : author_id, 'host': remoteHost, 'displayName': displayName };
-    let followerProfile = { 'id' : follower_id, 'host': 'http://' + window.location.host + '/', 'displayName': follower_displayName };
-    console.log("FOLLOWEE PROFILE : " + authorProfile);
-    console.log("FOLLOWER PROFILE : " + followerProfile);
-
-    // HARD CODED
-    if (remoteHost == "project-c404.rhcloud.com/api") {
-      remoteHost = "http://project-c404.rhcloud.com/";
-    }
-
-    sendRemoteFriendRequest(followerProfile, authorProfile, remoteHost);
-  });
-
   // button about unfollow someone
   $("button.unfollow-btn").one("click", function(event){
     var author_id = this.id.slice(13);
@@ -366,13 +344,14 @@ window.onload = function() {
   function sendRemoteFriendRequest(follower_author_obj, followee_author_obj, remote_host_url) {
     var followee_id = followee_author_obj["id"];
     var remote_url = remote_host_url;
-    if (remote_host_url.startsWith("http://") == false) {
+    if ((remote_host_url.startsWith("http://") == false) && (remote_host_url.startsWith("https://") == false)) {
       remote_url = "http://" + remote_host_url
     }
     if (remote_url.slice(-1) != '/') {
       remote_url = remote_url + '/';
     }
-
+    console.log(follower_author_obj);
+    console.log(followee_author_obj);
     var JSONobject = { "query": "friendrequest", "author":  follower_author_obj, "friend": followee_author_obj };
     var jsonData = JSON.stringify( JSONobject);
     console.log(jsonData);
@@ -384,19 +363,23 @@ window.onload = function() {
       dataType: 'json',
       beforeSend: function(xhr, settings) {
         // put authentication credentials to REMOTE SITES here - may be different for each group
-        if (remote_host_url == "http://project-c404.rhcloud.com/") {
+        if (remote_url == "http://project-c404.rhcloud.com/") {
           xhr.setRequestHeader("Authorization", "Basic " + btoa("team4:team4team4"));
+        }
+        else if (remote_url == "https://mighty-cliffs-82717.herokuapp.com/") {
+          xhr.setRequestHeader("Authorization", "Basic " + btoa("Team4:team4"));
         }
         // put else if other remote site credentials here
       },
       success: function(response, statusText, xhr) {
         console.log(response);
         if (xhr.status == 200 || xhr.status == 201) {
+          sendLocalFriendRequest(follower_author_obj, followee_author_obj);
           toastr.info("Followed!");
-          $("button#follow-btn-"+followee_id).text("Followed");
-          $("button#follow-btn-"+followee_id).removeClass("follow-btn");
-          $("button#follow-btn-"+followee_id).removeClass("btn-success");
-          $("button#follow-btn-"+followee_id).addClass("btn-info");
+          $("button#remote-follow-btn-"+followee_id).text("Followed");
+          $("button#remote-follow-btn-"+followee_id).removeClass("follow-btn");
+          $("button#remote-follow-btn-"+followee_id).removeClass("btn-success");
+          $("button#remote-follow-btn-"+followee_id).addClass("btn-info");
         }
       },
       error: function(xhr, ajaxOptions, error) {
@@ -416,10 +399,12 @@ window.onload = function() {
     var follower_id = document.getElementById('logged-in-author').getAttribute("data");
     var follower_displayName = $('#logged-in-author').data("displayname");
 
-    let authorProfile = { 'id' : author_id, 'host': remoteHost, 'displayName': displayName };
+    let authorProfile = { 'id' : author_id, 'host': remoteHost, 'displayName': displayName, "url": remoteHost +'author/'+author_id };
     let followerProfile = { 'id' : follower_id, 'host': 'http://' + window.location.host + '/', 'displayName': follower_displayName };
-    console.log("FOLLOWEE PROFILE : " + authorProfile);
-    console.log("FOLLOWER PROFILE : " + followerProfile);
+    console.log("FOLLOWEE PROFILE : ");
+    console.log(authorProfile);
+    console.log("FOLLOWER PROFILE : ");
+    console.log(followerProfile);
 
     // HARD CODED
     if (remoteHost == "project-c404.rhcloud.com/api") {
@@ -472,7 +457,7 @@ window.onload = function() {
         }
       },
       error: function(xhr, ajaxOptions, error) {
-        toastr.error("Error. Response is not 200 or 201");
+        toastr.error("Local Error. Response is not 200 or 201");
         console.log(xhr.status);
         console.log(xhr.responseText);
       }
@@ -598,7 +583,7 @@ window.onload = function() {
   }
 
 // use bootstrap tooltip to display the small pop-up box
-    $(document).ready(function(){
+  $(document).ready(function(){
       $('[data-toggle="tooltip"]').tooltip();
   });
 
@@ -644,6 +629,8 @@ window.onload = function() {
       }
     });
   });
+
+
 
 
 };
