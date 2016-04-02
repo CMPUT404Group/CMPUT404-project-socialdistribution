@@ -523,7 +523,7 @@ class CommentList(generics.GenericAPIView):
                     author.save()
         else:
             author = Author.objects.get(user=request.user)
-        
+
         author_id = author.id
         try:
             if (isAllowed(post_pk, author_id)):
@@ -957,7 +957,7 @@ class FriendingCheck(generics.GenericAPIView):
             else:
                 friends = False
             return Response({'query':'friends', 'authors': [author_id1, author_id2], 'friends':friends}, status=status.HTTP_200_OK)
-        
+
         # returns all friends of author_1
         else:
             # check if request is for a remote node, if so handle it
@@ -1083,13 +1083,11 @@ class FriendRequest(generics.GenericAPIView):
                 atLeastOneAuthorIsLocal = True
 
             # if friend is remote user
-            # else:
-            #     return Response({"message":"Friend is not an author on this node"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({"message":"Friend is not an author on this node"}, status=status.HTTP_400_BAD_REQUEST)
 
         except Author.DoesNotExist as e:
-            friend = Author.objects.create(id=friend_req["id"], displayName=friend_req["displayName"], host=friend_req["host"])
-            friend.save()
-            # return Response({"message":"Friend is not an author on this node"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message":"Friend is not an author on this node"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not atLeastOneAuthorIsLocal and not bothLocalAuthors:  # both remote users - client error - shouldn't have to handle this
             return Response({"message": "both are remote authors."}, status=status.HTTP_400_BAD_REQUEST)
