@@ -308,8 +308,8 @@ window.onload = function() {
   $("button.unfollow-btn").one("click", function(event){
     var author_id = this.id.slice(13);
     var unfollower_id = document.getElementById('logged-in-author').getAttribute("data");
-    console.log(author_id)
-    console.log(unfollower_id)
+    console.log(author_id);
+    console.log(unfollower_id);
 
     $.ajax({
       url: 'http://' + window.location.host + '/api/author/' + author_id,
@@ -319,6 +319,8 @@ window.onload = function() {
         xhr.setRequestHeader("X-CSRFToken", csrftoken);
       },
       success: function(response, statusText, xhr) {
+        console.log(response);
+        console.log(xhr.statusText);
         if (xhr.status == 200) {
           var host = response["host"];
           if (host == undefined) {
@@ -326,9 +328,9 @@ window.onload = function() {
             return;
           }
           var unfollowee_obj = parseProfileResponse(response);
-          if ((host == 'http://' + window.location.host) || (host == 'http://' + window.location.host + '/')){
-            sendLocalUnFriendRequest(unfollower_id, unfollowee_obj);
-          }
+          // if ((host == 'http://' + window.location.host) || (host == 'http://' + window.location.host + '/')){
+          sendLocalUnFriendRequest(unfollower_id, unfollowee_obj);
+          // }
         }
       },
       error: function(xhr, ajaxOptions, error){
