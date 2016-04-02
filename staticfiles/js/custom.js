@@ -406,22 +406,24 @@ window.onload = function() {
     var follower_displayName = $('#logged-in-author').data("displayname");
 
     var remote_host_only = remoteHost;
-    if (remoteHost.slice(-3) == "api") {
-      remote_host_only = remoteHost.substr(0,remoteHost.length-3);
+    if (remoteHost.slice(-4) == "api/") {
+      remote_host_only = remoteHost.substr(0,remoteHost.length-4);
     }
     let authorProfile = { 'id' : author_id, 'host': remoteHost, 'displayName': displayName, "url": remote_host_only +'author/'+author_id };
     let followerProfile = { 'id' : follower_id, 'host': 'http://' + window.location.host + '/', 'displayName': follower_displayName };
+
+
+    // HARD CODED
+    if (remoteHost == "project-c404.rhcloud.com/api/") {
+      remoteHost = "http://project-c404.rhcloud.com/";
+      followerProfile["url"] = 'http://' + window.location.host + '/author/' + follower_id;
+    }
+
     console.log("FOLLOWEE PROFILE : ");
     console.log(authorProfile);
     console.log("FOLLOWER PROFILE : ");
     console.log(followerProfile);
-
-    // HARD CODED
-    if (remoteHost == "project-c404.rhcloud.com/api") {
-      remoteHost = "http://project-c404.rhcloud.com/";
-    }
-
-    sendRemoteFriendRequest(followerProfile, authorProfile, remoteHost);
+    // sendRemoteFriendRequest(followerProfile, authorProfile, remoteHost);
   });
 
 
