@@ -423,7 +423,8 @@ window.onload = function() {
     console.log(authorProfile);
     console.log("FOLLOWER PROFILE : ");
     console.log(followerProfile);
-    // sendRemoteFriendRequest(followerProfile, authorProfile, remoteHost);
+
+    sendRemoteFriendRequest(followerProfile, authorProfile, remoteHost);
   });
 
 
