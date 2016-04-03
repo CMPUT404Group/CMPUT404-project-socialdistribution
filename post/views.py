@@ -20,6 +20,8 @@ import requests
 from django.http import HttpResponse
 from django import forms
 from django.contrib.auth import authenticate
+from datetime import datetime
+from time import time
 
 #global variables
 credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
@@ -133,6 +135,10 @@ def explore(request, node_id=None):
                     postSerializer = PostSerializer(jsonResponse["results"], many=True)
 
                 posts = postSerializer.data
+                for p in posts:
+                    # fix date formatting
+                    date = datetime.strptime(p['published'][0:10], "%Y-%m-%d")
+                    p['published'] = date.strftime("%b %d, %Y")
 
                 form = PostForm()
                 return render(request, 'explore.html', {'node':node,'posts': posts, 'form': form, 'loggedInAuthor': author, 'nodes': nodes, 'all':False, 'followList': followList})
