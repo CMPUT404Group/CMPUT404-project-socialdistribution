@@ -137,12 +137,10 @@ def explore(request, node_id=None):
                 posts = postSerializer.data
                 for p in posts:
                     # fix date formatting
-                    print(p['published'])
                     date = datetime.strptime(p['published'][0:10], "%Y-%m-%d")
                     time = datetime.strptime(p['published'][11:16], "%H:%M")
                     date_time = datetime.combine(date, datetime.time(time))
                     p['published'] = date_time.strftime("%b %d, %Y, %-I:%M %p")
-                    print(date_time, time)
 
                 form = PostForm()
                 return render(request, 'explore.html', {'node':node,'posts': posts, 'form': form, 'loggedInAuthor': author, 'nodes': nodes, 'all':False, 'followList': followList})
