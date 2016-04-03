@@ -23,7 +23,7 @@ document.getElementById("public_stream").setAttribute("class", "active");
         {% endif %}
     <img id="user-profile-image-{{ post.author.id }}"
          class="profile-photo-icon img-circle img-responsive img-center pull-left"
-         data-toggle="tooltip" title="{{ post.author }}"
+         data-toggle="tooltip" title="{{ post.author.user }}"
          alt="Profile Image"
         {% if post.author.picture %}
          src="/media/{{ post.author.picture }}"/>
@@ -36,9 +36,9 @@ document.getElementById("public_stream").setAttribute("class", "active");
 
     {% if  loggedInAuthor.id != post.author.id %}
         {% if post.author not in followList %}
-            <button  id='follow-btn-{{post.author.id}}' class="follow-btn btn-sm btn-success pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;" data-host='{{post.author.host}}' data-displayName='{{post.author.displayName}}'> Follow </button>
+            <button  id='follow-btn-{{post.author.id}}' class="follow-btn btn-sm btn-success pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;" data-host='{{post.author.host}}' data-displayName='{{post.author.user}}'> Follow </button>
         {% else %}
-            <button  id='unfollow-btn-{{post.author.id}}' class="unfollow-btn btn-sm btn-warning pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;" data-host='{{post.author.host}}' data-displayName='{{post.author.displayName}}'> Unfollow </button>
+            <button  id='unfollow-btn-{{post.author.id}}' class="unfollow-btn btn-sm btn-warning pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;" data-host='{{post.author.host}}' data-displayName='{{post.author.user}}'> Unfollow </button>
         {% endif %}
     {% endif %}
 
