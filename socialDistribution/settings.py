@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 import os
 import dj_database_url
 
+LOCAL_URL = "http://cmput404-team-4b.herokuapp.com/api/"
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -88,7 +90,14 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
+# os.environ["HEROKU_POSTGRESQL_ONYX_URL"] = 'postgres://ouojucpaysfzdn:D99gHsSUyVG6GFtVTzmGaQrVEW@ec2-107-22-248-209.compute-1.amazonaws.com:5432/dp73t5fm0m6lq'
+# DATABASES = {
+#     'default': dj_database_url.config(default=os.environ["HEROKU_POSTGRESQL_ONYX_URL"])
+# }
+# os.environ["HEROKU_POSTGRESQL_ONYX_URL"] = 'postgres://rkxwqqtgemnlvl:CU3EN3VuVo3iTImzaP8Olw-NzB@ec2-107-22-248-166.compute-1.amazonaws.com:5432/d1mtofi0ljio75'
+# DATABASES = {
+#     'default': dj_database_url.config(default=os.environ["HEROKU_POSTGRESQL_ONYX_URL"])
+# }
 
 
 
@@ -142,7 +151,6 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 50,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.BasicAuthentication',
-        # 'api.basicAuth.HostBasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     )
 }
