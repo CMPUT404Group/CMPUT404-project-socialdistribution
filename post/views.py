@@ -273,10 +273,7 @@ def get_APIPost(post_id, host, header):
     if host == "http://mighty-cliffs-82717.herokuapp.com/api/posts/":
         jsonResponse = jsonResponse["post"]
     postSerializer = PostSerializer(jsonResponse)
-    for p in postSerializer.data:
-        # fix date formatting
-		p = formatDate(p)
-    return postSerializer.data
+    return formatDate(postSerializer.data)
 
 '''
 Get all the friends for a particular author
@@ -403,10 +400,9 @@ def explore_post(request, node_id, post_id):
                             post = get_APIPost(post_id, t7_url+"api/posts/", t7_h)
                     else:
                         return HttpResponseForbidden("You are not allowed to access this page")
-                
                 # fix date formatting
-				post = formatDate(post)
-            
+                # post = formatDate(post)
+
                 #display the post if its allowed
                 if (isAllowed(author,post)):
                     commentForm = CommentForm()
@@ -549,7 +545,7 @@ def post_detail(request, post_pk):
         if Found == True:
             if local == False:
                 # format date for remote posts
-				post = formatDate(post)
+                post = formatDate(post)
 
             if (isAllowed(viewer,post)):
                 if request.method == "POST":
@@ -733,4 +729,4 @@ def formatDate(post):
     time = datetime.strptime(post['published'][11:16], "%H:%M")
     date_time = datetime.combine(date, datetime.time(time))
     post['published'] = date_time.strftime("%b %d, %Y, %-I:%M %p")
-	return post                
+    return post                
