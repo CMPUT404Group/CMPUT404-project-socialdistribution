@@ -180,6 +180,7 @@ window.onload = function() {
     event.preventDefault();
     var formData = new FormData($("#uploadProfileImageForm")[0]);
     var authorID = $("#uploadProfileImageForm").data("author-id");
+    console.log(formData);
     $.ajax({
       url: 'http://' + window.location.host + '/api/author/' + authorID + '/',
       type: "POST",
@@ -195,7 +196,7 @@ window.onload = function() {
         // clear upload image form
         $("form#uploadProfileImageForm").trigger("reset");
         // change user profile image
-        $("img#id-user-profile-image").attr('src', response.picture);
+        $("img#id-user-profile-image").attr('src', "http://" + window.location.host + response.picture);
         toastr.info("Profile Image Updated!");
       },
       error: function(xhr, ajaxOptions, error) {
