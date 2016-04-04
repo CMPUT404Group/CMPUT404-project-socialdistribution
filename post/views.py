@@ -483,11 +483,42 @@ def my_stream(request):
         except urllib2.HTTPError, e:
             print("Couldnt get own posts "+author.user.username+" "+str(e.code))
 
-        #TODO order from newest to oldest
+        #orders from newest to oldest
         form = PostForm()
+        s_posts = sort_posts(posts)
+        posts = []
+        #displays the date nicely
+        for post in s_posts:
+            post = formatDate(post)
+            posts.append(post)
+
         return render(request, 'post/myStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList})
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
+
+#sort the mystream posts by their published date
+def sort_posts(posts):
+    sorted_posts = []
+    all_dates = []
+    oldest = datetime.now()
+    index = None
+
+    for post in posts:
+        date = datetime.strptime(post['published'][0:10], "%Y-%m-%d")
+        time = datetime.strptime(post['published'][11:16], "%H:%M")
+        date_time = datetime.combine(date, datetime.time(time))
+        all_dates.append(date_time)
+
+    for post in posts:
+        for j in range(len(all_dates)):
+            if all_dates[j] < oldest:
+                oldest = all_dates[j]
+                index = j
+        sorted_posts.append(posts[index])
+        all_dates.pop(index)
+        index = None
+        oldest = datetime.now()
+    return reversed(sorted_posts)
 
 # '''
 # Handles submitting the Comment form - used when creating a new Comment
