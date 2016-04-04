@@ -157,10 +157,10 @@ def get_APIAuthorPosts(friend_id):
     team5 = get_team5(friend_id)
     if  team5 != None and len(team5) > 0:
         return team5
-    team6 = get_team5(friend_id)
+    team6 = get_team6(friend_id)
     if team6 != None and len(team6) > 0:
         return team6
-    team7 = get_team5(friend_id)
+    team7 = get_team7(friend_id)
     if team7 != None and len(team7) > 0:
         return team6
     else:
@@ -191,22 +191,23 @@ Get all posts for <author> from team5
 '''
 def get_team5(author_id):
     #checks what node it is on and returns the public posts from that node
-    try:
-        url = "http://disporia-cmput404.rhcloud.com/api/author/"+str(author_id)+"/posts/"
-        opener = urllib2.build_opener(urllib2.HTTPHandler)
-        req = urllib2.Request(url)
-        # set credentials on request
-        req.add_header("Authorization", "JWT " + credentials["http://disporia-cmput404.rhcloud.com/"])
-        x = opener.open(req)
-        y = x.read()
-        jsonResponse = json.loads(y)
-        postSerializer = PostSerializer(jsonResponse["results"], many=True)
-        for p in postSerializer.data:
-            # fix date formatting
-            p = formatDate(p)
-        return postSerializer.data
-    except urllib2.HTTPError, e:
-        print("team 5 Error: "+str(e.code))
+    # try:
+    #     url = "http://disporia-cmput404.rhcloud.com/api/author/"+str(author_id)+"/posts/"
+    #     opener = urllib2.build_opener(urllib2.HTTPHandler)
+    #     req = urllib2.Request(url)
+    #     # set credentials on request
+    #     req.add_header("Authorization", "JWT " + credentials["http://disporia-cmput404.rhcloud.com/"])
+    #     x = opener.open(req)
+    #     y = x.read()
+    #     jsonResponse = json.loads(y)
+    #     postSerializer = PostSerializer(jsonResponse["results"], many=True)
+    #     for p in postSerializer.data:
+    #         # fix date formatting
+    #         p = formatDate(p)
+    #     return postSerializer.data
+    # except urllib2.HTTPError, e:
+    #     print("team 5 Error: "+str(e.code))
+    return []
 
 '''
 Get all posts for <author> from team6
@@ -237,8 +238,9 @@ def get_team6(author_id):
 Get all posts for <author> from team6
 '''
 def get_team7(author_id):
+    # return []
     try:
-        #checks what node it is on and returns the public posts from that node
+        # checks what node it is on and returns the public posts from that node
         url = "http://mighty-cliffs-82717.herokuapp.com/api/author/"+str(author_id)+"/posts/"
         opener = urllib2.build_opener(urllib2.HTTPHandler)
         req = urllib2.Request(url)
@@ -440,9 +442,8 @@ def my_stream(request):
         followList = []
         followRelationships = Friending.objects.filter(author=author)
         for relationship in followRelationships:
-            followList.append(relationship.friend.id)
+            followList.append(str(relationship.friend.id))
 
-        posts = Post.objects.all()
         # ##################### notification on if logged in author has new follower
         # followList = []
         # followRelationships = Friending.objects.filter(friend=author)
@@ -463,7 +464,7 @@ def my_stream(request):
         # author.save()
         # ################## end of notification block
         #
-        # posts = []
+        posts = []
         #
         # #get the ids of the people you are following
         # following = []
@@ -472,24 +473,32 @@ def my_stream(request):
         #     following.append(str(relationship.friend.id))
         #
         # #add the posts by the people we are friends with into our myStream
-        # viewer_id = author.id
-        # #viewer_id = "13c4bb0f-f324-427e-8722-0f90c57176c4" # Test it with this when not on the heroku account
-        # for i in range(len(friends)):
-        #     posts_all = []
-        #     friend = friends[i]
-        #     #get all the posts for a friend
-        #     posts_all = get_APIAuthorPosts(friend)
-        #     for j in range(len(posts_all)):
-        #         if isAllowed(author, posts_all[j]):
-        #             posts.append(posts_all[j])
-        #
-        # #get all posts by the logged in author
-        # try:
-        #     mine = get_APIAuthorPosts(viewer_id)
-        #     posts.extend(mine)
-        # except urllib2.HTTPError, e:
-        #     print("Couldnt get own posts "+author.user.username+" "+str(e.code))
+        viewer_id = author.id
 
+        #viewer_id = "13c4bb0f-f324-427e-8722-0f90c57176c4" # Test it with this when not on the heroku account
+        for i in range(len(followList)):
+            posts_all = []
+            friend_id = followList[i]
+            #get all the posts for a friend
+            posts_all = get_APIAuthorPosts(friend_id)
+            for j in range(len(posts_all)):
+                if isAllowed(author, posts_all[j]):
+                    posts.append(posts_all[j])
+
+        #get all posts by the logged in author
+        try:
+            mine = get_APIAuthorPosts(viewer_id)
+            posts.extend(mine)
+        except urllib2.HTTPError, e:
+            print("Couldnt get own posts "+author.user.username+" "+str(e.code))
+
+
+
+
+        for post in posts:
+            print post["author"]["id"] == author.id,
+            print " |  ",
+            print post["author"]["id"] == str(author.id)
         #TODO order from newest to oldest
         form = PostForm()
         return render(request, 'post/myStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList})

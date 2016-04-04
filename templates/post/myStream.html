@@ -11,13 +11,20 @@ document.getElementById("my_stream").setAttribute("class", "active");
 
 {% include "post/createPost.html" with icon=loggedInAuthor.picture %}
 
-<h1> LOGGED IN AUTHOR ID : {{ loggedInAuthor.id }} </h1>
+<h3> LOGGED IN AUTHOR ID : {{ loggedInAuthor.id }} </h3>
 {% for id in followList %}
-<h2>{{ id }}</h2>
+<p>{{ id }}</p>
 {% endfor %}
 
 {% for post in posts %}
 <div class="row post">
+    <p>Logged In Author : {{ loggedInAuthor.id }}</p>
+    <p>Post Author : {{ post.author.id }} </p>
+    {% if  loggedInAuthor.id|stringformat:"s" == post.author.id %}
+    <h1> YES </h1>
+    {% else %}
+    <h1> NO </h1>
+    {% endif %}
     <!-- Display post's author's profile image -->
     <div>
     {% if request.get_host not in post.author.host %}
@@ -37,11 +44,11 @@ document.getElementById("my_stream").setAttribute("class", "active");
     </a>
     </div>
 
-    {% if  loggedInAuthor.id != post.author.id %}
-        {% if post.author not in followList %}
-            <button  id='follow-btn-{{post.author.id}}' data-host="{{post.author.host}}" class="follow-btn btn-sm btn-success pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;" data-displayName='{{post.author.user}}'> Follow </button>
-        {% else %}
+    {% if  loggedInAuthor.id|stringformat:"s" != post.author.id %}
+        {% if post.author.id in followList %}
             <button  id='unfollow-btn-{{post.author.id}}' class="unfollow-btn btn-sm btn-warning pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;" data-host='{{post.author.host}}' data-displayName='{{post.author.user}}'> Unfollow </button>
+        {% else %}
+          <button  id='follow-btn-{{post.author.id}}' data-host="{{post.author.host}}" class="follow-btn btn-sm btn-success pull-left" style="position: relative; bottom; 1.5em; right: 1.5em;" data-displayName='{{post.author.user}}'> Follow </button>
         {% endif %}
     {% endif %}
 
