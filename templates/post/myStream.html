@@ -8,12 +8,15 @@ document.getElementById("my_stream").setAttribute("class", "active");
 </script>
 
 <div id="logged-in-author" data="{{loggedInAuthor.id}}" data-displayName="{{loggedInAuthor.displayName}}"></div>
+<h1> LOGGED IN AUTHOR ID : {{ loggedInAuthor.id }} </h1>
+{% for id in followList %}
+<h2>{{ id }}</h2>
+{% endfor %}
 
 {% include "post/createPost.html" with icon=loggedInAuthor.picture %}
 
 {% for post in posts %}
 <div class="row post">
-
     <!-- Display post's author's profile image -->
     <div>
     {% if request.get_host not in post.author.host %}
