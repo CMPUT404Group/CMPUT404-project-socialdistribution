@@ -203,6 +203,12 @@ def get_team5(author_id):
         y = x.read()
         jsonResponse = json.loads(y)
         postSerializer = PostSerializer(jsonResponse["results"], many=True)
+        for p in postSerializer.data:
+            # fix date formatting
+            date = datetime.strptime(p['published'][0:10], "%Y-%m-%d")
+            time = datetime.strptime(p['published'][11:16], "%H:%M")
+            date_time = datetime.combine(date, datetime.time(time))
+            p['published'] = date_time.strftime("%b %d, %Y, %-I:%M %p")
         return postSerializer.data
     except urllib2.HTTPError, e:
         print("team 5 Error: "+str(e.code))
@@ -223,6 +229,12 @@ def get_team6(author_id):
         jsonResponse = json.loads(y)
         if len(jsonResponse) > 0:
             postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+            for p in postSerializer.data:
+                # fix date formatting
+                date = datetime.strptime(p['published'][0:10], "%Y-%m-%d")
+                time = datetime.strptime(p['published'][11:16], "%H:%M")
+                date_time = datetime.combine(date, datetime.time(time))
+                p['published'] = date_time.strftime("%b %d, %Y, %-I:%M %p")
             return postSerializer.data
         else:
             return []
@@ -245,6 +257,12 @@ def get_team7(author_id):
         jsonResponse = json.loads(y)
         if len(jsonResponse) > 0:
             postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+            for p in postSerializer.data:
+                # fix date formatting
+                date = datetime.strptime(p['published'][0:10], "%Y-%m-%d")
+                time = datetime.strptime(p['published'][11:16], "%H:%M")
+                date_time = datetime.combine(date, datetime.time(time))
+                p['published'] = date_time.strftime("%b %d, %Y, %-I:%M %p")
             return postSerializer.data
         else:
             return []
@@ -394,7 +412,13 @@ def explore_post(request, node_id, post_id):
                             post = get_APIPost(post_id, t7_url+"api/posts/", t7_h)
                     else:
                         return HttpResponseForbidden("You are not allowed to access this page")
-
+                
+                # fix date formatting
+                date = datetime.strptime(post['published'][0:10], "%Y-%m-%d")
+                time = datetime.strptime(post['published'][11:16], "%H:%M")
+                date_time = datetime.combine(date, datetime.time(time))
+                post['published'] = date_time.strftime("%b %d, %Y, %-I:%M %p")
+            
                 #display the post if its allowed
                 if (isAllowed(author,post)):
                     commentForm = CommentForm()
@@ -505,11 +529,13 @@ def post_detail(request, post_pk):
         viewer = Author.objects.get(user=request.user)
         ####TEMPORARY Check what node the post came from
         Found = False
+        local = True
         try:
             post = get_APIPost(post_pk,"http://cmput404-team-4b.herokuapp.com/api/posts/","Basic " + base64.b64encode("test:test"))
             Found = True
         except urllib2.HTTPError, e:
             print("Not a local Post. Error: "+str(e.code))
+            local = False
         try:
             post = get_APIPost(post_pk,t5_url+"api/posts/", t5_h)
             node = "55e70a0a-a284-4ffb-b192-08d083f4f164"
@@ -533,6 +559,12 @@ def post_detail(request, post_pk):
             print("Not a team 7 Post. Error: "+str(e.code))
         #############################
         if Found == True:
+            if local == False:
+                # format date for remote posts
+                date = datetime.strptime(post['published'][0:10], "%Y-%m-%d")
+                time = datetime.strptime(post['published'][11:16], "%H:%M")
+                date_time = datetime.combine(date, datetime.time(time))
+                post['published'] = date_time.strftime("%b %d, %Y, %-I:%M %p")
             if (isAllowed(viewer,post)):
                 if request.method == "POST":
                     #response = _submitCommentForm(request, post_pk)
