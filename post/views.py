@@ -437,51 +437,58 @@ def my_stream(request):
 
         author = Author.objects.get(user=request.user)
 
-        ##################### notification on if logged in author has new follower
         followList = []
         followRelationships = Friending.objects.filter(author=author)
-
         for relationship in followRelationships:
-            followList.append(relationship.friend)
+            followList.append(relationship.friend.id)
 
-        # notification on if logged in author has new follower
-        followerList = []
-        followerRelationships = Friending.objects.filter(friend=author)
-        for relationship in followerRelationships:
-            followerList.append(relationship.friend)
-        if len(followerList) > author.previous_follower_num:
-            author.noti = True
-            author.previous_follower_num = len(followerList)
-        else:
-            author.noti = False
-        author.save()
-        ################## end of notification block
-
-        posts = []
-
-        #get the ids of the people you are following
-        friends = []
-        followers =  Friending.objects.filter(author=author)
-        for follower in followers:
-            friends.append(str(follower.friend.id))
-        #add the posts by the people we are friends with into our myStream
-        viewer_id = author.id
-        #viewer_id = "13c4bb0f-f324-427e-8722-0f90c57176c4" # Test it with this when not on the heroku account
-        for i in range(len(friends)):
-            posts_all = []
-            friend = friends[i]
-            #get all the posts for a friend
-            posts_all = get_APIAuthorPosts(friend)
-            for j in range(len(posts_all)):
-                if isAllowed(author, posts_all[j]):
-                    posts.append(posts_all[j])
-
-        #get all posts by the logged in author
-        try:
-            mine = get_APIAuthorPosts(viewer_id)
-            posts.extend(mine)
-        except urllib2.HTTPError, e:
-            print("Couldnt get own posts "+author.user.username+" "+str(e.code))
+        posts = Post.objects.all()
+        # ##################### notification on if logged in author has new follower
+        # followList = []
+        # followRelationships = Friending.objects.filter(friend=author)
+        #
+        # for relationship in followRelationships:
+        #     followList.append(relationship.friend.id)
+        #
+        # # notification on if logged in author has new follower
+        # followerList = []
+        # followerRelationships = Friending.objects.filter(friend=author)
+        # for relationship in followerRelationships:followerList.append(relationship.friend)
+        #
+        # if len(followerList) > author.previous_follower_num:
+        #     author.noti = True
+        #     author.previous_follower_num = len(followerList)
+        # else:
+        #     author.noti = False
+        # author.save()
+        # ################## end of notification block
+        #
+        # posts = []
+        #
+        # #get the ids of the people you are following
+        # following = []
+        # followingRel =  Friending.objects.filter(author=author)
+        # for relationship in followingRel:
+        #     following.append(str(relationship.friend.id))
+        #
+        # #add the posts by the people we are friends with into our myStream
+        # viewer_id = author.id
+        # #viewer_id = "13c4bb0f-f324-427e-8722-0f90c57176c4" # Test it with this when not on the heroku account
+        # for i in range(len(friends)):
+        #     posts_all = []
+        #     friend = friends[i]
+        #     #get all the posts for a friend
+        #     posts_all = get_APIAuthorPosts(friend)
+        #     for j in range(len(posts_all)):
+        #         if isAllowed(author, posts_all[j]):
+        #             posts.append(posts_all[j])
+        #
+        # #get all posts by the logged in author
+        # try:
+        #     mine = get_APIAuthorPosts(viewer_id)
+        #     posts.extend(mine)
+        # except urllib2.HTTPError, e:
+        #     print("Couldnt get own posts "+author.user.username+" "+str(e.code))
 
         #TODO order from newest to oldest
         form = PostForm()
