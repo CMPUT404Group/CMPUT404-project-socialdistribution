@@ -137,10 +137,7 @@ def explore(request, node_id=None):
                 posts = postSerializer.data
                 for p in posts:
                     # fix date formatting
-                    date = datetime.strptime(p['published'][0:10], "%Y-%m-%d")
-                    time = datetime.strptime(p['published'][11:16], "%H:%M")
-                    date_time = datetime.combine(date, datetime.time(time))
-                    p['published'] = date_time.strftime("%b %d, %Y, %-I:%M %p")
+                    p = formatDate(p)
 
                 form = PostForm()
                 return render(request, 'explore.html', {'node':node,'posts': posts, 'form': form, 'loggedInAuthor': author, 'nodes': nodes, 'all':False, 'followList': followList})
@@ -203,6 +200,9 @@ def get_team5(author_id):
         y = x.read()
         jsonResponse = json.loads(y)
         postSerializer = PostSerializer(jsonResponse["results"], many=True)
+        for p in postSerializer.data:
+            # fix date formatting
+            p = formatDate(p)
         return postSerializer.data
     except urllib2.HTTPError, e:
         print("team 5 Error: "+str(e.code))
@@ -223,6 +223,9 @@ def get_team6(author_id):
         jsonResponse = json.loads(y)
         if len(jsonResponse) > 0:
             postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+            for p in postSerializer.data:
+                # fix date formatting
+                p = formatDate(p)
             return postSerializer.data
         else:
             return []
@@ -245,6 +248,9 @@ def get_team7(author_id):
         jsonResponse = json.loads(y)
         if len(jsonResponse) > 0:
             postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+            for p in postSerializer.data:
+                # fix date formatting
+                p = formatDate(p)
             return postSerializer.data
         else:
             return []
@@ -267,7 +273,7 @@ def get_APIPost(post_id, host, header):
     if host == "http://mighty-cliffs-82717.herokuapp.com/api/posts/":
         jsonResponse = jsonResponse["post"]
     postSerializer = PostSerializer(jsonResponse)
-    return postSerializer.data
+    return formatDate(postSerializer.data)
 
 '''
 Get all the friends for a particular author
@@ -394,6 +400,8 @@ def explore_post(request, node_id, post_id):
                             post = get_APIPost(post_id, t7_url+"api/posts/", t7_h)
                     else:
                         return HttpResponseForbidden("You are not allowed to access this page")
+                # fix date formatting
+                # post = formatDate(post)
 
                 #display the post if its allowed
                 if (isAllowed(author,post)):
@@ -421,7 +429,7 @@ def my_stream(request):
             else:
                 # -- TODO : display post success or failure on mainStream.html -- #
                 if response.status_code == 201:
-                    return HttpResponseRedirect('/success')
+                    return HttpResponseRedirect('/myStream')#stay on myStream after posting
                 else:  # 400 error
                     # alert user of the error
                     pass
@@ -505,11 +513,13 @@ def post_detail(request, post_pk):
         viewer = Author.objects.get(user=request.user)
         ####TEMPORARY Check what node the post came from
         Found = False
+        local = True
         try:
             post = get_APIPost(post_pk,"http://cmput404-team-4b.herokuapp.com/api/posts/","Basic " + base64.b64encode("test:test"))
             Found = True
         except urllib2.HTTPError, e:
             print("Not a local Post. Error: "+str(e.code))
+            local = False
         try:
             post = get_APIPost(post_pk,t5_url+"api/posts/", t5_h)
             node = "55e70a0a-a284-4ffb-b192-08d083f4f164"
@@ -533,12 +543,14 @@ def post_detail(request, post_pk):
             print("Not a team 7 Post. Error: "+str(e.code))
         #############################
         if Found == True:
+            if local == False:
+                # format date for remote posts
+                post = formatDate(post)
+
             if (isAllowed(viewer,post)):
                 if request.method == "POST":
                     #response = _submitCommentForm(request, post_pk)
                     response = send_comment(request, post_pk, None)
-
-
                 post = get_APIPost(post_pk,"http://cmput404-team-4b.herokuapp.com/api/posts/","Basic "+base64.b64encode("test:test"))
                 form = CommentForm()
                 author = Author.objects.get(user=request.user)
@@ -569,6 +581,7 @@ def post_edit(request, post_pk):
                     pass
 
         post = Post.objects.get(pk=post_pk)
+        #post = formatDate(post)
         form = PostForm(instance=post)
         author = Author.objects.get(user=request.user)
         return render(request, 'post/postDetail.html', {'post': post, 'form': form, 'loggedInAuthor': author})
@@ -587,13 +600,8 @@ def user_profile(request, user_id):
         # Delegates create post form submission
         if request.method == "POST":
             if 'old_password' in request.POST:
-                print("WENT HERE!!!\n")
-                print("request:", request)
-                print("\n\n")
                 changed = postChangeUserPassword(request, profile_owner)
                 if not changed:
-                    #response = "wrong password!"
-                    #response.status_code=100
                     return HttpResponseRedirect(reverse('user_profile_success', kwargs={'user_id': user_id}), status = 400)
                     
             else:
@@ -698,7 +706,6 @@ def isAllowed(viewer,post):
 # adapted from: http://stackoverflow.com/questions/16700968/check-existing-password-and-reset-password
 def postChangeUserPassword(request, profile_owner):
     old_password = str(request.POST['old_password'].strip())
-    print(old_password)
     reset_password = str(request.POST['reset_password'].strip())
     new_password = str(request.POST['new_password'].strip())
 
@@ -711,3 +718,11 @@ def postChangeUserPassword(request, profile_owner):
             return True
                         
     return False
+
+# fix date formatting
+def formatDate(post):
+    date = datetime.strptime(post['published'][0:10], "%Y-%m-%d")
+    time = datetime.strptime(post['published'][11:16], "%H:%M")
+    date_time = datetime.combine(date, datetime.time(time))
+    post['published'] = date_time.strftime("%b %d, %Y, %-I:%M %p")
+    return post                
