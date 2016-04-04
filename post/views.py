@@ -57,11 +57,9 @@ def public_stream(request):
                 # alert user form was empty
                 pass
             else:
-                # -- TODO : display post success or failure on mainStream.html -- #
                 if response.status_code == 201:
                     return HttpResponseRedirect('/success')
-                else:  # 400 error
-                    # alert user of the error
+                else:  
                     pass
 
         posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
@@ -361,7 +359,6 @@ def send_comment(request, post_id, node_id=None):
         url = settings.LOCAL_URL + "posts/" + post_id +"/comments/"
         creds = base64.b64encode("test:test")
         headers = {"Authorization" : "Basic " + creds}
-        #comment["author"]["id"] = "46410191-43e4-4a41-bd61-c8bd08e366f2"
     r = requests.post(url, json=comment, headers=headers)
 
 '''
@@ -401,8 +398,6 @@ def explore_post(request, node_id, post_id):
                             post = get_APIPost(post_id, t7_url+"api/posts/", t7_h)
                     else:
                         return HttpResponseForbidden("You are not allowed to access this page")
-                # fix date formatting
-                # post = formatDate(post)
 
                 #display the post if its allowed
                 if (isAllowed(author,post)):
@@ -428,16 +423,14 @@ def my_stream(request):
                 # alert user form was empty
                 pass
             else:
-                # -- TODO : display post success or failure on mainStream.html -- #
                 if response.status_code == 201:
                     return HttpResponseRedirect('/myStream')#stay on myStream after posting
-                else:  # 400 error
-                    # alert user of the error
+                else:  
                     pass
 
         author = Author.objects.get(user=request.user)
 
-        ##################### notification on if logged in author has new follower
+        # notification on if logged in author has new followees
         followList = []
         followRelationships = Friending.objects.filter(author=author)
 
@@ -466,7 +459,7 @@ def my_stream(request):
             friends.append(str(follower.friend.id))
         #add the posts by the people we are friends with into our myStream
         viewer_id = author.id
-        #viewer_id = "13c4bb0f-f324-427e-8722-0f90c57176c4" # Test it with this when not on the heroku account
+        #viewer_id = "13c4bb0f-f324-427e-8722-0f90c57176c4" # Test it with this locally when not on the heroku account
         for i in range(len(friends)):
             posts_all = []
             friend = friends[i]
@@ -520,17 +513,6 @@ def sort_posts(posts):
         oldest = datetime.now()
     return reversed(sorted_posts)
 
-# '''
-# Handles submitting the Comment form - used when creating a new Comment
-# '''
-
-# def _submitCommentForm(request, post_pk):
-#     if request.method == "POST":
-#         form = CommentForm(request.POST)
-#         if form.is_valid():
-#             response = CommentList.as_view()(request, post_pk)  # makes post call to API
-#             return response
-
 '''
 Renders the page for specific post (including the post's comments)
 '''
@@ -573,7 +555,6 @@ def post_detail(request, post_pk):
             return page
         except urllib2.HTTPError, e:
             print("Not a team 7 Post. Error: "+str(e.code))
-        #############################
         if Found == True:
             if local == False:
                 # format date for remote posts
@@ -581,7 +562,6 @@ def post_detail(request, post_pk):
 
             if (isAllowed(viewer,post)):
                 if request.method == "POST":
-                    #response = _submitCommentForm(request, post_pk)
                     response = send_comment(request, post_pk, None)
                 post = get_APIPost(post_pk,settings.LOCAL_URL + "posts/","Basic "+base64.b64encode("test:test"))
                 form = CommentForm()
@@ -605,15 +585,12 @@ def post_edit(request, post_pk):
                 # alert user form was empty
                 pass
             else:
-                # -- TODO : display post success or failure on postDetail.html -- #
                 if ((response.status_code == 201) or (response.status_code == 200)):
                     return HttpResponseRedirect(reverse('post_detail_success', kwargs={'post_pk': post_pk}))
-                else:  # 400 error
-                    # alert user of the error
+                else: 
                     pass
 
         post = Post.objects.get(pk=post_pk)
-        #post = formatDate(post)
         form = PostForm(instance=post)
         author = Author.objects.get(user=request.user)
         return render(request, 'post/postDetail.html', {'post': post, 'form': form, 'loggedInAuthor': author})
@@ -626,7 +603,6 @@ def user_profile(request, user_id):
         try:
             profile_owner = Author.objects.get(id=user_id)
         except Author.DoesNotExist as e:
-            # return render(request, "user_profile.html", {'posts': None, 'form': None, 'user_account': None})
             return render(request, "404_page.html", {'message': "Author does not exist."},status=404)
 
         # Delegates create post form submission
@@ -644,11 +620,9 @@ def user_profile(request, user_id):
                     # alert user form was empty
                     pass
                 else:
-                    # -- TODO : display post success or failure on mainStream.html -- #
                     if response.status_code == 201:
                         return HttpResponseRedirect(reverse('user_profile_success', kwargs={'user_id': user_id}))
-                    else:  # 400 error
-                        # alert user of the error
+                    else: 
                         pass
 
         # FILTER POSTS BY VISIBILITY TO LOGGED IN USER --- #
