@@ -438,7 +438,7 @@ def my_stream(request):
 
         ##################### notification on if logged in author has new follower
         followList = []
-        followRelationships = Friending.objects.filter(friend=author)
+        followRelationships = Friending.objects.filter(author=author)
 
         for relationship in followRelationships:
             followList.append(relationship.friend)
