@@ -526,7 +526,7 @@ class CommentList(generics.GenericAPIView):
             try:
                 author = Author.objects.get(id=author_serializer.data["id"])
             except Author.DoesNotExist as e:
-                return Response({"message": "The author given in the post does not exist locally."}), status=status.HTTP_400_BAD_REQUEST)    
+                return Response({"message": "The author given in the post does not exist locally."}, status=status.HTTP_400_BAD_REQUEST)    
 
         author_id = author.id
         try:
