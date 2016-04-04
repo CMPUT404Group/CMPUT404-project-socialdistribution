@@ -429,7 +429,7 @@ def my_stream(request):
             else:
                 # -- TODO : display post success or failure on mainStream.html -- #
                 if response.status_code == 201:
-                    return HttpResponseRedirect('/success')
+                    return HttpResponseRedirect('/myStream')#stay on myStream after posting
                 else:  # 400 error
                     # alert user of the error
                     pass
@@ -581,6 +581,7 @@ def post_edit(request, post_pk):
                     pass
 
         post = Post.objects.get(pk=post_pk)
+        #post = formatDate(post)
         form = PostForm(instance=post)
         author = Author.objects.get(user=request.user)
         return render(request, 'post/postDetail.html', {'post': post, 'form': form, 'loggedInAuthor': author})
@@ -599,13 +600,8 @@ def user_profile(request, user_id):
         # Delegates create post form submission
         if request.method == "POST":
             if 'old_password' in request.POST:
-                print("WENT HERE!!!\n")
-                print("request:", request)
-                print("\n\n")
                 changed = postChangeUserPassword(request, profile_owner)
                 if not changed:
-                    #response = "wrong password!"
-                    #response.status_code=100
                     return HttpResponseRedirect(reverse('user_profile_success', kwargs={'user_id': user_id}), status = 400)
                     
             else:
