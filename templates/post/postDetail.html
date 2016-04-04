@@ -6,7 +6,7 @@
 <div id="logged-in-author" data="{{loggedInAuthor.id}}"></div>
 
 <div class="row post">
-	<img class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/50x50" data-popover="true" data-html=true data-toggle="popover" title="{{ post.author }}" data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"/>
+	<img class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/50x50" data-popover="true" data-html=true data-toggle="popover" title="{{ post.author.displayName }}" data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"/>
 
 	{% if form %}
 		{% include "post/createPost.html" with edit=True %}
@@ -80,7 +80,7 @@
 		{% else %}
 			{% for comment in post.comments.all reversed %}
 			<div class="row comment">
-				<img class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/35x35" data-popover="true" data-html=true data-toggle="popover" title="{{ comment.author }}" data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"/>
+				<img class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/35x35" data-popover="true" data-html=true data-toggle="popover" title="{{ comment.author.displayName }}" data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"/>
 
 			    <div class="media-body">
 			    	<div class='panel-body'> 
