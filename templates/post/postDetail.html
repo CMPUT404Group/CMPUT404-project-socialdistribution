@@ -6,20 +6,28 @@
 <div id="logged-in-author" data="{{loggedInAuthor.id}}"></div>
 
 <div class="row post">
-	<img class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/50x50" data-popover="true" data-html=true data-toggle="popover" title="{{ post.author.displayName }}" data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"/>
+	<img id="user-profile-image-{{ post.author.id }}"
+			 class="profile-photo-icon img-circle img-responsive img-center pull-left"
+			 data-toggle="tooltip" title="{{ post.author.user }}"
+			 alt="Profile Image"
+			{% if post.author.picture %}
+			 src="/media/{{ post.author.picture }}"/>
+			{% else %}
+			 src="http://placehold.it/50x50"/>
+			{% endif %}
 
 	{% if form %}
 		{% include "post/createPost.html" with edit=True %}
 	{% else %}
     <div class="panel panel-primary media-body">
     	<div class='panel-heading'> {{ post.title }} <span class='date'> {{ post.published }} </span> </div>
-    	<div class='panel-body'> 
+    	<div class='panel-body'>
     		{% if post.contentType == "text/x-markdown" %}
-    			{{ post.content|markdown }} 
+    			{{ post.content|markdown }}
 			{% else %}
 				{{ post.content|urlize }}
     		{% endif %}
-    		
+
     		<br/>
             {% if post.image %}
                 <img src="{{ post.image }}"  width="300px"/>
@@ -53,12 +61,19 @@
 	{% if remote == True %}
 		{% for comment in post.comments reversed %}
 		<div class="row comment">
-			<img class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/35x35" data-popover="true" data-html=true data-toggle="popover" title="{{ comment.author.displayName }}" data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"/>
+			<img class="profile-photo-icon img-circle img-responsive img-center pull-left"
+					 data-toggle="tooltip" title="{{ post.author.user }}"
+					 alt="Profile Image"
+					{% if comment.author.picture %}
+					 src="/media/{{ comment.author.picture }}"/>
+					{% else %}
+					 src="http://placehold.it/35x35"/>
+					{% endif %}
 
 		    <div class="media-body">
-		    	<div class='panel-body'> 
+		    	<div class='panel-body'>
 		    		{% if comment.contentType == "text/x-markdown" %}
-		    			{{ comment.comment|markdown }} 
+		    			{{ comment.comment|markdown }}
 					{% else %}
 						{{ comment.comment|urlize }}
 		    		{% endif %}
@@ -75,7 +90,7 @@
 			</div>
 
 		</div>
-		<hr class='comment-hr'>		
+		<hr class='comment-hr'>
 		{% endfor %}
 		{% else %}
 			{% for comment in post.comments.all reversed %}
@@ -83,9 +98,9 @@
 				<img class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/35x35" data-popover="true" data-html=true data-toggle="popover" title="{{ comment.author.displayName }}" data-content="<button class='btn btn-default btn-sm'>Follow Me</button><p> </p><button class='btn btn-default btn-sm'>Friend Me</button>"/>
 
 			    <div class="media-body">
-			    	<div class='panel-body'> 
+			    	<div class='panel-body'>
 			    		{% if comment.contentType == "text/x-markdown" %}
-			    			{{ comment.comment|markdown }} 
+			    			{{ comment.comment|markdown }}
 						{% else %}
 							{{ comment.comment|urlize }}
 			    		{% endif %}
@@ -102,7 +117,7 @@
 				</div>
 
 			</div>
-			<hr class='comment-hr'>		
+			<hr class='comment-hr'>
 		{% endfor %}
 	{% endif %}
 
