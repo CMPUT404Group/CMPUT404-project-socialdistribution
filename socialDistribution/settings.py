@@ -149,7 +149,6 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 50,
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.BasicAuthentication',
-        # 'api.basicAuth.HostBasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     )
 }
