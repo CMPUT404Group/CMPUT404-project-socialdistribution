@@ -15,7 +15,6 @@ from api.paginators import ListPaginator
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from itertools import chain
-from django.conf import settings
 from rest_framework.reverse import reverse
 from post.models import Notification
 import json
@@ -526,7 +525,7 @@ class CommentList(generics.GenericAPIView):
             try:
                 author = Author.objects.get(id=author_serializer.data["id"])
             except Author.DoesNotExist as e:
-                return Response({"message": "The author given in the post does not exist locally."}, status=status.HTTP_400_BAD_REQUEST)    
+                return Response({"message": "The author given in the post does not exist locally."}, status=status.HTTP_400_BAD_REQUEST)
 
         author_id = author.id
         try:

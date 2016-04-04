@@ -22,6 +22,7 @@ from django import forms
 from django.contrib.auth import authenticate
 from datetime import datetime
 from time import time
+from django.conf import settings
 
 #global variables
 credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
@@ -161,7 +162,7 @@ def get_APIAuthorPosts(friend_id):
         return team6
     team7 = get_team5(friend_id)
     if team7 != None and len(team7) > 0:
-        return team6      
+        return team6
     else:
         return []
 
@@ -171,7 +172,7 @@ Get all the posts for a local author
 def get_local(author_id):
     #checks what node it is on and returns the public posts from that node
     try:
-        url = "http://cmput404-team-4b.herokuapp.com/api/author/"+str(author_id)+"/posts"
+        url = settings.LOCAL_URL + "author/"+str(author_id)+"/posts"
         opener = urllib2.build_opener(urllib2.HTTPHandler)
         req = urllib2.Request(url)
         # set credentials on request
@@ -287,7 +288,7 @@ def get_APIFriends(person_id):
     t7_h = "Basic " + base64.b64encode(credentials[t7_url])
     opener = urllib2.build_opener(urllib2.HTTPHandler)
     try:
-        url = "http://cmput404-team-4b.herokuapp.com/api/friends/" + str(person_id)
+        url = settings.LOCAL_URL + "friends/" + str(person_id)
         req = urllib2.Request(url)
         creds = base64.b64encode("test:test")
         req.add_header("Authorization", "Basic " + creds)
@@ -340,7 +341,7 @@ def send_comment(request, post_id, node_id=None):
     comment["author"]["github"] = author.github
     comment["author"]["url"] = author.url
     comment["visibility"] = "PUBLIC"
-    comment["author"]["url"] = "http://cmput404-team-4b.herokuapp.com/api/author/"+str(author.id)
+    comment["author"]["url"] = settings.LOCAL_URL + "author/"+str(author.id)
     #send it to a remote host
     if node_id != None:
         node = Node.objects.get(id=node_id)
@@ -348,7 +349,7 @@ def send_comment(request, post_id, node_id=None):
             url = node.url + "api/posts/" + post_id +"/comments/"
             creds = base64.b64encode(credentials[node.url])
             headers = {"Authorization" : "Basic " + creds}
-            comment["author"]["url"] = "http://cmput404-team-4b.herokuapp.com/api/author/"+str(author.id)
+            comment["author"]["url"] = settings.LOCAL_URL + "author/"+str(author.id)
         elif node.url == "http://disporia-cmput404.rhcloud.com/":
             url = node.url + "api/posts/" + post_id +"/comments"
             creds = credentials[node.url]
@@ -357,7 +358,7 @@ def send_comment(request, post_id, node_id=None):
 
     #send it to a local host
     else:
-        url = "http://cmput404-team-4b.herokuapp.com/api/posts/" + post_id +"/comments/"
+        url = settings.LOCAL_URL + "posts/" + post_id +"/comments/"
         creds = base64.b64encode("test:test")
         headers = {"Authorization" : "Basic " + creds}
         #comment["author"]["id"] = "46410191-43e4-4a41-bd61-c8bd08e366f2"
@@ -515,7 +516,7 @@ def post_detail(request, post_pk):
         Found = False
         local = True
         try:
-            post = get_APIPost(post_pk,"http://cmput404-team-4b.herokuapp.com/api/posts/","Basic " + base64.b64encode("test:test"))
+            post = get_APIPost(post_pk,settings.LOCAL_URL + "posts/","Basic " + base64.b64encode("test:test"))
             Found = True
         except urllib2.HTTPError, e:
             print("Not a local Post. Error: "+str(e.code))
@@ -551,7 +552,7 @@ def post_detail(request, post_pk):
                 if request.method == "POST":
                     #response = _submitCommentForm(request, post_pk)
                     response = send_comment(request, post_pk, None)
-                post = get_APIPost(post_pk,"http://cmput404-team-4b.herokuapp.com/api/posts/","Basic "+base64.b64encode("test:test"))
+                post = get_APIPost(post_pk,settings.LOCAL_URL + "posts/","Basic "+base64.b64encode("test:test"))
                 form = CommentForm()
                 author = Author.objects.get(user=request.user)
                 return render(request, 'post/postDetail.html', {'remote':True,'post': post, 'commentForm': form, 'loggedInAuthor': author})
@@ -603,7 +604,7 @@ def user_profile(request, user_id):
                 changed = postChangeUserPassword(request, profile_owner)
                 if not changed:
                     return HttpResponseRedirect(reverse('user_profile_success', kwargs={'user_id': user_id}), status = 400)
-                    
+
             else:
                 response = _submitPostForm(request)
 
@@ -711,12 +712,12 @@ def postChangeUserPassword(request, profile_owner):
 
     if (old_password and reset_password and reset_password == new_password):
         saveuser = User.objects.get(id=profile_owner.user.id)
-            
+
         if saveuser.check_password(old_password):
             saveuser.set_password(request.POST['reset_password']);
             saveuser.save()
             return True
-                        
+
     return False
 
 # fix date formatting
@@ -725,4 +726,4 @@ def formatDate(post):
     time = datetime.strptime(post['published'][11:16], "%H:%M")
     date_time = datetime.combine(date, datetime.time(time))
     post['published'] = date_time.strftime("%b %d, %Y, %-I:%M %p")
-    return post                
+    return post
