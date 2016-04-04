@@ -137,10 +137,7 @@ def explore(request, node_id=None):
                 posts = postSerializer.data
                 for p in posts:
                     # fix date formatting
-                    date = datetime.strptime(p['published'][0:10], "%Y-%m-%d")
-                    time = datetime.strptime(p['published'][11:16], "%H:%M")
-                    date_time = datetime.combine(date, datetime.time(time))
-                    p['published'] = date_time.strftime("%b %d, %Y, %-I:%M %p")
+                    p = formatDate(p)
 
                 form = PostForm()
                 return render(request, 'explore.html', {'node':node,'posts': posts, 'form': form, 'loggedInAuthor': author, 'nodes': nodes, 'all':False, 'followList': followList})
@@ -205,10 +202,7 @@ def get_team5(author_id):
         postSerializer = PostSerializer(jsonResponse["results"], many=True)
         for p in postSerializer.data:
             # fix date formatting
-            date = datetime.strptime(p['published'][0:10], "%Y-%m-%d")
-            time = datetime.strptime(p['published'][11:16], "%H:%M")
-            date_time = datetime.combine(date, datetime.time(time))
-            p['published'] = date_time.strftime("%b %d, %Y, %-I:%M %p")
+            p = formatDate(p)
         return postSerializer.data
     except urllib2.HTTPError, e:
         print("team 5 Error: "+str(e.code))
@@ -231,10 +225,7 @@ def get_team6(author_id):
             postSerializer = PostSerializer(jsonResponse["posts"], many=True)
             for p in postSerializer.data:
                 # fix date formatting
-                date = datetime.strptime(p['published'][0:10], "%Y-%m-%d")
-                time = datetime.strptime(p['published'][11:16], "%H:%M")
-                date_time = datetime.combine(date, datetime.time(time))
-                p['published'] = date_time.strftime("%b %d, %Y, %-I:%M %p")
+                p = formatDate(p)
             return postSerializer.data
         else:
             return []
@@ -259,10 +250,7 @@ def get_team7(author_id):
             postSerializer = PostSerializer(jsonResponse["posts"], many=True)
             for p in postSerializer.data:
                 # fix date formatting
-                date = datetime.strptime(p['published'][0:10], "%Y-%m-%d")
-                time = datetime.strptime(p['published'][11:16], "%H:%M")
-                date_time = datetime.combine(date, datetime.time(time))
-                p['published'] = date_time.strftime("%b %d, %Y, %-I:%M %p")
+                p = formatDate(p)
             return postSerializer.data
         else:
             return []
@@ -285,6 +273,9 @@ def get_APIPost(post_id, host, header):
     if host == "http://mighty-cliffs-82717.herokuapp.com/api/posts/":
         jsonResponse = jsonResponse["post"]
     postSerializer = PostSerializer(jsonResponse)
+    for p in postSerializer.data:
+        # fix date formatting
+		p = formatDate(p)
     return postSerializer.data
 
 '''
@@ -414,10 +405,7 @@ def explore_post(request, node_id, post_id):
                         return HttpResponseForbidden("You are not allowed to access this page")
                 
                 # fix date formatting
-                date = datetime.strptime(post['published'][0:10], "%Y-%m-%d")
-                time = datetime.strptime(post['published'][11:16], "%H:%M")
-                date_time = datetime.combine(date, datetime.time(time))
-                post['published'] = date_time.strftime("%b %d, %Y, %-I:%M %p")
+				post = formatDate(post)
             
                 #display the post if its allowed
                 if (isAllowed(author,post)):
@@ -561,16 +549,12 @@ def post_detail(request, post_pk):
         if Found == True:
             if local == False:
                 # format date for remote posts
-                date = datetime.strptime(post['published'][0:10], "%Y-%m-%d")
-                time = datetime.strptime(post['published'][11:16], "%H:%M")
-                date_time = datetime.combine(date, datetime.time(time))
-                post['published'] = date_time.strftime("%b %d, %Y, %-I:%M %p")
+				post = formatDate(post)
+
             if (isAllowed(viewer,post)):
                 if request.method == "POST":
                     #response = _submitCommentForm(request, post_pk)
                     response = send_comment(request, post_pk, None)
-
-
                 post = get_APIPost(post_pk,"http://cmput404-team-4b.herokuapp.com/api/posts/","Basic "+base64.b64encode("test:test"))
                 form = CommentForm()
                 author = Author.objects.get(user=request.user)
@@ -730,7 +714,6 @@ def isAllowed(viewer,post):
 # adapted from: http://stackoverflow.com/questions/16700968/check-existing-password-and-reset-password
 def postChangeUserPassword(request, profile_owner):
     old_password = str(request.POST['old_password'].strip())
-    print(old_password)
     reset_password = str(request.POST['reset_password'].strip())
     new_password = str(request.POST['new_password'].strip())
 
@@ -743,3 +726,11 @@ def postChangeUserPassword(request, profile_owner):
             return True
                         
     return False
+
+# fix date formatting
+def formatDate(post):
+    date = datetime.strptime(post['published'][0:10], "%Y-%m-%d")
+    time = datetime.strptime(post['published'][11:16], "%H:%M")
+    date_time = datetime.combine(date, datetime.time(time))
+    post['published'] = date_time.strftime("%b %d, %Y, %-I:%M %p")
+	return post                
