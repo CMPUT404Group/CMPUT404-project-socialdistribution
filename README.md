@@ -40,9 +40,6 @@ http://www.tangowithdjango.com/book17/
 
 Code was taken & used from : http://stackoverflow.com/questions/5871730/need-a-minimal-django-file-upload-example
 
-group whentomeet:  
-http://www.when2meet.com/?4368216-nLULW
-
 #Demo Video
 https://youtu.be/-nLWkDsgGsw
 
