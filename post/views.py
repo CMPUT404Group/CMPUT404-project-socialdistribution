@@ -182,9 +182,6 @@ def get_local(author_id):
         y = x.read()
         jsonResponse = json.loads(y)
         postSerializer = PostSerializer(jsonResponse["posts"], many=True)
-        for p in postSerializer.data:
-            # fix date formatting
-            p = formatDate(p)
         return postSerializer.data
     except urllib2.HTTPError, e:
         print("Local Error: "+str(e.code))
@@ -204,9 +201,6 @@ def get_team5(author_id):
         y = x.read()
         jsonResponse = json.loads(y)
         postSerializer = PostSerializer(jsonResponse["results"], many=True)
-        for p in postSerializer.data:
-            # fix date formatting
-            p = formatDate(p)
         return postSerializer.data
     except urllib2.HTTPError, e:
         print("team 5 Error: "+str(e.code))
@@ -228,9 +222,6 @@ def get_team6(author_id):
         jsonResponse = json.loads(y)
         if len(jsonResponse) > 0:
             postSerializer = PostSerializer(jsonResponse["posts"], many=True)
-            for p in postSerializer.data:
-                # fix date formatting
-                p = formatDate(p)
             return postSerializer.data
         else:
             return []
@@ -254,9 +245,6 @@ def get_team7(author_id):
         jsonResponse = json.loads(y)
         if len(jsonResponse) > 0:
             postSerializer = PostSerializer(jsonResponse["posts"], many=True)
-            for p in postSerializer.data:
-                # fix date formatting
-                p = formatDate(p)
             return postSerializer.data
         else:
             return []
@@ -279,9 +267,6 @@ def get_team8(author_id):
         jsonResponse = json.loads(y)
         if len(jsonResponse) > 0:
             postSerializer = PostSerializer(jsonResponse["posts"], many=True)
-            for p in postSerializer.data:
-                # fix date formatting
-                p = formatDate(p)
             return postSerializer.data
         else:
             return []
@@ -508,7 +493,7 @@ def my_stream(request):
         # #add the posts by the people we are friends with into our myStream
         viewer_id = author.id
 
-        #viewer_id = "13c4bb0f-f324-427e-8722-0f90c57176c4" # Test it with this when not on the heroku account
+        #viewer_id = "4fd7e786-7307-47e0-80d4-2c7a5cd14cb4" # Test it with this when not on the heroku account
         for i in range(len(followList)):
             posts_all = []
             friend_id = followList[i]
@@ -529,13 +514,10 @@ def my_stream(request):
         #orders from newest to oldest
         form = PostForm()
 
-        # not working
-        # s_posts = sort_posts(posts)
-        # posts = []
-        # # displays the date nicely
-        # for post in s_posts:
-        #     post = formatDate(post)
-        #     posts.append(post)
+        # displays the date nicely
+        for post in posts:
+            post = formatDate(post)
+        posts = sort_posts(posts)
 
         return render(request, 'post/myStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList})
     else:
@@ -545,24 +527,20 @@ def my_stream(request):
 def sort_posts(posts):
     sorted_posts = []
     all_dates = []
+    all_dates2 = []
     oldest = datetime.now()
     index = None
 
     for post in posts:
-        date = datetime.strptime(post['published'][0:10], "%Y-%m-%d")
-        time = datetime.strptime(post['published'][11:16], "%H:%M")
-        date_time = datetime.combine(date, datetime.time(time))
+        date_time = datetime.strptime(post["published"],"%b %d, %Y, %I:%M %p")
         all_dates.append(date_time)
+        all_dates2.append(date_time)
 
-    for post in posts:
-        for j in range(len(all_dates)):
-            if all_dates[j] < oldest:
-                oldest = all_dates[j]
-                index = j
-        sorted_posts.append(posts[index])
-        all_dates.pop(index)
-        index = None
-        oldest = datetime.now()
+    all_dates.sort()
+    for date in all_dates:
+        i = all_dates2.index(date)
+        sorted_posts.append(posts[i])
+
     return reversed(sorted_posts)
 
 '''
@@ -739,7 +717,7 @@ checks if a user is allowed access to a file
 '''
 def isAllowed(viewer,post):
     viewer_id = viewer.id
-    #viewer_id = "13c4bb0f-f324-427e-8722-0f90c57176c4"
+    #viewer_id = "4fd7e786-7307-47e0-80d4-2c7a5cd14cb4"
     privacy = post["visibility"]
     #if the post was created by the user allow access
     if viewer_id == post["author"]["id"]:
