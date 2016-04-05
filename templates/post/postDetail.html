@@ -8,7 +8,7 @@
 <div class="row post">
 	<img id="user-profile-image-{{ post.author.id }}"
 			 class="profile-photo-icon img-circle img-responsive img-center pull-left"
-			 data-toggle="tooltip" title="{{ post.author.user }}"
+			 data-toggle="tooltip" title="{{ post.author.displayName }}"
 			 alt="Profile Image"
 			{% if post.author.picture %}
 			 src="/media/{{ post.author.picture }}"/>
