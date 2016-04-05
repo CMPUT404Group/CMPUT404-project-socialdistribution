@@ -25,6 +25,12 @@ Contributors:
     Erin Torbiak
     Abram Hindle
 
+    Cheng Chen
+    Falon Scheers
+    Geneva Giang
+    Lixin Jin
+    Sarah Van Belleghem
+
 Code was taken, used, & modified from :
 
 Navbars & Sidebar - https://github.com/BlackrockDigital/startbootstrap-sb-admin
@@ -38,10 +44,7 @@ group whentomeet:
 http://www.when2meet.com/?4368216-nLULW
 
 #Demo Video
-https://youtu.be/-nLWkDsgGsw 
+https://youtu.be/-nLWkDsgGsw
 
 ##Note
 Check out our wiki for all documentation and info on how to run our webserver
-
-
-
