@@ -158,7 +158,7 @@ def get_APIAuthorPosts(friend_id):
         return team6
     team7 = get_team7(friend_id)
     if team7 != None and len(team7) > 0:
-        return team6
+        return team7
     else:
         return []
 
@@ -237,11 +237,9 @@ def get_team7(author_id):
     # return []
     try:
         # checks what node it is on and returns the public posts from that node
-        url = "http://mighty-cliffs-82717.herokuapp.com/api/author/"+str(author_id)+"/posts/"
-        print url
+        url = "http://mighty-cliffs-82717.herokuapp.com/api/author/"+str(author_id)+"/posts/?id=" + author_id
         opener = urllib2.build_opener(urllib2.HTTPHandler)
         req = urllib2.Request(url)
-        print "IN HERE TEAM 7"
         # set credentials on request
         req.add_header("Authorization", "Basic " + base64.b64encode(credentials["http://mighty-cliffs-82717.herokuapp.com/"]))
         x = opener.open(req)
@@ -507,7 +505,7 @@ def my_stream(request):
                 if isAllowed(author, posts_all[j]):
                     posts.append(posts_all[j])
 
-        #get all posts by the logged in author
+        # get all posts by the logged in author
         try:
             mine = get_APIAuthorPosts(viewer_id)
             posts.extend(mine)
@@ -517,12 +515,14 @@ def my_stream(request):
 
         #orders from newest to oldest
         form = PostForm()
+
+        # not working
         # s_posts = sort_posts(posts)
         # posts = []
-        #displays the date nicely
+        # # displays the date nicely
         # for post in s_posts:
-            # post = formatDate(post)
-            # posts.append(post)
+        #     post = formatDate(post)
+        #     posts.append(post)
 
         return render(request, 'post/myStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList})
     else:
@@ -718,7 +718,6 @@ def user_profile(request, user_id):
 checks if a user is allowed access to a file
 '''
 def isAllowed(viewer,post):
-    print post
     viewer_id = viewer.id
     #viewer_id = "13c4bb0f-f324-427e-8722-0f90c57176c4"
     privacy = post["visibility"]
