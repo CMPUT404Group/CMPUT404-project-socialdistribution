@@ -3,21 +3,18 @@ from django.template import RequestContext
 from django.utils import timezone
 from api.models import Post, Author, Comment, Friending, Node
 from .forms import PostForm, CommentForm
-from django.http import HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse
 from django.core.urlresolvers import reverse
-from api.views import PostList, CommentList, PostDetail
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from itertools import chain
 from api.serializers import *
-from django.http import HttpResponse
 import urllib2
 import json
 import base64
 import urllib
 import requests
-from django.http import HttpResponse
 from django import forms
 from django.contrib.auth import authenticate
 from datetime import datetime
@@ -60,7 +57,7 @@ def public_stream(request):
             else:
                 if response.status_code == 201:
                     return HttpResponseRedirect('/success')
-                else:  
+                else:
                     pass
 
         posts = Post.objects.filter(visibility='PUBLIC').order_by('-published')
@@ -156,12 +153,15 @@ def get_APIAuthorPosts(friend_id):
     team5 = get_team5(friend_id)
     if  team5 != None and len(team5) > 0:
         return team5
-    team6 = get_team5(friend_id)
+    team6 = get_team6(friend_id)
     if team6 != None and len(team6) > 0:
         return team6
-    team7 = get_team5(friend_id)
+    team7 = get_team7(friend_id)
     if team7 != None and len(team7) > 0:
-        return team6
+        return team7
+    team8 = get_team8(friend_id)
+    if team8 != None and len(team8) > 0:
+        return team8
     else:
         return []
 
@@ -206,6 +206,7 @@ def get_team5(author_id):
         return postSerializer.data
     except urllib2.HTTPError, e:
         print("team 5 Error: "+str(e.code))
+    # return []
 
 '''
 Get all posts for <author> from team6
@@ -236,9 +237,10 @@ def get_team6(author_id):
 Get all posts for <author> from team7
 '''
 def get_team7(author_id):
+    # return []
     try:
-        #checks what node it is on and returns the public posts from that node
-        url = "http://mighty-cliffs-82717.herokuapp.com/api/author/"+str(author_id)+"/posts/"
+        # checks what node it is on and returns the public posts from that node
+        url = "http://mighty-cliffs-82717.herokuapp.com/api/author/"+str(author_id)+"/posts/?id=" + author_id
         opener = urllib2.build_opener(urllib2.HTTPHandler)
         req = urllib2.Request(url)
         # set credentials on request
@@ -260,7 +262,7 @@ def get_team7(author_id):
 '''
 Get all posts for <author> from team8
 '''
-def get_team7(author_id):
+def get_team8(author_id):
     try:
         #checks what node it is on and returns the public posts from that node
         url = "http://secret-inlet-51780.herokuapp.com/api/author/"+str(author_id)+"/posts/"
@@ -468,23 +470,22 @@ def my_stream(request):
             else:
                 if response.status_code == 201:
                     return HttpResponseRedirect('/myStream')#stay on myStream after posting
-                else:  
+                else:
                     pass
 
         author = Author.objects.get(user=request.user)
 
-        # notification on if logged in author has new followees
+        # #get the ids of the people you are following
         followList = []
         followRelationships = Friending.objects.filter(author=author)
-
         for relationship in followRelationships:
-            followList.append(relationship.friend)
+            followList.append(str(relationship.friend.id))
 
-        # notification on if logged in author has new follower
+        ##################### notification on if logged in author has new follower
         followerList = []
         followerRelationships = Friending.objects.filter(friend=author)
-        for relationship in followerRelationships:
-            followerList.append(relationship.friend)
+        for relationship in followerRelationships:followerList.append(relationship.friend)
+
         if len(followerList) > author.previous_follower_num:
             author.noti = True
             author.previous_follower_num = len(followerList)
@@ -492,41 +493,39 @@ def my_stream(request):
             author.noti = False
         author.save()
         ################## end of notification block
-
+        #
         posts = []
-
-        #get the ids of the people you are following
-        friends = []
-        followers =  Friending.objects.filter(author=author)
-        for follower in followers:
-            friends.append(str(follower.friend.id))
-        #add the posts by the people we are friends with into our myStream
+        # #add the posts by the people we are friends with into our myStream
         viewer_id = author.id
-        #viewer_id = "13c4bb0f-f324-427e-8722-0f90c57176c4" # Test it with this locally when not on the heroku account
-        for i in range(len(friends)):
+
+        #viewer_id = "13c4bb0f-f324-427e-8722-0f90c57176c4" # Test it with this when not on the heroku account
+        for i in range(len(followList)):
             posts_all = []
-            friend = friends[i]
+            friend_id = followList[i]
             #get all the posts for a friend
-            posts_all = get_APIAuthorPosts(friend)
+            posts_all = get_APIAuthorPosts(friend_id)
             for j in range(len(posts_all)):
                 if isAllowed(author, posts_all[j]):
                     posts.append(posts_all[j])
 
-        #get all posts by the logged in author
+        # get all posts by the logged in author
         try:
             mine = get_APIAuthorPosts(viewer_id)
             posts.extend(mine)
         except urllib2.HTTPError, e:
             print("Couldnt get own posts "+author.user.username+" "+str(e.code))
 
+
         #orders from newest to oldest
         form = PostForm()
-        s_posts = sort_posts(posts)
-        posts = []
-        #displays the date nicely
-        for post in s_posts:
-            post = formatDate(post)
-            posts.append(post)
+
+        # not working
+        # s_posts = sort_posts(posts)
+        # posts = []
+        # # displays the date nicely
+        # for post in s_posts:
+        #     post = formatDate(post)
+        #     posts.append(post)
 
         return render(request, 'post/myStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList})
     else:
@@ -588,7 +587,7 @@ def post_detail(request, post_pk):
             print("Not a team 5 Post. Error: "+str(e.code))
         try:
             post = get_APIPost(post_pk,t6_url+"api/posts/", t6_h)
-            node = "1a3f4b77-a4b7-405e-9dd7-fcb40e925c61"
+            node = "469995bf-0d2f-4bc9-a7f3-49f6a58d13da"
             page = explore_post(request, node, post_pk)
             return page
         except urllib2.HTTPError, e:
@@ -600,8 +599,6 @@ def post_detail(request, post_pk):
             return page
         except urllib2.HTTPError, e:
             print("Not a team 7 Post. Error: "+str(e.code))
-<<<<<<< HEAD
-=======
         try:
             post = get_APIPost(post_pk,t8_url+"api/posts/", t8_h)
             node = "1636c703-aa1c-4f78-bdcf-fcf0dec56f16"
@@ -610,7 +607,6 @@ def post_detail(request, post_pk):
         except urllib2.HTTPError, e:
             print("Not a team 8 Post. Error: "+str(e.code))
         #############################
->>>>>>> fb2873b366dbd61167a476c253032ec7ea431af2
         if Found == True:
             if local == False:
                 # format date for remote posts
@@ -643,7 +639,7 @@ def post_edit(request, post_pk):
             else:
                 if ((response.status_code == 201) or (response.status_code == 200)):
                     return HttpResponseRedirect(reverse('post_detail_success', kwargs={'post_pk': post_pk}))
-                else: 
+                else:
                     pass
 
         post = Post.objects.get(pk=post_pk)
@@ -678,7 +674,7 @@ def user_profile(request, user_id):
                 else:
                     if response.status_code == 201:
                         return HttpResponseRedirect(reverse('user_profile_success', kwargs={'user_id': user_id}))
-                    else: 
+                    else:
                         pass
 
         # FILTER POSTS BY VISIBILITY TO LOGGED IN USER --- #
@@ -725,7 +721,6 @@ def user_profile(request, user_id):
 checks if a user is allowed access to a file
 '''
 def isAllowed(viewer,post):
-    print post
     viewer_id = viewer.id
     #viewer_id = "13c4bb0f-f324-427e-8722-0f90c57176c4"
     privacy = post["visibility"]

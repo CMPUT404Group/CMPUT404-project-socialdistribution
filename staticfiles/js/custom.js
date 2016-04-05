@@ -376,6 +376,9 @@ window.onload = function() {
         else if (remote_url == "https://mighty-cliffs-82717.herokuapp.com/") {
           xhr.setRequestHeader("Authorization", "Basic " + btoa("Team4:team4"));
         }
+        else if (remote_url == "http://secret-inlet-51780.herokuapp.com/") {
+          xhr.setRequestHeader("Authorization", "Basic " + btoa("team4:team4team4"));
+        }
         // put else if other remote site credentials here
       },
       success: function(response, statusText, xhr) {
