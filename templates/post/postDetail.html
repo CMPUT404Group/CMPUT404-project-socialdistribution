@@ -40,7 +40,7 @@
     	</div>
     </div>
 
-    {% if post.author == loggedInAuthor %}
+    {% if post.author.id == loggedInAuthor.id|stringformat:"s" %}
 	<div class="media-body post-action-icons">
 		<a href="{% url 'post_edit' post.id %}"><button class="btn btn-default action-icon edit-post"><i class="fa fa-pencil-square-o"></i></button></a>
 		<button id='delete-post-{{ post.id }}' class="btn btn-default action-icon delete-post-single"><i class="fa fa-trash-o"></i></button>
@@ -80,8 +80,8 @@
 		    	</div>
 		    	<div class="comment-footer">
 
-					{% if comment.author == loggedInAuthor %}
-		    		<button class="btn-default action-icon"><i class="fa fa-pencil-square-o"></i></button>
+					{% if comment.author.id == loggedInAuthor.id|stringformat:"s" %}
+		    		<!-- <button class="btn-default action-icon"><i class="fa fa-pencil-square-o"></i></button> -->
 		    		<button class="btn-default action-icon  delete-comment" id='delete-comment-{{ comment.id }}' data-post-id='{{ post.id }}'><i class="fa fa-trash-o"></i></button>
 					{% endif %}
 
@@ -114,8 +114,8 @@
 			    	</div>
 			    	<div class="comment-footer">
 
-						{% if comment.author == loggedInAuthor %}
-			    		<button class="btn-default action-icon"><i class="fa fa-pencil-square-o"></i></button>
+						{% if comment.author.id == loggedInAuthor.id|stringformat:"s" %}
+			    		<!-- <button class="btn-default action-icon"><i class="fa fa-pencil-square-o"></i></button> -->
 			    		<button class="btn-default action-icon  delete-comment" id='delete-comment-{{ comment.id }}' data-post-id='{{ post.id }}'><i class="fa fa-trash-o"></i></button>
 						{% endif %}
 

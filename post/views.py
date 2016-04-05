@@ -182,6 +182,9 @@ def get_local(author_id):
         y = x.read()
         jsonResponse = json.loads(y)
         postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+        for p in postSerializer.data:
+            # fix date formatting
+            p = formatDate(p)
         return postSerializer.data
     except urllib2.HTTPError, e:
         print("Local Error: "+str(e.code))
@@ -518,8 +521,6 @@ def my_stream(request):
         # get all posts by the logged in author
         try:
             mine = get_APIAuthorPosts(viewer_id)
-            for post in mine:
-                post = formatDate(post)
             posts.extend(mine)
         except urllib2.HTTPError, e:
             print("Couldnt get own posts "+author.user.username+" "+str(e.code))
