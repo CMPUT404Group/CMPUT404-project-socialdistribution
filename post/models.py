@@ -8,4 +8,4 @@ from api.models import Author
 class Notification(models.Model):
     notificatee = models.ForeignKey(Author, related_name='noti_author', on_delete=models.CASCADE)
     follower = models.ForeignKey(Author, related_name='noti_follower', on_delete=models.CASCADE)
-    # date = models.DateTimeField(default=timezone.now)
+

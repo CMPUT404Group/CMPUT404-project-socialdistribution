@@ -170,16 +170,11 @@ Returns False if request.user is an Author
 def getRemoteNode(user):
     try:
         node = Node.objects.get(user=user)
-        # print node
-        # print node.hostname,
-        # print " - ",
-        # print node.url
         return node
     except Node.DoesNotExist as e:
         return None
 
 # ref: http://stackoverflow.com/questions/16700968/check-existing-password-and-reset-password
-# HASN'T BEEN QUITE TESTED OR IMPLEMENTED COMPLETELY YET
 def postChangeUserPassword(request):
     if (not request.user.is_authenticated()):
             return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -429,6 +424,20 @@ class CommentList(generics.GenericAPIView):
     POST : http://service/api/posts/<post_pk>/comments/
         * Creates a new comment attached to the post specified by post_pk
 
+    POST required object fields: in the json POST body are the author making the comment, the comment and contentType, such as:
+    author (object) : the author making the comment
+    * id : the author id
+    * github : the github url of the author
+    * picture : the picture the author has (optional field)
+    * host : the host url of the author
+    * displayName - display name of the author
+    * url : the url of the author   
+    comment : the comment body text
+    contentType : the content type of the comment (e.g text/x-markdown)
+
+    
+
+
     '''
     pagination_class = ListPaginator
     serializer_class = CommentSerializer
@@ -521,8 +530,7 @@ class CommentList(generics.GenericAPIView):
                             author.displayName = author_serializer.data[key]
                         elif key == 'github':
                             author.github = author_serializer.data[key]
-                    # author = Author.objects.create(id=author_serializer.data["id"], displayName=author_serializer.data["displayName"], host=remoteNode.url)
-                    # author = Author.objects.create(id=author_serializer.data["id"], displayName=author_serializer.data["displayName"], host=author_serializer.data["host"], github=author_serializer.data["github"])
+                   
                     author.save()
         else:
             # author = Author.objects.get(user=request.user)

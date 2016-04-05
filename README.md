@@ -37,14 +37,10 @@ Code was taken & used from : http://stackoverflow.com/questions/5871730/need-a-m
 group whentomeet:  
 http://www.when2meet.com/?4368216-nLULW
 
-#Note
+#Demo Video
 
-<b>admin account:</b>  
-username: admin
-
-password: admin
-
-"python manage.py createsuperuser" to create admin account
+##Note
+Check out our wiki for all documentation and info on how to run our webserver
 
 
 
