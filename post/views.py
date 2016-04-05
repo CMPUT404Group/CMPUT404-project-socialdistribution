@@ -588,6 +588,22 @@ def post_detail(request, post_pk):
                 comment1 = formatDate(comment)
                 comments.append(comment1)
             post["comments"] = comments
+            if Found == True:
+                if local == False:
+                    # format date for remote posts
+                    post = formatDate(post)
+
+                if (isAllowed(viewer,post)):
+                    if request.method == "POST":
+                        response = send_comment(request, post_pk, None)
+                    form = CommentForm()
+                    author = Author.objects.get(user=request.user)
+                    return render(request, 'post/postDetail.html', {'remote':True,'post': post, 'commentForm': form, 'loggedInAuthor': author})
+                else:
+                    return HttpResponseForbidden("You are not allowed to access this page")
+            else:
+                return render(request, "404_page.html", {'message': "Post Not Found",'loggedInAuthor': viewer},status=404)
+
         except urllib2.HTTPError, e:
             print("Not a local Post. Error: "+str(e.code))
             local = False
@@ -620,22 +636,7 @@ def post_detail(request, post_pk):
         except urllib2.HTTPError, e:
             print("Not a team 8 Post. Error: "+str(e.code))
         #############################
-        if Found == True:
-            if local == False:
-                # format date for remote posts
-                post = formatDate(post)
 
-            if (isAllowed(viewer,post)):
-                if request.method == "POST":
-                    response = send_comment(request, post_pk, None)
-                post = get_APIPost(post_pk,settings.LOCAL_URL + "posts/","Basic "+base64.b64encode("test:test"))
-                form = CommentForm()
-                author = Author.objects.get(user=request.user)
-                return render(request, 'post/postDetail.html', {'remote':True,'post': post, 'commentForm': form, 'loggedInAuthor': author})
-            else:
-                return HttpResponseForbidden("You are not allowed to access this page")
-        else:
-            return render(request, "404_page.html", {'message': "Post Not Found",'loggedInAuthor': viewer},status=404)
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
