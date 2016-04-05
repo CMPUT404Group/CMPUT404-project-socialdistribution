@@ -95,7 +95,7 @@ document.getElementById("explore").setAttribute("class", "active");
         </div>
         <hr class='post-hr'>
         <div class='panel-body'>
-            <a href='{% url "explore_post" node.id  post.id %}#comments' class='comments'> {{ post.comments.count }} Comments </a>
+            <a href='{% url "explore_post" node.id  post.id %}#comments' class='comments'> {{ post.comments|length }} Comments </a>
             <a href='{% url "explore_post" node.id  post.id %}' class='pull-right'><i class="fa fa-plus"></i></a>
         </div>
     </div>
