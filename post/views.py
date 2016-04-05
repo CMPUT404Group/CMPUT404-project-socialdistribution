@@ -515,12 +515,12 @@ def my_stream(request):
 
         #orders from newest to oldest
         form = PostForm()
-        s_posts = sort_posts(posts)
-        posts = []
+        # s_posts = sort_posts(posts)
+        # posts = []
         #displays the date nicely
-        for post in s_posts:
-            post = formatDate(post)
-            posts.append(post)
+        # for post in s_posts:
+            # post = formatDate(post)
+            # posts.append(post)
 
         return render(request, 'post/myStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList})
     else:
