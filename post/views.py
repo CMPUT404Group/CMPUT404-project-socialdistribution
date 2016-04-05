@@ -3,21 +3,18 @@ from django.template import RequestContext
 from django.utils import timezone
 from api.models import Post, Author, Comment, Friending, Node
 from .forms import PostForm, CommentForm
-from django.http import HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponseRedirect, HttpResponseForbidden, HttpResponse
 from django.core.urlresolvers import reverse
-from api.views import PostList, CommentList, PostDetail
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from itertools import chain
 from api.serializers import *
-from django.http import HttpResponse
 import urllib2
 import json
 import base64
 import urllib
 import requests
-from django.http import HttpResponse
 from django import forms
 from django.contrib.auth import authenticate
 from datetime import datetime
@@ -191,23 +188,23 @@ Get all posts for <author> from team5
 '''
 def get_team5(author_id):
     #checks what node it is on and returns the public posts from that node
-    # try:
-    #     url = "http://disporia-cmput404.rhcloud.com/api/author/"+str(author_id)+"/posts/"
-    #     opener = urllib2.build_opener(urllib2.HTTPHandler)
-    #     req = urllib2.Request(url)
-    #     # set credentials on request
-    #     req.add_header("Authorization", "JWT " + credentials["http://disporia-cmput404.rhcloud.com/"])
-    #     x = opener.open(req)
-    #     y = x.read()
-    #     jsonResponse = json.loads(y)
-    #     postSerializer = PostSerializer(jsonResponse["results"], many=True)
-    #     for p in postSerializer.data:
-    #         # fix date formatting
-    #         p = formatDate(p)
-    #     return postSerializer.data
-    # except urllib2.HTTPError, e:
-    #     print("team 5 Error: "+str(e.code))
-    return []
+    try:
+        url = "http://disporia-cmput404.rhcloud.com/api/author/"+str(author_id)+"/posts/"
+        opener = urllib2.build_opener(urllib2.HTTPHandler)
+        req = urllib2.Request(url)
+        # set credentials on request
+        req.add_header("Authorization", "JWT " + credentials["http://disporia-cmput404.rhcloud.com/"])
+        x = opener.open(req)
+        y = x.read()
+        jsonResponse = json.loads(y)
+        postSerializer = PostSerializer(jsonResponse["results"], many=True)
+        for p in postSerializer.data:
+            # fix date formatting
+            p = formatDate(p)
+        return postSerializer.data
+    except urllib2.HTTPError, e:
+        print("team 5 Error: "+str(e.code))
+    # return []
 
 '''
 Get all posts for <author> from team6
@@ -439,39 +436,26 @@ def my_stream(request):
 
         author = Author.objects.get(user=request.user)
 
+        # #get the ids of the people you are following
         followList = []
         followRelationships = Friending.objects.filter(author=author)
         for relationship in followRelationships:
             followList.append(str(relationship.friend.id))
 
-        # ##################### notification on if logged in author has new follower
-        # followList = []
-        # followRelationships = Friending.objects.filter(friend=author)
-        #
-        # for relationship in followRelationships:
-        #     followList.append(relationship.friend.id)
-        #
-        # # notification on if logged in author has new follower
-        # followerList = []
-        # followerRelationships = Friending.objects.filter(friend=author)
-        # for relationship in followerRelationships:followerList.append(relationship.friend)
-        #
-        # if len(followerList) > author.previous_follower_num:
-        #     author.noti = True
-        #     author.previous_follower_num = len(followerList)
-        # else:
-        #     author.noti = False
-        # author.save()
-        # ################## end of notification block
+        ##################### notification on if logged in author has new follower
+        followerList = []
+        followerRelationships = Friending.objects.filter(friend=author)
+        for relationship in followerRelationships:followerList.append(relationship.friend)
+
+        if len(followerList) > author.previous_follower_num:
+            author.noti = True
+            author.previous_follower_num = len(followerList)
+        else:
+            author.noti = False
+        author.save()
+        ################## end of notification block
         #
         posts = []
-        #
-        # #get the ids of the people you are following
-        # following = []
-        # followingRel =  Friending.objects.filter(author=author)
-        # for relationship in followingRel:
-        #     following.append(str(relationship.friend.id))
-        #
         # #add the posts by the people we are friends with into our myStream
         viewer_id = author.id
 
@@ -493,12 +477,6 @@ def my_stream(request):
             print("Couldnt get own posts "+author.user.username+" "+str(e.code))
 
 
-
-
-        for post in posts:
-            print post["author"]["id"] == author.id,
-            print " |  ",
-            print post["author"]["id"] == str(author.id)
         #TODO order from newest to oldest
         form = PostForm()
         return render(request, 'post/myStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList})

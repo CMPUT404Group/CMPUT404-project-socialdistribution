@@ -11,20 +11,8 @@ document.getElementById("my_stream").setAttribute("class", "active");
 
 {% include "post/createPost.html" with icon=loggedInAuthor.picture %}
 
-<h3> LOGGED IN AUTHOR ID : {{ loggedInAuthor.id }} </h3>
-{% for id in followList %}
-<p>{{ id }}</p>
-{% endfor %}
-
 {% for post in posts %}
 <div class="row post">
-    <p>Logged In Author : {{ loggedInAuthor.id }}</p>
-    <p>Post Author : {{ post.author.id }} </p>
-    {% if  loggedInAuthor.id|stringformat:"s" == post.author.id %}
-    <h1> YES </h1>
-    {% else %}
-    <h1> NO </h1>
-    {% endif %}
     <!-- Display post's author's profile image -->
     <div>
     {% if request.get_host not in post.author.host %}
