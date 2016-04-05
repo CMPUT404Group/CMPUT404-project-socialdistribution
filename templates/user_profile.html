@@ -48,9 +48,8 @@
         <button id='uploadProfileImageTrigger' type="button" class="btn btn-default" data-toggle="modal" data-target="#uploadProfileImageModal"><i class="fa fa-picture-o"></i></button>
     </span>
     {% endif %}
-
-
 </div>
+
 {% if profile_owner.github != "" %}
 <div class="main-body" style="position: relative; float: left; width: 70%;"/>
 <!-- display profile owner's github activity -->
@@ -61,8 +60,55 @@
   <div id="github_body" class="panel-body"></div>
 </div>
 
-</div>
 {% endif %}
+
+
+{% for post in posts %}
+<div class="row post">
+
+    <!-- Display profile image -->
+    {% if post.author.picture %}
+    <img id="id-user-profile-image" src="/media/{{ post.author.picture }}" class="profile-photo-icon img-circle img-responsive img-center pull-left" alt="Profile Image"/>
+    {% else %}
+    <img id="id-user-profile-image" class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/50x50">
+    {% endif %}
+
+    <div class="panel panel-primary media-body">
+        <div class='panel-heading'> <a class='title' href='{% url "post_detail" post.id %}'> {{ post.title }} </a> <span class='date'> {{ post.published }} </span> </div>
+        <div class='panel-body'>
+            {% if post.contentType == "text/x-markdown" %}
+                {{ post.content|markdown }}
+            {% else %}
+                {{ post.content|urlize|slice:"500" }}
+                {% if post.content|length > 500 %}
+                <a class='read_more' href='{% url "post_detail" post.id %}'> Continue Reading... </a>
+                {% endif %}
+            {% endif %}
+
+            <br/>
+            {% if post.image %}
+              <img src="{{ post.image }}" width="300px"/>
+            {% endif %}
+        </div>
+        <hr class='post-hr'>
+        <div class='panel-body'>
+            <a href='{% url "post_detail" post.id %}#comments' class='comments'> {{ post.comments.count }} Comments </a>
+            <a href='{% url "post_detail" post.id %}' class='pull-right'><i class="fa fa-plus"></i></a>
+        </div>
+    </div>
+
+    {% if post.author == loggedInAuthor %}
+    <div class="media-body post-action-icons">
+        <a href="{% url 'post_edit' post.id %}"><button class="btn btn-default action-icon edit-post"><i class="fa fa-pencil-square-o"></i></button></a>
+        <button id='delete-post-{{ post.id }}' class="btn btn-default action-icon delete-post-single"><i class="fa fa-trash-o"></i></button>
+    </div>
+    {% else %}
+    <div class="media-body post-action-icons placeholder">
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
+</div>
 
 <!-- display the profile owners friends and followers -->
 <div style="position: relative; float:right; width: 30%; padding-left: 1.5em;">
@@ -88,12 +134,12 @@
     <div class="list-group sidebar" >
         <h4 class="list-group-item list-group-item-info">Followers</h4>
         {% for follower in followers|slice:":8" %}
-         <a class="list-group-item" style="height: 75px;" href="{% url 'user_profile' follower.id %}">
+        <a class="list-group-item" style="height: 75px;" href="{% url 'user_profile' follower.id %}">
         <img src={% if follower.picture %} '/media/{{follower.picture}}' {% else %} "http://placehold.it/50x50" {% endif%} class="friend-profile-icon img-circle img-responsive img-center pull-left list-group-item-text" alt="Profile Image"/>
         <span>
-        <h4 class="list-group-item-heading">{{follower}}</h4>
-        <p class="list-group-item-text" style="font-size: smaller;">{{follower.host}}</p>
-    </span>
+          <h4 class="list-group-item-heading">{{follower}}</h4>
+          <p class="list-group-item-text" style="font-size: smaller;">{{follower.host}}</p>
+        </span>
         </a>
         {% endfor %}
         {% if followers|length > 8 %}
@@ -103,52 +149,6 @@
         {% endif %}
     </div>
 </div>
-
-{% for post in posts %}
-<div class="row post" style="clear:left">
-
-    <!-- Display profile image -->
-    {% if post.author.picture %}
-    <img id="id-user-profile-image" src="/media/{{ post.author.picture }}" class="profile-photo-icon img-circle img-responsive img-center pull-left" alt="Profile Image"/>
-    {% else %}
-    <img id="id-user-profile-image" class="profile-photo-icon img-circle img-responsive img-center pull-left" src="http://placehold.it/50x50">
-    {% endif %}
-
-    <div class="panel panel-primary media-body">
-        <div class='panel-heading'> <a class='title' href='{% url "post_detail" post.id %}'> {{ post.title }} </a> <span class='date'> {{ post.published }} </span> </div>
-        <div class='panel-body'>
-            {% if post.contentType == "text/x-markdown" %}
-                {{ post.content|markdown }}
-            {% else %}
-                {{ post.content|urlize|slice:"500" }}
-                {% if post.content|length > 500 %}
-                <a class='read_more' href='{% url "post_detail" post.id %}'> Continue Reading... </a>
-                {% endif %}
-            {% endif %}
-
-            <br/>
-            {% if post.image %}
-                <img src="{{ post.image }}" />
-            {% endif %}
-        </div>
-        <hr class='post-hr'>
-        <div class='panel-body'>
-            <a href='{% url "post_detail" post.id %}#comments' class='comments'> {{ post.comments.count }} Comments </a>
-            <a href='{% url "post_detail" post.id %}' class='pull-right'><i class="fa fa-plus"></i></a>
-        </div>
-    </div>
-
-    {% if post.author == loggedInAuthor %}
-    <div class="media-body post-action-icons">
-        <a href="{% url 'post_edit' post.id %}"><button class="btn btn-default action-icon edit-post"><i class="fa fa-pencil-square-o"></i></button></a>
-        <button id='delete-post-{{ post.id }}' class="btn btn-default action-icon delete-post-single"><i class="fa fa-trash-o"></i></button>
-    </div>
-    {% else %}
-    <div class="media-body post-action-icons placeholder">
-    </div>
-    {% endif %}
-</div>
-{% endfor %}
 
 {% include "reset_password_box.html" %}
 {% include "post/editProfileFieldModal.html" %}
