@@ -159,6 +159,9 @@ def get_APIAuthorPosts(friend_id):
     team7 = get_team7(friend_id)
     if team7 != None and len(team7) > 0:
         return team7
+    team8 = get_team8(friend_id)
+    if team8 != None and len(team8) > 0:
+        return team8
     else:
         return []
 
