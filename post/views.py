@@ -259,7 +259,7 @@ def get_team7(author_id):
 '''
 Get all posts for <author> from team8
 '''
-def get_team7(author_id):
+def get_team8(author_id):
     try:
         #checks what node it is on and returns the public posts from that node
         url = "http://secret-inlet-51780.herokuapp.com/api/author/"+str(author_id)+"/posts/"
