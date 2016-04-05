@@ -147,9 +147,9 @@ def manager(request):
         loggedInAuthor = Author.objects.get(user=request.user)
         authors = Author.objects.filter(host="http://"+request.get_host()+'/')
         nodes = Node.objects.all()
-        return render(request, 'manager/admin.html', {'authors': authors, 'loggedInAuthor': loggedInAuthor, 'nodes': nodes})# 
+        return render(request, 'manager/admin.html', {'authors': authors, 'loggedInAuthor': loggedInAuthor, 'nodes': nodes})#
 
-# display friend request notification 
+# display friend request notification
 def friendRequest(request, username):
     if request.user.is_authenticated():
         try:
@@ -158,7 +158,13 @@ def friendRequest(request, username):
             return render(request, "404_page.html", {'message': "User does not exist."})
 
         author = Author.objects.get(user=request.user)
-        notis = Notification.objects.filter(notificatee=author)
+        # notis = Notification.objects.filter(notificatee=author)
+        followers = Friending.objects.filter(friend=author)
+        following = Friending.objects.filter(author=author)
+
+        followersList = [ rel.author for rel in followers]
+        followingList = [ rel.friend for rel in following]
+        fList = list(set(followersList) - set(followingList))
 
         # notification on if logged in author has new follower
         followList = []
@@ -174,7 +180,6 @@ def friendRequest(request, username):
         author.save()
 
         return render(request, "manager/friendRequest.html",
-                      {'notis': notis, 'user_account': user, 'loggedInAuthor': author})
+                      {'fList': fList, 'user_account': user, 'loggedInAuthor': author})
     else:
-        return HttpResponseRedirect(reverse('accounts_login')) 
-
+        return HttpResponseRedirect(reverse('accounts_login'))
