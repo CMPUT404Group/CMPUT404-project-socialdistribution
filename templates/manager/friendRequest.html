@@ -16,7 +16,7 @@ should display ones who are following me but not my friends-->
         <a href="{% url 'user_profile' noti.follower.id %}">
         <img id="id-user-profile-image"
          class="profile-photo img-circle img-responsive img-center pull-left create-post"
-         data-toggle="tooltip" title="{{ noti.follower.user.username}}"
+         data-toggle="tooltip" title="{{ noti.follower.displayName}}"
          alt="Profile Image"
         {% if noti.follower.picture %}
          src="/media/{{ noti.follower.picture }}"/></a>
