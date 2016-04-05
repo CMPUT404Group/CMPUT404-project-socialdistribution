@@ -518,6 +518,8 @@ def my_stream(request):
         # get all posts by the logged in author
         try:
             mine = get_APIAuthorPosts(viewer_id)
+            for post in mine:
+                post = formatDate(post)
             posts.extend(mine)
         except urllib2.HTTPError, e:
             print("Couldnt get own posts "+author.user.username+" "+str(e.code))
