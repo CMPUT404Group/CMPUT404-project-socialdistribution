@@ -21,7 +21,7 @@ document.getElementById("explore").setAttribute("class", "active");
 
     <!-- Display a couple ns on top of the specified authors posts -->
     {%if all == False%}
-        {% for n in nodes|slice:":3"%}
+        {% for n in nodes|slice:":5"%}
         <li class="list-group-item" style="padding: 1em">
         <span>
             <a href={% url 'explore_host' n.id %}>
@@ -30,7 +30,7 @@ document.getElementById("explore").setAttribute("class", "active");
         </span>
         </li>
         {% endfor %}
-        {%if nodes|length > 3 %}
+        {%if nodes|length > 5 %}
         <a class="list-group-item" href={% url 'explore' %}>See More nodes ...</a>
         {% endif %}
 

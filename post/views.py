@@ -27,7 +27,8 @@ from django.conf import settings
 #global variables
 credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
     "http://disporia-cmput404.rhcloud.com/": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlYW00IiwidXNlcl9pZCI6MiwiZW1haWwiOiIiLCJleHAiOjE0NTg3MDI5Mzl9.cGDfv2lhFLNqOON3P4tq-LvoSTtarC5gIa1rG-ST5CA",\
-    "http://mighty-cliffs-82717.herokuapp.com/" : "Team4:team4" }
+    "http://mighty-cliffs-82717.herokuapp.com/" : "Team4:team4",\
+    "http://secret-inlet-51780.herokuapp.com/":"team4:team4team4"}
 
 # Create your views here.
 '''
@@ -120,7 +121,7 @@ def explore(request, node_id=None):
             req = urllib2.Request(url)
             try:
                 # set credentials on request
-                if node.url == "http://project-c404.rhcloud.com/" or node.url == "http://mighty-cliffs-82717.herokuapp.com/":
+                if node.url == "http://project-c404.rhcloud.com/" or node.url == "http://mighty-cliffs-82717.herokuapp.com/" or node.url == "http://secret-inlet-51780.herokuapp.com/":
                     creds = base64.b64encode(credentials[node.url])
                     req.add_header("Authorization", "Basic " + creds)
                     x = opener.open(req)
@@ -143,7 +144,7 @@ def explore(request, node_id=None):
                 form = PostForm()
                 return render(request, 'explore.html', {'node':node,'posts': posts, 'form': form, 'loggedInAuthor': author, 'nodes': nodes, 'all':False, 'followList': followList})
             except urllib2.HTTPError, e:
-                return render(request, "404_page.html", {'message': "HTTP ERROR: "+str(e.code)+" "+e.reason, 'loggedInAuthor': author},status=404)
+                return render(request, "404_page.html", {'message': "HTTP ERROR: "+str(e.code)+" "+e.reason, 'loggedInAuthor': author},status=e.code)
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
@@ -234,7 +235,7 @@ def get_team6(author_id):
         print("team 6 Error: "+str(e.code))
 
 '''
-Get all posts for <author> from team6
+Get all posts for <author> from team7
 '''
 def get_team7(author_id):
     try:
@@ -257,6 +258,31 @@ def get_team7(author_id):
             return []
     except urllib2.HTTPError, e:
         print("team 7 Error: "+str(e.code))
+
+'''
+Get all posts for <author> from team8
+'''
+def get_team7(author_id):
+    try:
+        #checks what node it is on and returns the public posts from that node
+        url = "http://secret-inlet-51780.herokuapp.com/api/author/"+str(author_id)+"/posts/"
+        opener = urllib2.build_opener(urllib2.HTTPHandler)
+        req = urllib2.Request(url)
+        # set credentials on request
+        req.add_header("Authorization", "Basic " + base64.b64encode(credentials["http://secret-inlet-51780.herokuapp.com/"]))
+        x = opener.open(req)
+        y = x.read()
+        jsonResponse = json.loads(y)
+        if len(jsonResponse) > 0:
+            postSerializer = PostSerializer(jsonResponse["posts"], many=True)
+            for p in postSerializer.data:
+                # fix date formatting
+                p = formatDate(p)
+            return postSerializer.data
+        else:
+            return []
+    except urllib2.HTTPError, e:
+        print("team 8 Error: "+str(e.code))
 
 '''
 Get a single post from someone's API
@@ -286,6 +312,8 @@ def get_APIFriends(person_id):
     t5_h = "JWT "+credentials[t5_url]
     t7_url = "http://mighty-cliffs-82717.herokuapp.com/"
     t7_h = "Basic " + base64.b64encode(credentials[t7_url])
+    t8_url = "http://secret-inlet-51780.herokuapp.com/"
+    t8_h = "Basic " + base64.b64encode(credentials[t8_url])
     opener = urllib2.build_opener(urllib2.HTTPHandler)
     try:
         url = settings.LOCAL_URL + "friends/" + str(person_id)
@@ -324,6 +352,15 @@ def get_APIFriends(person_id):
         return json.loads(y)["authors"]
     except urllib2.HTTPError, e:
         print("Not a team 7 Person. Error: "+str(e.code))
+    try:
+        url = t8_url+"api/friends/"+str(person_id)
+        req = urllib2.Request(url)
+        req.add_header("Authorization", t8_h)
+        x = opener.open(req)
+        y = x.read()
+        return json.loads(y)["authors"]
+    except urllib2.HTTPError, e:
+        print("Not a team 8 Person. Error: "+str(e.code))
 
 '''
 Create Comment to send to remote host
@@ -345,7 +382,7 @@ def send_comment(request, post_id, node_id=None):
     #send it to a remote host
     if node_id != None:
         node = Node.objects.get(id=node_id)
-        if node.url == "http://project-c404.rhcloud.com/" or node.url == "http://mighty-cliffs-82717.herokuapp.com/":
+        if node.url == "http://project-c404.rhcloud.com/" or node.url == "http://mighty-cliffs-82717.herokuapp.com/" or node.url =="http://secret-inlet-51780.herokuapp.com/":
             url = node.url + "api/posts/" + post_id +"/comments/"
             creds = base64.b64encode(credentials[node.url])
             headers = {"Authorization" : "Basic " + creds}
@@ -374,6 +411,8 @@ def explore_post(request, node_id, post_id):
     t5_h = "JWT "+credentials[t5_url]
     t7_url = "http://mighty-cliffs-82717.herokuapp.com/"
     t7_h = "Basic " + base64.b64encode(credentials[t7_url])
+    t8_url = "http://secret-inlet-51780.herokuapp.com/"
+    t8_h = "Basic " + base64.b64encode(credentials[t8_url])
     if (request.user.is_authenticated()):
         author = Author.objects.get(user=request.user)
         node = Node.objects.get(id=node_id)
@@ -388,6 +427,8 @@ def explore_post(request, node_id, post_id):
                     post = get_APIPost(post_id,t5_url+"api/posts/", t5_h)
                 elif node.url == "http://mighty-cliffs-82717.herokuapp.com/":
                     post = get_APIPost(post_id,t7_url+"api/posts/", t7_h)
+                elif node.url == "http://secret-inlet-51780.herokuapp.com/":
+                    post = get_APIPost(post_id,t8_url+"api/posts/", t8_h)
 
                 #create and send the comment if its allowed
                 if request.method == "POST":
@@ -399,6 +440,8 @@ def explore_post(request, node_id, post_id):
                             post = get_APIPost(post_id, t5_url+"api/posts/", t5_h)
                         elif node.url == "http://mighty-cliffs-82717.herokuapp.com/":
                             post = get_APIPost(post_id, t7_url+"api/posts/", t7_h)
+                        elif node.url == "http://secret-inlet-51780.herokuapp.com/":
+                            post = get_APIPost(post_id, t8_url+"api/posts/", t8_h)
                     else:
                         return HttpResponseForbidden("You are not allowed to access this page")
                 # fix date formatting
@@ -428,7 +471,6 @@ def my_stream(request):
                 # alert user form was empty
                 pass
             else:
-                # -- TODO : display post success or failure on mainStream.html -- #
                 if response.status_code == 201:
                     return HttpResponseRedirect('/myStream')#stay on myStream after posting
                 else:  # 400 error
@@ -520,17 +562,6 @@ def sort_posts(posts):
         oldest = datetime.now()
     return reversed(sorted_posts)
 
-# '''
-# Handles submitting the Comment form - used when creating a new Comment
-# '''
-
-# def _submitCommentForm(request, post_pk):
-#     if request.method == "POST":
-#         form = CommentForm(request.POST)
-#         if form.is_valid():
-#             response = CommentList.as_view()(request, post_pk)  # makes post call to API
-#             return response
-
 '''
 Renders the page for specific post (including the post's comments)
 '''
@@ -541,6 +572,8 @@ def post_detail(request, post_pk):
     t5_h = "JWT "+credentials[t5_url]
     t7_url = "http://mighty-cliffs-82717.herokuapp.com/"
     t7_h = "Basic " + base64.b64encode(credentials[t7_url])
+    t8_url = "http://secret-inlet-51780.herokuapp.com/"
+    t8_h = "Basic " + base64.b64encode(credentials[t8_url])
     if (request.user.is_authenticated()):
         viewer = Author.objects.get(user=request.user)
         ####TEMPORARY Check what node the post came from
@@ -573,6 +606,13 @@ def post_detail(request, post_pk):
             return page
         except urllib2.HTTPError, e:
             print("Not a team 7 Post. Error: "+str(e.code))
+        try:
+            post = get_APIPost(post_pk,t8_url+"api/posts/", t8_h)
+            node = "1636c703-aa1c-4f78-bdcf-fcf0dec56f16"
+            page = explore_post(request, node, post_pk)
+            return page
+        except urllib2.HTTPError, e:
+            print("Not a team 8 Post. Error: "+str(e.code))
         #############################
         if Found == True:
             if local == False:
@@ -695,6 +735,7 @@ def user_profile(request, user_id):
 checks if a user is allowed access to a file
 '''
 def isAllowed(viewer,post):
+    print post
     viewer_id = viewer.id
     #viewer_id = "13c4bb0f-f324-427e-8722-0f90c57176c4"
     privacy = post["visibility"]
