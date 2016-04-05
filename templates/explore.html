@@ -22,6 +22,7 @@ document.getElementById("explore").setAttribute("class", "active");
     <!-- Display a couple ns on top of the specified authors posts -->
     {%if all == False%}
         {% for n in nodes|slice:":5"%}
+        {% if n.hostname != "team55" %}
         <li class="list-group-item" style="padding: 1em">
         <span>
             <a href={% url 'explore_host' n.id %}>
@@ -29,6 +30,7 @@ document.getElementById("explore").setAttribute("class", "active");
             </a>
         </span>
         </li>
+        {% endif %}
         {% endfor %}
         {%if nodes|length > 5 %}
         <a class="list-group-item" href={% url 'explore' %}>See More nodes ...</a>
@@ -37,6 +39,7 @@ document.getElementById("explore").setAttribute("class", "active");
     <!-- Display all ns -->
     {% else %}
         {% for n in nodes%}
+        {% if n.hostname != "team55" %}
         <li class="list-group-item" style="padding: 1em">
         <span>
             <a href={% url 'explore_host' n.id %}>
@@ -44,6 +47,7 @@ document.getElementById("explore").setAttribute("class", "active");
             </a>
         </span>
         </li>
+        {% endif %}
         {% endfor %}
     {% endif %}
     </ul>
