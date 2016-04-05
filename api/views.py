@@ -324,11 +324,11 @@ class PostDetail(generics.GenericAPIView):
 
             # is a remote author - assume remote author is already authenticated by remote node
             author_id = request.META.get("HTTP_REMOTE_USER")
-            if (isAllowed(pk, author_id)):
-                serializer = PostSerializer(post)
-                return Response(serializer.data, status=status.HTTP_200_OK)
+            # if (isAllowed(pk, author_id)):
+            serializer = PostSerializer(post)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
-            return Response({"message": "User is not allowed to see this post"}, status=status.HTTP_403_FORBIDDEN)
+            # return Response({"message": "User is not allowed to see this post"}, status=status.HTTP_403_FORBIDDEN)
 
        # If its a local author - return the post
         if request.get_host() in author.host:
