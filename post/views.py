@@ -587,7 +587,7 @@ def post_detail(request, post_pk):
             print("Not a team 5 Post. Error: "+str(e.code))
         try:
             post = get_APIPost(post_pk,t6_url+"api/posts/", t6_h)
-            node = "1a3f4b77-a4b7-405e-9dd7-fcb40e925c61"
+            node = "469995bf-0d2f-4bc9-a7f3-49f6a58d13da"
             page = explore_post(request, node, post_pk)
             return page
         except urllib2.HTTPError, e:
