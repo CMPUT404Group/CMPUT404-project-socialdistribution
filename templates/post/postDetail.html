@@ -81,8 +81,10 @@
 		    	<div class="comment-footer">
 
 					{% if comment.author.id == loggedInAuthor.id|stringformat:"s" %}
-		    		<!-- <button class="btn-default action-icon"><i class="fa fa-pencil-square-o"></i></button> -->
-		    		<button class="btn-default action-icon  delete-comment" id='delete-comment-{{ comment.id }}' data-post-id='{{ post.id }}'><i class="fa fa-trash-o"></i></button>
+						{% if request.get_host in post.author.host %}
+		    			<!-- <button class="btn-default action-icon"><i class="fa fa-pencil-square-o"></i></button> -->
+		    			<button class="btn-default action-icon  delete-comment" id='delete-comment-{{ comment.id }}' data-post-id='{{ post.id }}'><i class="fa fa-trash-o"></i></button>
+						{% endif %}
 					{% endif %}
 
 					<span class='date'> {{ comment.published }} </span>
