@@ -241,7 +241,7 @@ def get_team7(author_id):
     # return []
     try:
         # checks what node it is on and returns the public posts from that node
-        url = "http://mighty-cliffs-82717.herokuapp.com/api/author/"+str(author_id)+"/posts/?id=" + author_id
+        url = "http://mighty-cliffs-82717.herokuapp.com/api/author/"+str(author_id)+"/posts/?id=" + str(author_id)
         opener = urllib2.build_opener(urllib2.HTTPHandler)
         req = urllib2.Request(url)
         # set credentials on request
