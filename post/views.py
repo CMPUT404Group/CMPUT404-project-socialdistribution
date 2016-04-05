@@ -581,6 +581,12 @@ def post_detail(request, post_pk):
         try:
             post = get_APIPost(post_pk,settings.LOCAL_URL + "posts/","Basic " + base64.b64encode("test:test"))
             Found = True
+            comments = []
+            # displays the date nicely
+            for comment in post["comments"]:
+                comment1 = formatDate(comment)
+                comments.append(comment1)
+            post["comments"] = comments
         except urllib2.HTTPError, e:
             print("Not a local Post. Error: "+str(e.code))
             local = False
