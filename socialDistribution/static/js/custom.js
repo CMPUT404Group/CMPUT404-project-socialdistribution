@@ -514,20 +514,6 @@ window.onload = function() {
       }
   });
 
-  //send an ajax request to see if that username exists - now we are using the user ids so this wont work
-  // function checkUserName(username){
-  //   $.ajax({
-  //     url: "/author/"+username+"/",
-  //     complete: function(e,xhr,settings){
-  //       if(e.status === 200) {
-  //         authorCallback(true, username);
-  //       } else if (e.status === 404) {
-  //         authorCallback(false, username);
-  //       }
-  //     }
-  //   });
-  // }
-
   //respond correctly if it is an actual user or not
   function authorCallback(result,username){
     if (result) {
@@ -562,11 +548,6 @@ window.onload = function() {
           //$("#github_body").html("Under Construction -> Data received still need to make it more reader friendly.");
           $.each(data, function (i, field) {
               $("#github_body").append("<p><b>"+field["type"]+"</b>"+" to "+field["repo"]["name"]+"</p>")
-              //var textNode = document.createTextNode(i+ " " +JSON.stringify(field));
-              //var textNode = document.createTextNode(JSON.stringify(JSON.stringify(field)));
-              //var $newdiv = $( "<div id='github_event_"+i+"'/>" );
-              //$("#github_body").append($newdiv);
-              //$("#github_event_"+i).append(textNode);
               // only get most recent 5 events
               if (i > 5) {
                 //$("#github_body").append("<b>Older Activity Hidden</b>");
@@ -640,8 +621,4 @@ window.onload = function() {
       }
     });
   });
-
-
-
-
 };
