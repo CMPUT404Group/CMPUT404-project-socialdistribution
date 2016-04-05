@@ -170,16 +170,11 @@ Returns False if request.user is an Author
 def getRemoteNode(user):
     try:
         node = Node.objects.get(user=user)
-        # print node
-        # print node.hostname,
-        # print " - ",
-        # print node.url
         return node
     except Node.DoesNotExist as e:
         return None
 
 # ref: http://stackoverflow.com/questions/16700968/check-existing-password-and-reset-password
-# HASN'T BEEN QUITE TESTED OR IMPLEMENTED COMPLETELY YET
 def postChangeUserPassword(request):
     if (not request.user.is_authenticated()):
             return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
