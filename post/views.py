@@ -20,6 +20,7 @@ from django.contrib.auth import authenticate
 from datetime import datetime
 from time import time
 from django.conf import settings
+from api.views import PostList, CommentList, PostDetail
 
 #global variables
 credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
