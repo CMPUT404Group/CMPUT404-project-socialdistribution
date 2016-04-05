@@ -28,6 +28,8 @@ credentials = { "http://project-c404.rhcloud.com/" : "team4:team4team4",\
     "http://mighty-cliffs-82717.herokuapp.com/" : "Team4:team4",\
     "http://secret-inlet-51780.herokuapp.com/":"team4:team4team4"}
 
+FLAG_FRIENDS = 1
+
 # Create your views here.
 '''
 Handles submitting the Post form - used when creating a new Post
@@ -148,23 +150,38 @@ def explore(request, node_id=None):
 Finds the posts for an author_id
 '''
 def get_APIAuthorPosts(friend_id):
-    local = get_local(friend_id)
-    if local != None and len(local) > 0:
-        return local
-    team5 = get_team5(friend_id)
-    if  team5 != None and len(team5) > 0:
-        return team5
-    team6 = get_team6(friend_id)
-    if team6 != None and len(team6) > 0:
-        return team6
-    team7 = get_team7(friend_id)
-    if team7 != None and len(team7) > 0:
-        return team7
-    team8 = get_team8(friend_id)
-    if team8 != None and len(team8) > 0:
-        return team8
+    friend = Author.objects.get(id=friend_id)
+
+    if friend.host == settings.LOCAL_URL[:-4]:
+        print "LOCAL TEAM"
+        serializer = PostSerializer(Post.objects.filter(author=friend), many=True)
+        # return serializer.data
+        posts = serializer.data
+
+    elif friend.host == "https://mighty-cliffs-82717.herokuapp.com/":
+        print "Team 7"
+        posts =  get_team7(friend_id)
+
+    elif (friend.host == "project-c404.rhcloud.com/api") or (friend.host == "project-c404.rhcloud.com/api/"):
+        print "Team 6"
+        posts = get_team6(friend_id)
+
+    elif friend.host == "secret-inlet-51780.herokuapp.com":
+        print "Team 8"
+        posts = get_team8(friend_id)
+
     else:
-        return []
+        print "No matching hosts. " + str(friend_id) + " | " + str(friend.host)
+        posts = []
+
+    for p in posts:
+        try:
+            # fix date formatting
+            p = formatDate(p)
+        except:
+            continue
+
+    return posts
 
 '''
 Get all the posts for a local author
@@ -351,6 +368,88 @@ def get_APIFriends(person_id):
     except urllib2.HTTPError, e:
         print("Not a team 8 Person. Error: "+str(e.code))
 
+
+'''
+Get all the friends for a particular author
+'''
+def get_APIFriends_myStream(person_id, person_host):
+    t6_url = "http://project-c404.rhcloud.com/"
+    t6_h = "Basic " + base64.b64encode(credentials[t6_url])
+    t5_url = "http://disporia-cmput404.rhcloud.com/"
+    t5_h = "JWT "+credentials[t5_url]
+    t7_url = "http://mighty-cliffs-82717.herokuapp.com/"
+    t7_h = "Basic " + base64.b64encode(credentials[t7_url])
+    t8_url = "http://secret-inlet-51780.herokuapp.com/"
+    t8_h = "Basic " + base64.b64encode(credentials[t8_url])
+    opener = urllib2.build_opener(urllib2.HTTPHandler)
+
+
+    if person_host == settings.LOCAL_URL[:-4]:
+        print "LOCAL TEAM"
+        try:
+            url = settings.LOCAL_URL + "friends/" + str(person_id)
+            req = urllib2.Request(url)
+            creds = base64.b64encode("test:test")
+            req.add_header("Authorization", "Basic " + creds)
+            x = opener.open(req)
+            y = x.read()
+            return json.loads(y)["authors"]
+        except urllib2.HTTPError, e:
+            print("Not a local Person. Error: "+str(e.code))
+
+    elif person_host == "https://mighty-cliffs-82717.herokuapp.com/":
+        print "Team 7"
+        try:
+            url = t7_url+"api/friends/"+str(person_id)
+            req = urllib2.Request(url)
+            req.add_header("Authorization", t7_h)
+            x = opener.open(req)
+            y = x.read()
+            return json.loads(y)["authors"]
+        except urllib2.HTTPError, e:
+            print("Not a team 7 Person. Error: "+str(e.code))
+
+    elif person_host == "project-c404.rhcloud.com/api":
+        print "Team 6"
+        try:
+            url = t6_url+"api/friends/"+str(person_id)
+            req = urllib2.Request(url)
+            req.add_header("Authorization", t6_h)
+            x = opener.open(req)
+            y = x.read()
+            return json.loads(y)["authors"]
+        except urllib2.HTTPError, e:
+            print("Not a team 6 Person. Error: "+str(e.code))
+
+    elif person_host == "secret-inlet-51780.herokuapp.com":
+        print "Team 8"
+        try:
+            url = t8_url+"api/friends/"+str(person_id)
+            req = urllib2.Request(url)
+            req.add_header("Authorization", t8_h)
+            x = opener.open(req)
+            y = x.read()
+            return json.loads(y)["authors"]
+        except urllib2.HTTPError, e:
+            print("Not a team 8 Person. Error: "+str(e.code))
+
+    elif person_host == "http://disporia-cmput404.rhcloud.com/":
+        print "Team 5"
+        try:
+            url = t5_url+"api/friends/"+str(person_id)
+            req = urllib2.Request(url)
+            req.add_header("Authorization", t5_h)
+            x = opener.open(req)
+            y = x.read()
+            return json.loads(y)["authors"]
+        except urllib2.HTTPError, e:
+            print("Not a team 5 Person. Error: "+str(e.code))
+
+    else:
+        print "No matching hosts - get_APIFriends - mystream"
+        return []
+
+
 '''
 Create Comment to send to remote host
 '''
@@ -450,6 +549,18 @@ def explore_post(request, node_id, post_id):
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
 
+
+def getAllFriends(author_id):
+    friendsList = []
+    # return json object so we must extract the friend id
+    aList = Friending.objects.filter(author__id=author_id).values('friend__id')
+    for i in aList:
+        # if both people are following eachother (so two-way friendship)
+        blist = Friending.objects.filter(author__id=i["friend__id"], friend__id=author_id)
+        if len(blist) > 0:
+            friendsList.append(i["friend__id"])
+    return friendsList
+
 '''
 Renders the My Stream page
 '''
@@ -493,35 +604,40 @@ def my_stream(request):
         # #add the posts by the people we are friends with into our myStream
         viewer_id = author.id
 
-        #viewer_id = "4fd7e786-7307-47e0-80d4-2c7a5cd14cb4" # Test it with this when not on the heroku account
-        for i in range(len(followList)):
-            posts_all = []
-            friend_id = followList[i]
-            #get all the posts for a friend
+        friends = getAllFriends(viewer_id)
+        for friend_id in friends:
             posts_all = get_APIAuthorPosts(friend_id)
-            for j in range(len(posts_all)):
-                if isAllowed(author, posts_all[j]):
-                    posts.append(posts_all[j])
 
-        # get all posts by the logged in author
-        try:
-            mine = get_APIAuthorPosts(viewer_id)
-            posts.extend(mine)
-        except urllib2.HTTPError, e:
-            print("Couldnt get own posts "+author.user.username+" "+str(e.code))
+            for post in posts_all:
+                if isAllowed_myStream(author, post, FLAG_FRIENDS):
+                    posts.append(post)
 
+
+        following = [ rel.friend.id for rel in Friending.objects.filter(author=author)]
+
+        followButNotFriends = list(set(following) - set(friends))
+
+        for person_id in followButNotFriends:
+            posts_all = get_APIAuthorPosts(person_id)
+
+            for post in posts_all:
+                if isAllowed_myStream(author, post):
+                    posts.append(post)
+
+        minePosts = get_APIAuthorPosts(viewer_id)
+        for post in posts_all:
+            posts.append(post)
 
         #orders from newest to oldest
         form = PostForm()
 
-        # displays the date nicely
-        for post in posts:
-            post = formatDate(post)
-        posts = sort_posts(posts)
+        # not working again - sorry
+        # posts = sort_posts(posts)
 
         return render(request, 'post/myStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList})
     else:
         return HttpResponseRedirect(reverse('accounts_login'))
+
 
 #sort the mystream posts by their published date
 def sort_posts(posts):
@@ -542,7 +658,6 @@ def sort_posts(posts):
         sorted_posts.append(posts[i])
 
     return reversed(sorted_posts)
-
 '''
 Renders the page for specific post (including the post's comments)
 '''
@@ -557,11 +672,14 @@ def post_detail(request, post_pk):
     t8_h = "Basic " + base64.b64encode(credentials[t8_url])
     if (request.user.is_authenticated()):
         viewer = Author.objects.get(user=request.user)
+
         ####TEMPORARY Check what node the post came from
         Found = False
         local = True
         try:
             post = get_APIPost(post_pk,settings.LOCAL_URL + "posts/","Basic " + base64.b64encode("test:test"))
+            # post = PostSerializer(Post.objects.get(id=post_pk)).data
+            print post
             Found = True
             comments = []
             # displays the date nicely
@@ -588,6 +706,10 @@ def post_detail(request, post_pk):
         except urllib2.HTTPError, e:
             print("Not a local Post. Error: "+str(e.code))
             local = False
+        # except Post.DoesNotExist as e:
+        #     print("Post is not local. Error: " + str(e))
+        #     local = False
+
         try:
             post = get_APIPost(post_pk,t5_url+"api/posts/", t5_h)
             node = "55e70a0a-a284-4ffb-b192-08d083f4f164"
@@ -755,6 +877,57 @@ def isAllowed(viewer,post):
             return False
     else:
         return False
+
+
+'''
+checks if a user is allowed access to a file - used for mystream
+'''
+def isAllowed_myStream(viewer,post, flag=None):
+    viewer_id = viewer.id
+    #viewer_id = "4fd7e786-7307-47e0-80d4-2c7a5cd14cb4"
+    privacy = post["visibility"]
+    #if the post was created by the user allow access
+    if str(viewer_id) == post["author"]["id"]:
+        return True
+    #if it is a public post allow everypne access
+    elif privacy == Post.PUBLIC:
+        return True
+    elif privacy == Post.SERVER_ONLY:
+        if viewer.host == post["author"]["host"]:
+            return True
+        else:
+            return False
+    #checks if another post is being shared with you -> not too great
+    elif privacy == Post.OTHER_AUTHOR:
+        other_username = post["other_author"]
+        if other_username == viewer.user.username:
+            return True
+        else:
+            return False
+    elif privacy == Post.FRIENDS:
+        if flag == FLAG_FRIENDS:
+            return True
+
+    elif privacy == Post.FRIENDS_OF_FRIENDS:
+        if flag == FLAG_FRIENDS:
+            return True
+
+        myFriends = [ str(id) for id in getAllFriends(viewer_id) ]
+        postAuthorID = post["author"]["id"]
+        postAuthorHost = post["author"]["host"]
+        postAuthorFriends = [ str(id) for id in get_APIFriends_myStream(postAuthorID, postAuthorHost) ]
+
+        commonFriends = list(set(myFriends) & set(postAuthorFriends))
+
+        if len(commonFriends) > 0:
+            return True
+
+        else:
+            return False
+
+    else:
+        return False
+
 
 # adapted from: http://stackoverflow.com/questions/16700968/check-existing-password-and-reset-password
 def postChangeUserPassword(request, profile_owner):
