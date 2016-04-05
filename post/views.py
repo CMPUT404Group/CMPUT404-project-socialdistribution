@@ -447,6 +447,12 @@ def explore_post(request, node_id, post_id):
                 #display the post if its allowed
                 if (isAllowed(author,post)):
                     commentForm = CommentForm()
+                    comments = []
+                    # displays the date nicely
+                    for comment in post["comments"]:
+                        comment1 = formatDate(comment)
+                        comments.append(comment1)
+                    post["comments"] = comments
                     return render(request, 'post/postDetail.html', {'remote':True, 'post': post, 'commentForm': commentForm, 'loggedInAuthor': author, 'node': node})
                 else:
                     return HttpResponseForbidden("You are not allowed to access this page")
