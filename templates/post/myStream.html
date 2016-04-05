@@ -64,15 +64,15 @@ document.getElementById("my_stream").setAttribute("class", "active");
         </div>
     </div>
 
-    {% if post.author == loggedInAuthor %}
-    <div class="media-body post-action-icons">
-        <a href="{% url 'post_edit' post.id %}"><button class="btn btn-default action-icon edit-post"><i class="fa fa-pencil-square-o"></i></button></a>
-        <button class="btn btn-default action-icon delete-post" id='delete-post-{{ post.id }}'><i class="fa fa-trash-o"></i></button>
-    </div>
-    {% else %}
-    <div class="media-body post-action-icons placeholder">
-    </div>
-    {% endif %}
+      {% if loggedInAuthor.id|stringformat:"s" == post.author.id %}
+        <div class="media-body post-action-icons">
+          <a href="{% url 'post_edit' post.id %}"><button class="btn btn-default action-icon edit-post"><i class="fa fa-pencil-square-o"></i></button></a>
+          <button class="btn btn-default action-icon delete-post" id='delete-post-{{ post.id }}'><i class="fa fa-trash-o"></i></button>
+        </div>
+      {% else %}
+        <div class="media-body post-action-icons placeholder">
+        </div>
+      {% endif %}
 </div>
 {% endfor %}
 {% endblock %}

@@ -238,8 +238,10 @@ def get_team7(author_id):
     try:
         # checks what node it is on and returns the public posts from that node
         url = "http://mighty-cliffs-82717.herokuapp.com/api/author/"+str(author_id)+"/posts/"
+        print url
         opener = urllib2.build_opener(urllib2.HTTPHandler)
         req = urllib2.Request(url)
+        print "IN HERE TEAM 7"
         # set credentials on request
         req.add_header("Authorization", "Basic " + base64.b64encode(credentials["http://mighty-cliffs-82717.herokuapp.com/"]))
         x = opener.open(req)
