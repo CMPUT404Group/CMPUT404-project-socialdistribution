@@ -871,8 +871,8 @@ def isAllowed(viewer,post):
     elif privacy == "FRIENDS" or privacy == "FOAF":
         #get the author's friends
         friend_id = post["author"]["id"]
-        friends = get_APIFriends(friend_id)
-        if viewer_id in friends:
+        friends = [ str(id) for id in get_APIFriends(friend_id) ]
+        if str(viewer_id) in friends:
             return True
         elif privacy == "FOAF":
             #check the friend of friends
