@@ -543,8 +543,11 @@ def explore_post(request, node_id, post_id):
                     comments = []
                     # displays the date nicely
                     for comment in post["comments"]:
-                        comment1 = formatDate(comment)
-                        comments.append(comment1)
+                        try:
+                            comment1 = formatDate(comment)
+                            comments.append(comment1)
+                        except:
+                            comments.append(comment)
                     post["comments"] = comments
                     return render(request, 'post/postDetail.html', {'remote':True, 'post': post, 'commentForm': commentForm, 'loggedInAuthor': author, 'node': node})
                 else:
