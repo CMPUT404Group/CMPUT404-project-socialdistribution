@@ -296,6 +296,7 @@ Get a single post from someone's API
 def get_APIPost(post_id, host, header):
     #checks what node it is on and returns the public posts from that node
     url = host+str(post_id)
+    print url
     opener = urllib2.build_opener(urllib2.HTTPHandler)
     req = urllib2.Request(url)
     # set credentials on request
@@ -678,7 +679,10 @@ def post_detail(request, post_pk):
         local = True
         try:
             post = get_APIPost(post_pk,settings.LOCAL_URL + "posts/","Basic " + base64.b64encode("test:test"))
-            # post = PostSerializer(Post.objects.get(id=post_pk)).data
+            print "1 : ",
+            print post
+            post = PostSerializer(Post.objects.get(id=post_pk)).data
+            print "2 : ",
             print post
             Found = True
             comments = []
