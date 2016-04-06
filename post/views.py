@@ -958,8 +958,11 @@ def postChangeUserPassword(request, profile_owner):
 
 # fix date formatting
 def formatDate(post):
-    date = datetime.strptime(post['published'][0:10], "%Y-%m-%d")
-    time = datetime.strptime(post['published'][11:16], "%H:%M")
-    date_time = datetime.combine(date, datetime.time(time))
-    post['published'] = date_time.strftime("%b %d, %Y, %-I:%M %p")
+    try:
+        date = datetime.strptime(post['published'][0:10], "%Y-%m-%d")
+        time = datetime.strptime(post['published'][11:16], "%H:%M")
+        date_time = datetime.combine(date, datetime.time(time))
+        post['published'] = date_time.strftime("%b %d, %Y, %-I:%M %p")
+    except:
+        return post
     return post
