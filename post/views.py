@@ -294,6 +294,10 @@ def get_team8(author_id):
 Get a single post from someone's API
 '''
 def get_APIPost(post_id, host, header):
+    print "**  IN GET APIPOST :"
+    print host
+    print post_id
+
     if host == settings.LOCAL_URL + "posts/":
         print "ZERO LOCAL"
         post = PostSerializer(Post.objects.get(id=post_id)).data
@@ -304,9 +308,7 @@ def get_APIPost(post_id, host, header):
 
 
 
-    print "**  IN GET APIPOST :"
-    print host
-    print post_id
+
     #checks what node it is on and returns the public posts from that node
     url = host+str(post_id)
     print "URL : ",
@@ -748,9 +750,9 @@ def post_detail(request, post_pk):
         except urllib2.HTTPError, e:
             print("Not a local Post. Error: "+str(e.code))
             local = False
-        # except Post.DoesNotExist as e:
-        #     print("Post is not local. Error: " + str(e))
-        #     local = False
+        except Post.DoesNotExist as e:
+            print("Post is not local. Error: " + str(e))
+            local = False
 
         try:
             post = get_APIPost(post_pk,t5_url+"api/posts/", t5_h)
