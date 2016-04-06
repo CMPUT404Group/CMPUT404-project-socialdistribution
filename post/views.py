@@ -525,7 +525,7 @@ def send_comment(request, post_id, node_id=None):
         url = settings.LOCAL_URL + "posts/" + post_id +"/comments/"
         creds = base64.b64encode("test:test")
         headers = {"Authorization" : "Basic " + creds}
-    print comments
+    print comment
     print headers
     print url
     r = requests.post(url, json=comment, headers=headers)
@@ -746,6 +746,7 @@ def post_detail(request, post_pk):
 
                 # if (isAllowed(viewer,post)):
                 if request.method == "POST":
+                    print "4 : send_comment call"
                     response = send_comment(request, post_pk, None)
                 form = CommentForm()
                 author = Author.objects.get(user=request.user)
