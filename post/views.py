@@ -751,6 +751,11 @@ def post_detail(request, post_pk):
                 if request.method == "POST":
                     print "4 : send_comment call"
                     response = send_comment(request, post_pk, None)
+                    if ((response.status_code == 201) or (response.status_code == 200)):
+                        return HttpResponseRedirect(reverse('post_detail_success', kwargs={'post_pk': post_pk}))
+                    else:
+                        return render(request, "404_page.html", {'message': response.status_code + " Comment Failed to Post",'loggedInAuthor': viewer},status=404)
+
                 form = CommentForm()
                 author = Author.objects.get(user=request.user)
                 return render(request, 'post/postDetail.html', {'remote':True,'post': post, 'commentForm': form, 'loggedInAuthor': author})
