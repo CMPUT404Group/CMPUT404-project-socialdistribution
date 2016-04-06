@@ -525,6 +525,9 @@ def send_comment(request, post_id, node_id=None):
         url = settings.LOCAL_URL + "posts/" + post_id +"/comments/"
         creds = base64.b64encode("test:test")
         headers = {"Authorization" : "Basic " + creds}
+        print "C3"
+
+    print "C4"
     print comment
     print headers
     print url
