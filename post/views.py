@@ -489,6 +489,8 @@ def get_APIFriends_myStream(person_id, person_host):
 Create Comment to send to remote host
 '''
 def send_comment(request, post_id, node_id=None):
+    print "IN SEND COMMENT"
+
     data = request.POST
     author = Author.objects.get(user=request.user)
     comment = {}
@@ -502,6 +504,7 @@ def send_comment(request, post_id, node_id=None):
     comment["author"]["url"] = author.url
     comment["visibility"] = "PUBLIC"
     comment["author"]["url"] = settings.LOCAL_URL + "author/"+str(author.id)
+    print "C1"
     #send it to a remote host
     if node_id != None:
         node = Node.objects.get(id=node_id)
@@ -518,10 +521,15 @@ def send_comment(request, post_id, node_id=None):
 
     #send it to a local host
     else:
+        print "C2"
         url = settings.LOCAL_URL + "posts/" + post_id +"/comments/"
         creds = base64.b64encode("test:test")
         headers = {"Authorization" : "Basic " + creds}
+    print comments
+    print headers
+    print url
     r = requests.post(url, json=comment, headers=headers)
+    print r
 
 '''
 Renders the post clicked from the explore page
