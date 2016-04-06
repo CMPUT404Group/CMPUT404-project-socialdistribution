@@ -633,7 +633,7 @@ def my_stream(request):
                     posts.append(post)
 
         minePosts = get_APIAuthorPosts(viewer_id)
-        for post in posts_all:
+        for post in minePosts:
             posts.append(post)
 
         #orders from newest to oldest
@@ -688,9 +688,9 @@ def post_detail(request, post_pk):
             post = get_APIPost(post_pk,settings.LOCAL_URL + "posts/","Basic " + base64.b64encode("test:test"))
             print "1 : ",
             print post
-            post = PostSerializer(Post.objects.get(id=post_pk)).data
-            print "2 : ",
-            print post
+            # post = PostSerializer(Post.objects.get(id=post_pk)).data
+            # print "2 : ",
+            # print post
             Found = True
             comments = []
             # displays the date nicely
@@ -703,14 +703,14 @@ def post_detail(request, post_pk):
                     # format date for remote posts
                     post = formatDate(post)
 
-                if (isAllowed(viewer,post)):
-                    if request.method == "POST":
-                        response = send_comment(request, post_pk, None)
-                    form = CommentForm()
-                    author = Author.objects.get(user=request.user)
-                    return render(request, 'post/postDetail.html', {'remote':True,'post': post, 'commentForm': form, 'loggedInAuthor': author})
-                else:
-                    return HttpResponseForbidden("You are not allowed to access this page")
+                # if (isAllowed(viewer,post)):
+                if request.method == "POST":
+                    response = send_comment(request, post_pk, None)
+                form = CommentForm()
+                author = Author.objects.get(user=request.user)
+                return render(request, 'post/postDetail.html', {'remote':True,'post': post, 'commentForm': form, 'loggedInAuthor': author})
+                # else:
+                    # return HttpResponseForbidden("You are not allowed to access this page")
             else:
                 return render(request, "404_page.html", {'message': "Post Not Found",'loggedInAuthor': viewer},status=404)
 
