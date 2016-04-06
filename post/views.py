@@ -682,7 +682,10 @@ def my_stream(request):
         form = PostForm()
 
         # not working again - sorry
-        # posts = sort_posts(posts)
+        # displays the date nicely
+        for post in posts:
+            post = formatDate(post)
+        posts = sort_posts(posts)
 
         return render(request, 'post/myStream.html', {'posts': posts, 'form': form, 'loggedInAuthor': author, 'followList': followList})
     else:
@@ -694,11 +697,13 @@ def sort_posts(posts):
     sorted_posts = []
     all_dates = []
     all_dates2 = []
-    oldest = datetime.now()
     index = None
 
     for post in posts:
-        date_time = datetime.strptime(post["published"],"%b %d, %Y, %I:%M %p")
+        if isinstance(post["published"],datetime):
+            date_time = post["published"].replace(tzinfo=None)
+        else:
+            date_time = datetime.strptime(post["published"],"%b %d, %Y, %I:%M %p")
         all_dates.append(date_time)
         all_dates2.append(date_time)
 
