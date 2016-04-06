@@ -294,11 +294,18 @@ def get_team8(author_id):
 Get a single post from someone's API
 '''
 def get_APIPost(post_id, host, header):
+    print "**  IN GET APIPOST :"
+    print host
+    print post_id
     #checks what node it is on and returns the public posts from that node
     url = host+str(post_id)
+    print "URL : ",
     print url
     opener = urllib2.build_opener(urllib2.HTTPHandler)
+    print "one"
     req = urllib2.Request(url)
+    print "two"
+    print req
     # set credentials on request
     print "Header : ",
     print header
@@ -306,12 +313,23 @@ def get_APIPost(post_id, host, header):
     print "Request : ",
     print req
     x = opener.open(req)
+    print "three"
+    print x
     y = x.read()
+    print "four"
+    print y
     jsonResponse = json.loads(y)
+    print "five"
+    print jsonResponse
     if host == "http://mighty-cliffs-82717.herokuapp.com/api/posts/":
         jsonResponse = jsonResponse["post"]
     postSerializer = PostSerializer(jsonResponse)
-    return formatDate(postSerializer.data)
+    print "six"
+    print postSerializer.data
+    returnValue = formatDate(postSerializer.data)
+    print "seven"
+    print returnValue
+    return returnValue
 
 '''
 Get all the friends for a particular author
@@ -685,12 +703,12 @@ def post_detail(request, post_pk):
         Found = False
         local = True
         try:
-            # post = get_APIPost(post_pk,settings.LOCAL_URL + "posts/","Basic " + base64.b64encode("test:test"))
-            # print "1 : ",
-            # print post
-            post = PostSerializer(Post.objects.get(id=post_pk)).data
-            print "2 : ",
+            post = get_APIPost(post_pk,settings.LOCAL_URL + "posts/","Basic " + base64.b64encode("test:test"))
+            print "1 : ",
             print post
+            # post = PostSerializer(Post.objects.get(id=post_pk)).data
+            # print "2 : ",
+            # print post
             Found = True
             comments = []
             # displays the date nicely
