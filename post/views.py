@@ -296,7 +296,7 @@ Get a single post from someone's API
 def get_APIPost(post_id, host, header):
     if host == settings.LOCAL_URL + "posts/":
         print "ZERO LOCAL"
-        post = PostSerializer(Post.objects.get(id=post_pk)).data
+        post = PostSerializer(Post.objects.get(id=post_id)).data
         print "ZERO POST DATA : ",
         returnValue = formatDate(post)
         print returnValue
