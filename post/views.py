@@ -685,12 +685,12 @@ def post_detail(request, post_pk):
         Found = False
         local = True
         try:
-            post = get_APIPost(post_pk,settings.LOCAL_URL + "posts/","Basic " + base64.b64encode("test:test"))
-            print "1 : ",
-            print post
-            # post = PostSerializer(Post.objects.get(id=post_pk)).data
-            # print "2 : ",
+            # post = get_APIPost(post_pk,settings.LOCAL_URL + "posts/","Basic " + base64.b64encode("test:test"))
+            # print "1 : ",
             # print post
+            post = PostSerializer(Post.objects.get(id=post_pk)).data
+            print "2 : ",
+            print post
             Found = True
             comments = []
             # displays the date nicely
@@ -698,6 +698,9 @@ def post_detail(request, post_pk):
                 comment1 = formatDate(comment)
                 comments.append(comment1)
             post["comments"] = comments
+            print
+            print "3 : ",
+            print post
             if Found == True:
                 if local == False:
                     # format date for remote posts
