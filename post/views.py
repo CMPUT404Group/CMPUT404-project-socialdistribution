@@ -533,6 +533,7 @@ def send_comment(request, post_id, node_id=None):
     print url
     r = requests.post(url, json=comment, headers=headers)
     print vars(r)
+    return r
 
 '''
 Renders the post clicked from the explore page
