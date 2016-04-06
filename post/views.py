@@ -300,7 +300,11 @@ def get_APIPost(post_id, host, header):
     opener = urllib2.build_opener(urllib2.HTTPHandler)
     req = urllib2.Request(url)
     # set credentials on request
+    print "Header : ",
+    print header
     req.add_header("Authorization", header)
+    print "Request : ",
+    print req
     x = opener.open(req)
     y = x.read()
     jsonResponse = json.loads(y)

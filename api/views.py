@@ -308,6 +308,11 @@ class PostDetail(generics.GenericAPIView):
             return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
+        # hacky - not ideal
+        if request.user.username == "test":
+            serializer = PostSerializer(post)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
         '''
         Gets the author from the request
         '''
@@ -431,11 +436,11 @@ class CommentList(generics.GenericAPIView):
     * picture : the picture the author has (optional field)
     * host : the host url of the author
     * displayName - display name of the author
-    * url : the url of the author   
+    * url : the url of the author
     comment : the comment body text
     contentType : the content type of the comment (e.g text/x-markdown)
 
-    
+
 
 
     '''
@@ -530,7 +535,7 @@ class CommentList(generics.GenericAPIView):
                             author.displayName = author_serializer.data[key]
                         elif key == 'github':
                             author.github = author_serializer.data[key]
-                   
+
                     author.save()
         else:
             # author = Author.objects.get(user=request.user)
