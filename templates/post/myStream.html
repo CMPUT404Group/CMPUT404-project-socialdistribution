@@ -25,7 +25,7 @@ document.getElementById("my_stream").setAttribute("class", "active");
          data-toggle="tooltip" title="{{ post.author.displayName }}"
          alt="Profile Image"
         {% if post.author.picture %}
-         src="/media/{{ post.author.picture }}"/>
+         src="{{ post.author.picture }}"/>
         {% else %}
          src="http://placehold.it/50x50"/>
         {% endif %}

@@ -11,7 +11,7 @@
 			 data-toggle="tooltip" title="{{ post.author.displayName }}"
 			 alt="Profile Image"
 			{% if post.author.picture %}
-			 src="/media/{{ post.author.picture }}"/>
+			 src="{{ post.author.picture }}"/>
 			{% else %}
 			 src="http://placehold.it/50x50"/>
 			{% endif %}
@@ -65,7 +65,7 @@
 					 data-toggle="tooltip" title="{{ comment.author.displayName }}"
 					 alt="Profile Image"
 					{% if comment.author.picture %}
-					 src="/media/{{ comment.author.picture }}"/>
+					 src="{{ comment.author.picture }}"/>
 					{% else %}
 					 src="http://placehold.it/35x35"/>
 					{% endif %}
