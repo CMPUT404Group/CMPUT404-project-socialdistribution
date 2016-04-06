@@ -504,6 +504,7 @@ class CommentList(generics.GenericAPIView):
     def post(self, request, post_pk, format=None):
         # ensure user is authenticated
         if (not request.user.is_authenticated()):
+            print "NOT AUTHENTICATED"
             return Response({'message':'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
         data = request.data
@@ -548,6 +549,7 @@ class CommentList(generics.GenericAPIView):
         author_id = author.id
         try:
             if (isAllowed(post_pk, author_id)):
+                print "IS ALLOWED COMMENT POST"
                 serializer = CommentSerializer(data=data)
 
                 if serializer.is_valid():
@@ -561,6 +563,7 @@ class CommentList(generics.GenericAPIView):
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
             else:
+                print "NOT ALLOWED COMMENT POST"
                 return Response({"message": "User is not allowed to see this post/comment"}, status=status.HTTP_403_FORBIDDEN)
 
         except Post.DoesNotExist as e:
